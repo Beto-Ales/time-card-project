@@ -7,9 +7,8 @@ const cors = require('cors')
 
 // replace routers
 // ---------------
-// const notesRouter = require('./controllers/notes')
-// const usersRouter = require('./controllers/users')
-// const loginRouter = require('./controllers/login')
+const usersRouter = require('./controllers/users')
+const loginRouter = require('./controllers/login')
 // ---------------
 
 const hoursRouter = require('./controllers/hours')
@@ -38,12 +37,12 @@ app.use(middleware.requestLogger)
 
 // replace
 // -------
-// app.use('/api/login', loginRouter)
-// app.use('/api/notes', notesRouter)
-// app.use('/api/users', usersRouter)
+app.use('/api/login', loginRouter)
+app.use('/api/hours', hoursRouter)
+app.use('/api/users', usersRouter)
 // -------
 
-app.use('/api/hours', hoursRouter)
+
 
 
 app.use(middleware.unknownEndpoint)
