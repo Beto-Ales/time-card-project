@@ -1,12 +1,11 @@
 const mongoose = require('mongoose')
 
 const userSchema = new mongoose.Schema({
-    username: {
-        type: String,
-        unique: true
-    },
-    name: String,
-    lastName: String,
+    username: String,
+    // remove?
+    // -------
+    // name: String,
+    // lastName: String,
     passwordHash: String,
     hours: [{
         type: mongoose.Schema.Types.ObjectId,

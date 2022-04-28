@@ -10,10 +10,10 @@ const hourSchema = new mongoose.Schema({
             endWork: {
                 type: Number,
                 required: true
-            } 
+            },
+            totalNormal: Number,
+            totalSpecial: Number
         }],
-        totalNormal: Number,
-        totalSpecial: Number
     }],
     user: {
         type:mongoose.Schema.Types.ObjectId,
