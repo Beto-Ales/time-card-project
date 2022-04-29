@@ -32,7 +32,7 @@ hoursRouter.get('/:id', async (request, response) => {
 hoursRouter.post('/', async (request, response) => {
     // check request.body
     // row object?
-    const { grid, row, startWork, endWork } = request.body
+    const { grid, row, startWork, endWork, totalNormal, totalSpecial } = request.body
 
     // const token = getTokenFrom(request)  temporal
 
@@ -48,7 +48,9 @@ hoursRouter.post('/', async (request, response) => {
         grid,
         row,
         startWork,
-        endWork,        
+        endWork,
+        totalNormal,
+        totalSpecial     
     })
 
     const savedHours = await hours.save()
