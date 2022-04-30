@@ -23,8 +23,16 @@ const errorHandler = (error, request, response, next) => {
     next(error)
 }
 
+const calcSpecialHours = (request, response, next) => {
+    request.body.grid[0].row[0].totalNormal = request.body.grid[0].row[0].startWork * 2
+    request.body.grid[0].row[0].totalSpecial = request.body.grid[0].row[0].endWork * 3
+    console.log('startWork', request.body.grid[0].row[0].startWork, 'totalNormal', request.body.grid[0].row[0].totalNormal, 'totalSpecial', request.body.grid[0].row[0].totalSpecial);
+    next()
+}
+
 module.exports = {
     requestLogger,
     unknownEndpoint,
-    errorHandler
+    errorHandler,
+    calcSpecialHours
 }
