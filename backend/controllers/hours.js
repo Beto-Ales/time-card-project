@@ -34,13 +34,17 @@ hoursRouter.post('/', async (request, response) => {
     // row object?
     const { grid, row, startWork, endWork, totalNormal, totalSpecial } = request.body
 
-    // const token = getTokenFrom(request)  temporal
+    const token = getTokenFrom(request)
 
-    // const decodedToken = jwt.verify(token, process.env.SECRET)
-    // if (!token || !decodedToken.id) {
-    //     return response.status(401).json({ error: 'token missing or invalid' })
-    // }
-    // const user = await User.findById(decodedToken.id)
+    const decodedToken = jwt.verify(token, process.env.SECRET)
+    if (!token || !decodedToken.id) {
+        return response.status(401).json({ error: 'token missing or invalid' })
+    }
+    const user = await User.findById(decodedToken.id)
+
+    if (!(user.username === 'beto')) {
+        return response.status(401).json({ error: 'acces denied' })
+    }
 
     
 
@@ -54,8 +58,8 @@ hoursRouter.post('/', async (request, response) => {
     })
 
     const savedHours = await hours.save()
-    // user.hours = user.hours.concat(savedHours._id)
-    // await user.save()
+    user.hours = user.hours.concat(savedHours._id)
+    await user.save()
 
     response.status(201).json(savedHours)
 })
