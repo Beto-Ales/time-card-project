@@ -33,7 +33,7 @@ app.use(cors())
 // app.use(express.static('build'))
 app.use(express.json())
 app.use(middleware.requestLogger)
-app.use(middleware.calcSpecialHours)
+// app.use(middleware.calcSpecialHours) should be done by the frontend
 
 
 // replace
