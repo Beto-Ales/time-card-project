@@ -23,21 +23,23 @@ const mongoose = require('mongoose')
 
 const hourSchema = new mongoose.Schema({
     month: String,
-        days: [{
-            dayNumber: {
-                type: String,
-                required: true
-            },
-            startWork: {
-                type: String,
-                required: true
-            },
-            endWork: {
-                type: String,
-                required: true
-            },
-            totalHours: String
-        }],
+    days: [{
+        dayNumber: {
+            type: String,
+            required: true
+        },
+        startWork: {
+            type: String,
+            required: true
+        },
+        endWork: {
+            type: String,
+            required: true
+        },
+        totalHours: String
+    }],
+
+    monthHours: String,
     
     user: {
         type:mongoose.Schema.Types.ObjectId,

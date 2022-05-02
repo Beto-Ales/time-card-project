@@ -1,5 +1,5 @@
 const hoursRouter = require('express').Router()
-const jwt = require('jsonwebtoken')
+// const jwt = require('jsonwebtoken')  delete
 
 const Hours = require('../models/hours')
 const User = require('../models/user')
@@ -24,7 +24,7 @@ hoursRouter.get('/:id', async (request, response) => {
 
 hoursRouter.post('/', async (request, response) => {
     
-    const { month, days, dayNumber, startWork, endWork, totalHours } = request.body
+    const { month, days, dayNumber, startWork, endWork, totalHours, monthHours } = request.body
     
     const user = await User.findById(request.user.id)
 
@@ -42,7 +42,9 @@ hoursRouter.post('/', async (request, response) => {
         dayNumber,
         startWork,
         endWork,
-        totalHours     
+        totalHours,
+        monthHours,
+        user: user._id
     })
 
     const savedHours = await hours.save()
@@ -52,25 +54,39 @@ hoursRouter.post('/', async (request, response) => {
     response.status(201).json(savedHours)
 })
 
-hoursRouter.put('/:id', (request, response, next) => {
-    const body = request.body
+hoursRouter.put('/:id', async (request, response) => {
+    const hours = await Hours.findById(request.params.id)
+    const { month, days, dayNumber, startWork, endWork, totalHours, monthHours } = request.body
 
-    const note = {
-        content: body.content,
-        important: body.important
+    const user = await User.findById(request.user.id)
+
+    if (!user) {
+        return response.status(401).json({ error: 'token missing or invalid' })
     }
 
-    Note
-        .findByIdAndUpdate(request.params.id, note, { new: true })
-        .then(updatedNote => {
-            response.json(updatedNote)
-        })
-        .catch(error => next(error))
+    const hoursUpdate = {
+        month,
+        days,
+        dayNumber,
+        startWork,
+        endWork,
+        totalHours,
+        monthHours        
+    }
+
+    if (hours.user.toString() === request.user.id) {
+        const updatedHours = await Hours.findByIdAndUpdate(request.params.id, hoursUpdate, { new: true })
+        response.status(200).json(updatedHours)
+    }
 })
 
 hoursRouter.delete('/:id', async (request, response) => {
-    await Note.findByIdAndRemove(request.params.id)
-    response.status(204).end()
+    const hours = await Hours.findById(request.params.id)
+
+    if (hours.user.toString() === request.user.id) {
+        await Hours.findByIdAndRemove(hours.id)
+        response.status(204).end()
+    }
 })
 
 module.exports = hoursRouter
