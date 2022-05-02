@@ -26,6 +26,7 @@ hoursRouter.post('/', async (request, response) => {
     
     const { month, days, dayNumber, startWork, endWork, totalHours, monthHours } = request.body
     
+    // check superuser
     const user = await User.findById(request.user.id)
 
     if (!user) {
