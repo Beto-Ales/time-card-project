@@ -4,13 +4,6 @@ const jwt = require('jsonwebtoken')
 const Hours = require('../models/hours')
 const User = require('../models/user')
 
-const getTokenFrom = request => {
-    const authorization = request.get('authorization')
-    if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-        return authorization.substring(7)
-    }
-    return null
-}
 
 hoursRouter.get('/', async (request, response) => {
     const hours = await Hours
