@@ -1,20 +1,44 @@
 const mongoose = require('mongoose')
 
+// const hourSchema = new mongoose.Schema({
+//     grid: [{
+//         row: [{
+//             startWork: {
+//                 type: Number,
+//                 required: true
+//             },
+//             endWork: {
+//                 type: Number,
+//                 required: true
+//             },
+//             totalNormal: Number,
+//             totalSpecial: Number
+//         }],
+//     }],
+//     user: {
+//         type:mongoose.Schema.Types.ObjectId,
+//         ref: 'User'
+//     }
+// })
+
 const hourSchema = new mongoose.Schema({
-    grid: [{
-        row: [{
+    month: String,
+        days: [{
+            dayNumber: {
+                type: String,
+                required: true
+            },
             startWork: {
-                type: Number,
+                type: String,
                 required: true
             },
             endWork: {
-                type: Number,
+                type: String,
                 required: true
             },
-            totalNormal: Number,
-            totalSpecial: Number
+            totalHours: String
         }],
-    }],
+    
     user: {
         type:mongoose.Schema.Types.ObjectId,
         ref: 'User'

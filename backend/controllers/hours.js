@@ -32,7 +32,7 @@ hoursRouter.get('/:id', async (request, response) => {
 hoursRouter.post('/', async (request, response) => {
     // check request.body
     // row object?
-    const { grid, row, startWork, endWork, totalNormal, totalSpecial } = request.body
+    const { month, days, dayNumber, startWork, endWork, totalHours } = request.body
 
     const token = getTokenFrom(request)
 
@@ -49,12 +49,12 @@ hoursRouter.post('/', async (request, response) => {
     
 
     const hours = new Hours({
-        grid,
-        row,
+        month,
+        days,
+        dayNumber,
         startWork,
         endWork,
-        totalNormal,
-        totalSpecial     
+        totalHours     
     })
 
     const savedHours = await hours.save()
