@@ -36,12 +36,13 @@ app.use(middleware.requestLogger)
 // app.use(middleware.calcSpecialHours) should be done by the frontend
 
 
-// replace
-// -------
+app.use(middleware.tokenExtractor)
+app.use(middleware.userExtractor)
+
 app.use('/api/login', loginRouter)
 app.use('/api/hours', hoursRouter)
 app.use('/api/users', usersRouter)
-// -------
+
 
 
 

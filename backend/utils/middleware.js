@@ -1,10 +1,36 @@
 const logger = require('./logger')
+const jwt = require('jsonwebtoken')
+const User = require('../models/user')
 
 const requestLogger = (request, response, next) => {
     logger.info('Method', request.method)
     logger.info('Path', request.path)
     logger.info('Body', request.body)
     logger.info('---')
+    next()
+}
+
+const getTokenFrom = request => {
+    const authorization = request.get('authorization')
+    if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
+        return authorization.substring(7)
+    }
+    return null
+}
+
+const decodedToken = request => {
+    return jwt.verify(request.token, process.env.SECRET)
+}
+
+const tokenExtractor = (request, response, next) => {
+    request.token = getTokenFrom(request)
+    logger.info('token', request.token)
+    next()
+}
+
+const userExtractor = async (request, response, next) => {
+    request.user = await User.findById(decodedToken(request).id)
+    logger.info('user', request.user.toString())
     next()
 }
 
@@ -34,5 +60,7 @@ module.exports = {
     requestLogger,
     unknownEndpoint,
     errorHandler,
+    tokenExtractor,
+    userExtractor
     // calcSpecialHours
 }

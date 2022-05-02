@@ -30,23 +30,18 @@ hoursRouter.get('/:id', async (request, response) => {
 })
 
 hoursRouter.post('/', async (request, response) => {
-    // check request.body
-    // row object?
+    
     const { month, days, dayNumber, startWork, endWork, totalHours } = request.body
+    
+    const user = await User.findById(request.user.id)
 
-    const token = getTokenFrom(request)
-
-    const decodedToken = jwt.verify(token, process.env.SECRET)
-    if (!token || !decodedToken.id) {
+    if (!user) {
         return response.status(401).json({ error: 'token missing or invalid' })
     }
-    const user = await User.findById(decodedToken.id)
 
     if (!(user.username === 'beto')) {
         return response.status(401).json({ error: 'acces denied' })
-    }
-
-    
+    }    
 
     const hours = new Hours({
         month,
