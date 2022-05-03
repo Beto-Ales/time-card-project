@@ -40,6 +40,8 @@ const hourSchema = new mongoose.Schema({
     }],
 
     monthHours: String,
+
+    date: Date,
     
     user: {
         type:mongoose.Schema.Types.ObjectId,

@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
     // name: String,
     // lastName: String,
     passwordHash: String,
+    date: Date,
     hours: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Hour'
