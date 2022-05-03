@@ -9,6 +9,7 @@ const cors = require('cors')
 // ---------------
 const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
+const createUsersRouter = require('./controllers/createUser')
 // ---------------
 
 const hoursRouter = require('./controllers/hours')
@@ -36,10 +37,12 @@ app.use(middleware.requestLogger)
 // app.use(middleware.calcSpecialHours) should be done by the frontend
 
 
+app.use('/api/login', loginRouter)  // declare this first to avoid token problems
+app.use('/api/createUser', createUsersRouter)    // declare this first to avoid token problems
+
 app.use(middleware.tokenExtractor)
 app.use(middleware.userExtractor)
 
-app.use('/api/login', loginRouter)
 app.use('/api/hours', hoursRouter)
 app.use('/api/users', usersRouter)
 

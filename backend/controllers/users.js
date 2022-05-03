@@ -1,7 +1,8 @@
-const bcrypt = require('bcrypt')
+// const bcrypt = require('bcrypt')
 const usersRouter = require('express').Router()
 const User = require('../models/user')
 
+// get all the users
 usersRouter.get('/', async (request, response) => {
     // check superuser
     const superuser = await User.findById(request.user.id)
@@ -20,6 +21,7 @@ usersRouter.get('/', async (request, response) => {
     response.json(users)
 })
 
+// get one user
 usersRouter.get('/:id', async (request, response) => {
     // check superuser
     const superuser = await User.findById(request.user.id)
@@ -28,7 +30,7 @@ usersRouter.get('/:id', async (request, response) => {
         return response.status(401).json({ error: 'token missing or invalid' })
     }
 
-    if (!(superuser.username === 'beto')) {
+    if (!(superuser.username === 'beto') || !(request.params.id == request.user.id)) {
         return response.status(401).json({ error: 'access denied' })
     }
     
@@ -43,27 +45,27 @@ usersRouter.get('/:id', async (request, response) => {
 
 })
 
-usersRouter.post('/', async (request, response) => {
-    const { username, password } = request.body
+// usersRouter.post('/', async (request, response) => {
+//     const { username, password } = request.body
 
-    const existingUser = await User.findOne({ username })
+//     const existingUser = await User.findOne({ username })
 
-    if (existingUser) {
-        return response.status(400).json({ error: 'username must be unique' })
-    }
+//     if (existingUser) {
+//         return response.status(400).json({ error: 'username must be unique' })
+//     }
 
-    const saltRounds = 10
-    const passwordHash = await bcrypt.hash(password, saltRounds)
+//     const saltRounds = 10
+//     const passwordHash = await bcrypt.hash(password, saltRounds)
 
-    const user = new User({
-        username,        
-        passwordHash,
-    })
+//     const user = new User({
+//         username,        
+//         passwordHash,
+//     })
 
-    const savedUser = await user.save()
+//     const savedUser = await user.save()
 
-    response.json(savedUser)
-})
+//     response.json(savedUser)
+// })
 
 usersRouter.delete('/:id', async (request, response) => {
     await User.findByIdAndRemove(request.params.id)
