@@ -68,6 +68,17 @@ usersRouter.get('/:id', async (request, response) => {
 // })
 
 usersRouter.delete('/:id', async (request, response) => {
+    // check superuser
+    const user = await User.findById(request.user.id)
+
+    if (!user) {
+        return response.status(401).json({ error: 'token missing or invalid' })
+    }
+
+    if (!(user.username === 'beto')) {
+        return response.status(401).json({ error: 'acces denied' })
+    }
+    
     await User.findByIdAndRemove(request.params.id)
     response.status(204).end()
 })
