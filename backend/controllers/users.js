@@ -17,7 +17,7 @@ usersRouter.get('/', async (request, response) => {
 
     const users = await User
         .find({})
-        .populate('hours', { content: 1, date: 1 })
+        .populate('hours', { month: 1, days: 1, monthHours: 1, date: 1 })
     response.json(users)
 })
 

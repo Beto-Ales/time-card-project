@@ -7,7 +7,7 @@ const User = require('../models/user')
 hoursRouter.get('/', async (request, response) => {
     const hours = await Hours
         .find({})
-        .populate('user', { username: 1, name: 1 })
+        .populate('user', { username: 1, id: 1 })       // check id parameter or remove
     response.json(hours)
 })
 
@@ -53,6 +53,7 @@ hoursRouter.post('/', async (request, response) => {
         endWork,
         totalHours,
         monthHours,
+        date: new Date(),
         user: user._id
     })
 
