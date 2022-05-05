@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import loginService from './services/login'
+import usersService from './services/users'
 import LoginForm from './components/LoginForm'
+import User from './components/User'
 import './App.css'
 
 const App = () => {
@@ -8,6 +10,16 @@ const App = () => {
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
+  const [employees, setEmployees] = useState(null)
+
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedNoteappUser')
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
+      usersService.setToken(user.token)
+    }
+  }, [])
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -15,7 +27,11 @@ const App = () => {
       const user = await loginService.login({
         username, password,
       })
+      usersService.setToken(user.token)
       setUser(user)
+      window.localStorage.setItem(
+        'loggedNoteappUser', JSON.stringify(user)
+      ) 
       setUsername('')
       setPassword('')
     } catch (exception) {
@@ -25,50 +41,50 @@ const App = () => {
         }, 5000)
       }
   }
+
+  const handleGetEmployees = async () => {
+    if (user.username === 'beto') {
+      try {
+        const users = await usersService.getAll()
+        setEmployees(users)
+      } catch (error) {
+          setErrorMessage('Faild getting employees')
+          setTimeout(() => {
+            setErrorMessage(null)
+      }, 5000)
+      }
+    console.log('get employees');
+  }
+  }
   return (
     <div className="App">
-      <header className="App-header">
-        {/* <h1>beto</h1> */}
-        <h1>{errorMessage}</h1>
-        {/* <h1>{JSON.stringify(user)}</h1> */}
-        {/* <h1>{ user.username }</h1> */}
-        {user !== null && <h1>{user.username}</h1>}
+      
+      <header className="App-header">        
+        <h1>{errorMessage}</h1>        
       </header>
 
-      <LoginForm
-        handleLogin={handleLogin}
-        username={username}
-        setUsername={setUsername}
-        password={password}
-        setPassword={setPassword}
-      />
-
-      {/*                         replace with component
-                                  ---------------------- 
-      <h2>Login</h2>
-      <form onSubmit={handleLogin}>
-        <div>
-          username
-            <input
-            type="text"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUsername(target.value)}
-          />
-        </div>
-        <div>
-          password
-            <input
-            type="password"
-            value={password}
-            name="Password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </div>
-        <button type="submit">login</button>
-      </form> 
-                                  ----------------------    
-      */}
+      {user === null ?
+        <LoginForm
+          handleLogin={handleLogin}
+          username={username}
+          setUsername={setUsername}
+          password={password}
+          setPassword={setPassword}
+        /> :
+        <User
+          user={user}
+          handleGetEmployees={handleGetEmployees}
+          employees={employees}
+        />
+        // <div>
+        //   <h1>{user.username}</h1>
+        //   <br/>
+        //   <button onClick={() => handleGetEmployees()}>Get employees</button>
+        //   <User
+        //     employees={employees}
+        //   />
+        // </div>
+      }            
     </div>
   )
 }
