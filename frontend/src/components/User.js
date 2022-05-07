@@ -1,49 +1,42 @@
 import React from 'react'
 
-// const User = ({ employees }) => {
-//   return (
-//     <ul>
-//         {
-//             employees &&
-//             employees.map(user =>
-//                 <li key={user.id}>{user.username}</li>
-//             )
-//         }
-//     </ul>
-//   )
-// }
-
 const User = ({ user, handleGetEmployees, employees }) => {
-  const handleGethours = () => {
-    let hours = []
-    employees &&
-    employees.map(employee => hours.concat(employee.hours))
-    console.log(hours[hours.length - 1])
-    console.log(hours);
-  }
+
+  employees &&
+  employees.map(employee => employee.hours.reverse())
+  
+  // is it necesary?
+  // ---------------
+  // let reverse = true
+  // if (reverse) {
+  //   employees &&
+  //   employees.map(employee => employee.hours.reverse())
+  //   reverse = false
+  // }
   
   return (
     <div>
       <h1>{ user.username }</h1>
       <br/>
       <button onClick={() => handleGetEmployees()}>Get employees</button>
-      <button onClick={() => handleGethours()}>Get hours</button>
-
       <ul>
         {
             employees &&
             employees.filter(worker => worker.username !== user.username).map(employee =>
                 <li key={employee.username}>
-                  <b>name: </b>{employee.username}
+                  <b>Name: </b>{employee.username}
                   <br/>
                   {console.log(employee)}
-                  <b>date: </b>{employee.hours[1].date}
+                  <b>Last update: </b>{employee.hours[0].date}
                   <br/>
-                  <b>period: </b>{employee.hours[1].month}
+                  <b>Period: </b>{employee.hours[0].month}
                   <br/>
-                  <b>total horus: </b>{employee.hours[1].days[1].totalHours}
+                  <b>total horus: </b>{employee.hours[0].days[0].totalHours}
                   {employee.hours.map(hours => console.log('hours', hours.id))}
+                  {console.log(employee.hours)}
+                  <div style={{backgroundColor: 'black', height: '1em'}}></div>
                 </li>
+                
             )
         }
       </ul>
