@@ -16,6 +16,7 @@ const getAll = async () => {
   }
   
   const response = await axios.get(baseUrl, config)
+  response.data.map(employee => employee.hours.reverse())
   return response.data
 }
 

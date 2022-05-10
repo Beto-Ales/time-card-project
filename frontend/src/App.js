@@ -18,7 +18,7 @@ const App = () => {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
       usersService.setToken(user.token)
-    }
+    }    
   }, [])
 
   const handleLogin = async (event) => {
@@ -40,75 +40,21 @@ const App = () => {
           setErrorMessage(null)
         }, 5000)
       }
-  }
-
-  // useEffect(() => {
-  //   if(user){if (user.username === 'beto') {
-  //     try {
-  //       usersService.getAll()
-  //       // .then(users => users.map(employee => employee.hours.reverse()))
-  //       .then(users => setEmployees(users))
-        
-  //     } catch (error) {
-  //         setErrorMessage('Faild getting employees')
-  //         setTimeout(() => {
-  //           setErrorMessage(null)
-  //     }, 5000)
-  //     }}
-      
-  //     console.log('get employees')
-  //     // doesn't work
-  //     // employees &&
-  //     // employees.map(employee => employee.hours.reverse())
-
-  //   }
-  // }, [user])
+  }  
 
   useEffect(() => {
     if(user){if (user.username === 'beto') {
       try {
-        usersService.getAll()
-        // .then(users => users.map(employee => employee.hours.reverse()))
+        usersService.getAll()        
         .then(users => setEmployees(users))
-        
       } catch (error) {
           setErrorMessage('Faild getting employees')
           setTimeout(() => {
             setErrorMessage(null)
       }, 5000)
       }}
-
-      console.log('get employees')
-
     }
   }, [user])
-
-  useEffect(() => {
-    const reverseHours = async () => {
-      const newOrderUsers = await employees
-      newOrderUsers &&
-      newOrderUsers.map(employee => employee.hours.reverse())
-      console.log('newOrderUsers', newOrderUsers)
-      setEmployees(newOrderUsers)
-    }
-
-    reverseHours()
-    
-    console.log('reverse')
-    // doesn't work
-    // employees &&
-    // employees.map(employee => employee.hours.reverse())
-  }, [employees])
-
-  // useEffect(() => {
-  //   if (employees) {
-  //     const sorted = employees.map(employee => employee.hours.reverse())
-  //     setEmployees(sorted)
-  //     console.log(employees)
-  //   }
-  // }, [employees])
-
-  
 
   return (
     <div className="App">
@@ -126,19 +72,10 @@ const App = () => {
           setPassword={setPassword}
         /> :
         <User
-          user={user}
-          // handleGetEmployees={handleGetEmployees}
+          user={user}          
           employees={employees}
-        />
-        // <div>
-        //   <h1>{user.username}</h1>
-        //   <br/>
-        //   <button onClick={() => handleGetEmployees()}>Get employees</button>
-        //   <User
-        //     employees={employees}
-        //   />
-        // </div>
-      }            
+        />        
+      }
     </div>
   )
 }
