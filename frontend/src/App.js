@@ -42,21 +42,74 @@ const App = () => {
       }
   }
 
-  const handleGetEmployees = async () => {
-    if (user.username === 'beto') {
+  // useEffect(() => {
+  //   if(user){if (user.username === 'beto') {
+  //     try {
+  //       usersService.getAll()
+  //       // .then(users => users.map(employee => employee.hours.reverse()))
+  //       .then(users => setEmployees(users))
+        
+  //     } catch (error) {
+  //         setErrorMessage('Faild getting employees')
+  //         setTimeout(() => {
+  //           setErrorMessage(null)
+  //     }, 5000)
+  //     }}
+      
+  //     console.log('get employees')
+  //     // doesn't work
+  //     // employees &&
+  //     // employees.map(employee => employee.hours.reverse())
+
+  //   }
+  // }, [user])
+
+  useEffect(() => {
+    if(user){if (user.username === 'beto') {
       try {
-        const users = await usersService.getAll()
-        setEmployees(users)
+        usersService.getAll()
+        // .then(users => users.map(employee => employee.hours.reverse()))
+        .then(users => setEmployees(users))
+        
       } catch (error) {
           setErrorMessage('Faild getting employees')
           setTimeout(() => {
             setErrorMessage(null)
       }, 5000)
-      }
-      
+      }}
+
       console.log('get employees')
+
     }
-  }
+  }, [user])
+
+  useEffect(() => {
+    const reverseHours = async () => {
+      const newOrderUsers = await employees
+      newOrderUsers &&
+      newOrderUsers.map(employee => employee.hours.reverse())
+      console.log('newOrderUsers', newOrderUsers)
+      setEmployees(newOrderUsers)
+    }
+
+    reverseHours()
+    
+    console.log('reverse')
+    // doesn't work
+    // employees &&
+    // employees.map(employee => employee.hours.reverse())
+  }, [employees])
+
+  // useEffect(() => {
+  //   if (employees) {
+  //     const sorted = employees.map(employee => employee.hours.reverse())
+  //     setEmployees(sorted)
+  //     console.log(employees)
+  //   }
+  // }, [employees])
+
+  
+
   return (
     <div className="App">
       
@@ -74,7 +127,7 @@ const App = () => {
         /> :
         <User
           user={user}
-          handleGetEmployees={handleGetEmployees}
+          // handleGetEmployees={handleGetEmployees}
           employees={employees}
         />
         // <div>
