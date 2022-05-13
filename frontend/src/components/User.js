@@ -15,7 +15,8 @@ const User = ({ user, employees }) => {
       <br/>      
       <ul>
         {
-            employees &&
+            employees === null ?
+            'Loading' :
             employees.filter(worker => worker.username !== user.username).map(employee =>
                 <li key={employee.username}>                  
                   <button onClick={() => handleGetEmployee(employee)}>                  
