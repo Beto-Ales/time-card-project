@@ -23,20 +23,20 @@ usersRouter.get('/', async (request, response) => {
 
 // get one user
 usersRouter.get('/:id', async (request, response) => {
-    // check superuser
+    // check superuser ? or just check normal user
     const superuser = await User.findById(request.user.id)
 
     if (!superuser) {
         return response.status(401).json({ error: 'token missing or invalid' })
     }
 
-    if (!(superuser.username === 'beto') || !(request.params.id == request.user.id)) {
-        return response.status(401).json({ error: 'access denied' })
-    }
+    // if (!(superuser.username === 'beto') || !(request.params.id == request.user.id)) {
+    //     return response.status(401).json({ error: 'access denied' })
+    // }
     
     const user = await User
         .findById(request.params.id)
-        .populate('hours', { content: 1, date: 1 })
+        .populate('hours', { month: 1, days: 1, monthHours: 1, date: 1 })
     if (user) {
         response.json(user)
     } else {
