@@ -22,9 +22,9 @@ const User = ({ user, employees }) => {
                   <button onClick={() => handleGetEmployee(employee)}>                  
                   <b>Name: </b>{employee.username[0].toUpperCase() + employee.username.slice(1).toLowerCase()}
                   <br/>
-                  <b>Last update: </b>{employee.hours[0].date}
+                  <b>Last update: </b>{employee.hours.length > 0 && employee.hours[0].date}  {/* some employees don't have hours uploaded */}
                   <br/>
-                  <b>Period: </b>{employee.hours[0].month}
+                  <b>Period: </b>{employee.hours.length > 0 && employee.hours[0].month}  {/* some employees don't have hours uploaded */}
                   <br/>
                   </button>
                 </li>
