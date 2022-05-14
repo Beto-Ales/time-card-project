@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import loginService from './services/login'
 import usersService from './services/users'
+import signinService from './services/signin'
 import LoginForm from './components/LoginForm'
 import User from './components/User'
 import TimeCard from './components/TimeCard'
@@ -47,7 +48,27 @@ const App = () => {
           setErrorMessage(null)
         }, 5000)
       }
-  }  
+  }
+  
+  const handleSignin = async (event) => {
+    event.preventDefault()
+    try {
+      const newUser = await signinService.signin({
+        username, password,
+      })       
+      setUsername('')
+      setPassword('')
+      setErrorMessage(JSON.stringify(newUser))  /* maybe newUser.username signed in */
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+    } catch (exception) {
+        setErrorMessage(exception.messagge)
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+      }
+  }
 
   useEffect(() => {
     if(user) {
@@ -91,6 +112,7 @@ const App = () => {
       setUsername={setUsername}
       password={password}
       setPassword={setPassword}
+      handleSignin={handleSignin}
       />
     }else if (user.username === 'beto') {
       return <User
@@ -104,14 +126,32 @@ const App = () => {
     }
   }
 
+  const handleLogout = () => {
+    window.localStorage.removeItem('loggedNoteappUser')
+    setUser(null)
+  }
+
   return (
     <div className="App">
       
       <header className="App-header">        
-        <h1>{errorMessage}</h1>        
+        <h1>{errorMessage}</h1>
+        <br/>
+        {
+          user &&
+          <button onClick={() => handleLogout()}>Logout</button>
+        }
+        
       </header>
 
       {display()}
+      {/* {<SignIn
+        handleSignin={handleSignin}
+        username={username}
+        setUsername={setUsername}
+        password={password}
+        setPassword={setPassword}
+      />} */}
 
       {/* <TimeCard/> */}
 
