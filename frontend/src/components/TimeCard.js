@@ -1,5 +1,6 @@
 import React from 'react'
 import { useState } from 'react'
+import hoursService from '../services/hours'
 
 const TimeCard = ({ user }) => {
     const [screen, setScreen] = useState('1')
@@ -61,11 +62,148 @@ const TimeCard = ({ user }) => {
     }
       
     const ScreenThree = () => {
+        const [inputs, setInputs] = useState({finishTime: '00:00', startTime: '00:00'})
+        
+        const timeToDecimal = (t) => {
+            var arr = t.split(':')
+            var dec = parseInt((arr[1]/6)*10, 10)
+        
+            return parseFloat(parseInt(arr[0], 10) + '.' + (dec<10?'0':'') + dec)
+        }
+
+        const calculate = (startTime, endTime) => {
+            let start = startTime
+            let end = endTime
+            let normal = 0
+            let special = 0
+            if (end < 4) {
+                end += 24
+            }
+            const total = end - start
+            
+            if (end > 18) {
+                special = end - 18
+                normal = 18 - start
+            }else {
+                normal = total
+            }
+
+            // setInputs(values => ({...values, total: total, normal: normal, special: special}))
+            // console.log('normal', normal, 'special', special)
+
+            return {
+                normal: normal,
+                special: special,
+                total: total
+            }
+        }
+        
+
+        const handleChange = (event) => {
+            const name = event.target.name
+            const value = event.target.value
+            setInputs(values => ({...values,
+                [name]: value,                
+            }))
+        }
+
+        const addTimeCard = async (event) => {
+            event.preventDefault()
+            const {month, finishTime, startTime} = inputs
+            if (!month) {
+                return console.log('Month is a required field')
+            }
+            const object = {
+                month: month,
+                days: [
+                    {
+                        dayNumber: '21',
+                        startWork: startTime,
+                        endWork: finishTime
+                    }
+                ]
+            }
+            console.log('uploaded', inputs)
+            await hoursService
+              .create(object)
+              setInputs({ finishTime: '00:00', startTime: '00:00' })
+            //   setErrorMessage('Time card created')
+          }
+
+        // complete this function
+        // const handleSubmit = (event) => {
+        //     event.preventDefault()
+        //     calculate(timeToDecimal(inputs.startTime), timeToDecimal(inputs.finishTime))
+        //     console.log(inputs)
+        // }
+
         return (
             <div>
-                <h1>Upload data</h1>
+                <h1>TIMESEDDEL / TIME CARD</h1>
+                <br/>
                 <button onClick={() => toScreen('1')} >Back</button>
+                <br/>
 
+                {/* https://www.w3schools.com/react/react_forms.asp */}
+
+                {/* When the data is handled by the components, all the data is stored in the component state. */}
+
+                {/* You can control changes by adding event handlers in the onChange attribute. */}
+
+                {/* You can control the submit action by adding an event handler in the onSubmit attribute for the <form>: */}
+
+                {/* You can control the values of more than one input field by adding a name attribute to each element.
+
+                We will initialize our state with an empty object.
+
+                To access the fields in the event handler use the event.target.name and event.target.value syntax.
+
+                To update the state, use square brackets [bracket notation] around the property name. */}
+                
+                <form onSubmit={addTimeCard}>
+                    <div id='container'>
+                        <div className='row'>
+                            <p>MONTH/MÅNED</p>
+                            <p>DATO / DATE</p>
+                            <p>JOB DESCRIPTION</p>
+                            <p>START: TIME</p>
+                            <p>FINISH: TIME</p>
+                            <p>TOTAL HOURS/TIMER</p>
+                        </div>
+                        <div className='row'>
+                            <p>21</p>
+                            <input
+                                type="text"
+                                name="month"
+                                value={inputs.month || ''}
+                                onChange={handleChange}
+                            />
+                            <input
+                                type="text"
+                                name="jobDescription"
+                                value={inputs.jobDescription || ''}
+                                onChange={handleChange}
+                            />
+                            <input
+                                type="time"
+                                name="startTime"
+                                value={inputs.startTime || ''}
+                                onChange={handleChange}
+                            />
+                            <input
+                                type="time"
+                                name="finishTime"
+                                value={inputs.finishTime || ''}
+                                onChange={handleChange}
+                            />
+                            
+                            
+                            <p>{ inputs.startTime !== inputs.finishTime &&
+                            JSON.stringify(calculate(timeToDecimal(inputs.startTime), timeToDecimal(inputs.finishTime))) }</p>
+                        </div>
+                    </div>
+                    <button type="submit">Upload</button>
+                </form>
             </div>
         )
     }

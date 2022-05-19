@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import loginService from './services/login'
 import usersService from './services/users'
 import signinService from './services/signin'
+import hoursService from './services/hours'
 import LoginForm from './components/LoginForm'
 import User from './components/User'
 import TimeCard from './components/TimeCard'
@@ -13,6 +14,7 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [employees, setEmployees] = useState(null)
+  // const [newTimeCard, setNewTimeCard] = useState({})
   // const [sigleEmployee, setSingleEmployee] = useState(null)
   
   // sigleEmployee &&
@@ -24,6 +26,7 @@ const App = () => {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
       usersService.setToken(user.token)
+      hoursService.setToken(user.token)
       user &&
       console.log(user)
     }    
@@ -36,6 +39,7 @@ const App = () => {
         username, password,
       })
       usersService.setToken(user.token)
+      hoursService.setToken(user.token)
       setUser(user)
       window.localStorage.setItem(
         'loggedNoteappUser', JSON.stringify(user)
@@ -104,24 +108,35 @@ const App = () => {
   //   }
   // },[user])
 
+  // const addTimeCard = async (event) => {
+  //   event.preventDefault()
+  //   await hoursService
+  //     .create(newTimeCard)
+  //     setNewTimeCard({})
+  //     setErrorMessage('Time card created')
+  // }
+
   const display = () => {
     if (user === null) {
       return <LoginForm
-      handleLogin={handleLogin}
-      username={username}
-      setUsername={setUsername}
-      password={password}
-      setPassword={setPassword}
-      handleSignin={handleSignin}
+      handleLogin={ handleLogin }
+      username={ username }
+      setUsername={ setUsername }
+      password={ password }
+      setPassword={ setPassword }
+      handleSignin={ handleSignin }
       />
     }else if (user.username === 'beto') {
       return <User
-      user={user}          
-      employees={employees}
+      user={ user }          
+      employees={ employees }
       />
     }else if (user.username !== 'beto') {
       return <TimeCard
-      user={user}
+      user={ user }
+      // addTimeCard={ addTimeCard }
+      // newTimeCard={ newTimeCard }
+      // setNewTimeCard={ setNewTimeCard }
       />
     }
   }
