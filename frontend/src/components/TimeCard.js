@@ -164,36 +164,38 @@ const TimeCard = ({ user, setErrorMessage }) => {
                 To update the state, use square brackets [bracket notation] around the property name. */}
                 
                 <form onSubmit={addTimeCard}>
-                    <div id='container'>
-                        <div className='row'>
-                            <p>MONTH/MÅNED</p>
-                            <p>DATO / DATE</p>
-                            <p>JOB DESCRIPTION</p>
-                            <p>START: TIME</p>
-                            <p>FINISH: TIME</p>
-                            <p>TOTAL HOURS/TIMER</p>
-                        </div>
-                        <div className='row'>
-                            <p>21</p>
-                            <input
+                <p>MONTH/MÅNED</p>
+                <input
                                 type="text"
                                 name="month"
                                 value={inputs.month || ''}
                                 onChange={handleChange}
                             />
-                            <input
+                    <div className='timecard'>
+                        
+                            
+                            <p className='left'>DATO / DATE</p>
+                            <p className='left'>JOB DESCRIPTION</p>
+                            <p className='left'>START: TIME</p>
+                            <p className='left'>FINISH: TIME</p>
+                            <p className='left'>TOTAL HOURS/TIMER</p>
+                        
+                        
+                            <p className='dateright'>21</p>
+                            
+                            <input className='jobright'
                                 type="text"
                                 name="jobDescription"
                                 value={inputs.jobDescription || ''}
                                 onChange={handleChange}
                             />
-                            <input
+                            <input className='startright'
                                 type="time"
                                 name="startTime"
                                 value={inputs.startTime || ''}
                                 onChange={handleChange}
                             />
-                            <input
+                            <input className='finishright'
                                 type="time"
                                 name="finishTime"
                                 value={inputs.finishTime || ''}
@@ -201,11 +203,11 @@ const TimeCard = ({ user, setErrorMessage }) => {
                             />
                             
                             
-                            <p>{ inputs.startTime !== inputs.finishTime &&
+                            <p className='totalright'>{ inputs.startTime !== inputs.finishTime &&
                             JSON.stringify(calculate(timeToDecimal(inputs.startTime), timeToDecimal(inputs.finishTime))) }</p>
-                        </div>
+                        
                     </div>
-                    <button type="submit">Upload</button>
+                    <button className='uploadBtn' type="submit">Upload</button>
                 </form>
             </div>
         )

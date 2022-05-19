@@ -37,10 +37,54 @@
   }
 } */
 
-.form{
+.timecard{
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
   /* grid-template-rows: 3; */
+}
+
+form{
+  margin: 5em 0;
+}
+
+.uploadBtn{
+  margin-top: 2em;
+}
+
+@media only screen and (max-width: 600px) {
+  .timecard{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .left{
+    grid-column: 1/2;
+  }
+
+  .dateright{
+    grid-column: 2/3;
+    grid-row: 1/2;
+  }
+
+  .jobright{
+    grid-column: 2/3;
+    grid-row: 2/3;
+  }
+
+  .startright{
+    grid-column: 2/3;
+    grid-row: 3/4;
+  }
+
+  .finishright{
+    grid-column: 2/3;
+    grid-row: 4/5;
+  }
+
+  .totalright{
+    grid-column: 2/3;
+    grid-row: 5/6;
+  }
 }
 
 /* .monthT{
