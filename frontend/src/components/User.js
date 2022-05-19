@@ -63,7 +63,7 @@ const ScreenThree = ({ hours }) => {
           hours &&
           hours.days.map(day => 
             <li key={day.dayNumber}>
-              <p>Day: {day.dayNumber} Start: {day.startWork}, End: {day.endWork}</p>
+              <p>Day: {day.dayNumber} Job description: {day.jobDescription} Start: {day.startWork}, End: {day.endWork}</p>
               <p>Total Hours: {hours.totalHours}</p>
             </li>
           )

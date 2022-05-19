@@ -49,7 +49,7 @@ const TimeCard = ({ user, setErrorMessage }) => {
                       hours.days.map(
                           day =>
                           <li key={day.dayNumber}>
-                              <p>Day: {day.dayNumber} Start: {day.startWork}, End: {day.endWork}</p>
+                              <p>Day: {day.dayNumber} Job description: {day.jobDescription} Start: {day.startWork}, End: {day.endWork}</p>
                               <p>Total Hours: {hours.totalHours}</p>
                           </li>
                       )
@@ -109,7 +109,7 @@ const TimeCard = ({ user, setErrorMessage }) => {
 
         const addTimeCard = async (event) => {
             event.preventDefault()
-            const {month, finishTime, startTime} = inputs
+            const {month, jobDescription, finishTime, startTime} = inputs
             if (!month) {
                 return console.log('Month is a required field')
             }
@@ -118,6 +118,7 @@ const TimeCard = ({ user, setErrorMessage }) => {
                 days: [
                     {
                         dayNumber: '21',
+                        jobDescription: jobDescription,
                         startWork: startTime,
                         endWork: finishTime
                     }
