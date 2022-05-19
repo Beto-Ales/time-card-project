@@ -134,6 +134,7 @@ const App = () => {
     }else if (user.username !== 'beto') {
       return <TimeCard
       user={ user }
+      setErrorMessage={setErrorMessage}
       // addTimeCard={ addTimeCard }
       // newTimeCard={ newTimeCard }
       // setNewTimeCard={ setNewTimeCard }

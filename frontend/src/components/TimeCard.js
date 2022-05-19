@@ -2,7 +2,7 @@ import React from 'react'
 import { useState } from 'react'
 import hoursService from '../services/hours'
 
-const TimeCard = ({ user }) => {
+const TimeCard = ({ user, setErrorMessage }) => {
     const [screen, setScreen] = useState('1')
     const [hours, setHours] = useState(null)
 
@@ -127,7 +127,10 @@ const TimeCard = ({ user }) => {
             await hoursService
               .create(object)
               setInputs({ finishTime: '00:00', startTime: '00:00' })
-            //   setErrorMessage('Time card created')
+              setErrorMessage('Time card created')
+              setTimeout(() => {
+                setErrorMessage(null)
+              }, 5000)
           }
 
         // complete this function
