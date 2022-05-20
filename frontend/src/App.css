@@ -47,6 +47,10 @@ form{
   margin: 5em 0;
 }
 
+.left22{
+  display: none;
+}
+
 .uploadBtn{
   margin-top: 2em;
 }
@@ -57,7 +61,11 @@ form{
     grid-template-columns: 1fr 1fr;
   }
 
-  .left{
+  .left22{
+    display: initial;
+  }
+
+  .left, .left22{
     grid-column: 1/2;
   }
 

@@ -10,7 +10,8 @@ const TimeCard = ({ user, setErrorMessage }) => {
         if (user === null) {
             return 'Loading...'
         } else {
-            return user.username[0].toUpperCase() + user.username.slice(1).toLowerCase()
+            // name displayed in header
+            // return user.username[0].toUpperCase() + user.username.slice(1).toLowerCase()
         }
     }
 
@@ -62,7 +63,7 @@ const TimeCard = ({ user, setErrorMessage }) => {
     }
       
     const ScreenThree = () => {
-        const [inputs, setInputs] = useState({finishTime: '00:00', startTime: '00:00'})
+        const [inputs, setInputs] = useState({finishTime: '00:00', startTime: '00:00', finishTime22: '00:00', startTime22: '00:00'})
         
         const timeToDecimal = (t) => {
             var arr = t.split(':')
@@ -109,7 +110,7 @@ const TimeCard = ({ user, setErrorMessage }) => {
 
         const addTimeCard = async (event) => {
             event.preventDefault()
-            const {month, jobDescription, finishTime, startTime} = inputs
+            const {month, jobDescription, finishTime, startTime, jobDescription22, finishTime22, startTime22} = inputs
             if (!month) {
                 return console.log('Month is a required field')
             }
@@ -121,13 +122,19 @@ const TimeCard = ({ user, setErrorMessage }) => {
                         jobDescription: jobDescription,
                         startWork: startTime,
                         endWork: finishTime
+                    },
+                    {
+                        dayNumber: '22',
+                        jobDescription: jobDescription22,
+                        startWork: startTime22,
+                        endWork: finishTime22
                     }
                 ]
             }
             console.log('uploaded', inputs)
             await hoursService
               .create(object)
-              setInputs({ finishTime: '00:00', startTime: '00:00' })
+              setInputs({ finishTime: '00:00', startTime: '00:00', finishTime22: '00:00', startTime22: '00:00' })
               setErrorMessage('Time card created')
               setTimeout(() => {
                 setErrorMessage(null)
@@ -206,6 +213,41 @@ const TimeCard = ({ user, setErrorMessage }) => {
                             
                             <p className='totalright'>{ inputs.startTime !== inputs.finishTime &&
                             JSON.stringify(calculate(timeToDecimal(inputs.startTime), timeToDecimal(inputs.finishTime))) }</p>
+                        
+                    </div>
+                    <div className='timecard'>
+                        
+                            
+                            <p className='left22'>DATO / DATE</p>
+                            <p className='left22'>JOB DESCRIPTION</p>
+                            <p className='left22'>START: TIME</p>
+                            <p className='left22'>FINISH: TIME</p>
+                            <p className='left22'>TOTAL HOURS/TIMER</p>
+                        
+                        
+                            <p className='dateright'>22</p>
+                            
+                            <input className='jobright'
+                                type="text"
+                                name="jobDescription22"
+                                value={inputs.jobDescription22 || ''}
+                                onChange={handleChange}
+                            />
+                            <input className='startright'
+                                type="time"
+                                name="startTime22"
+                                value={inputs.startTime22 || ''}
+                                onChange={handleChange}
+                            />
+                            <input className='finishright'
+                                type="time"
+                                name="finishTime22"
+                                value={inputs.finishTime22 || ''}
+                                onChange={handleChange}
+                            />
+                                                        
+                            <p className='totalright'>{ inputs.startTime22 !== inputs.finishTime22 &&
+                            JSON.stringify(calculate(timeToDecimal(inputs.startTime22), timeToDecimal(inputs.finishTime22))) }</p>
                         
                     </div>
                     <button className='uploadBtn' type="submit">Upload</button>

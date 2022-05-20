@@ -10,8 +10,9 @@ const User = ({ user, employees }) => {
   const ScreenOne = ({ user, employees }) => {  
   
   return (
-    <div>      
-      <h1>{ user.username[0].toUpperCase() + user.username.slice(1).toLowerCase()}</h1>
+    <div>
+      {/* name displayed in header */}
+      {/* <h1>{ user.username[0].toUpperCase() + user.username.slice(1).toLowerCase()}</h1> */}
       <br/>      
       <ul>
         {
