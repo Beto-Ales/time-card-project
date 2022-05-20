@@ -31,11 +31,11 @@ const hourSchema = new mongoose.Schema({
         jobDescription: String,
         startWork: {
             type: String,
-            required: true
+            // required: true
         },
         endWork: {
             type: String,
-            required: true
+            // required: true
         },
         totalHours: String
     }],
