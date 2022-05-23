@@ -27,8 +27,8 @@ const App = () => {
       setUser(user)
       usersService.setToken(user.token)
       hoursService.setToken(user.token)
-      user &&
-      console.log(user)
+      // user &&
+      // console.log(user)
     }    
   }, [])
 
