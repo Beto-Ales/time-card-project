@@ -39,12 +39,25 @@
 
 .timecard{
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  /* grid-template-columns: 1fr 1fr 1fr 1fr 1fr; */
+  grid-template-columns: 1fr;
   /* grid-template-rows: 3; */
 }
 
 form{
   margin: 5em 0;
+}
+
+.timeCardHeader{
+  display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.eachDay{
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .left22{
