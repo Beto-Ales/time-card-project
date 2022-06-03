@@ -54,7 +54,19 @@ const ScreenTwo = ({ worker }) => {
     </div>
   )
 }
-const ScreenThree = ({ hours }) => {
+const ScreenThree = ({ hours }) => {  
+  const normal = hours.days.map(day => day.totalHours && day.totalHours.normal)
+  const special = hours.days.map(day => day.totalHours && day.totalHours.special)
+  const total = hours.days.map(day => day.totalHours && day.totalHours.total)
+  const allNormal = normal.filter(value => value !== undefined ).reduce((a,b) => a+b)
+  const allSpecial = special.filter(value => value !== undefined ).reduce((a,b) => a+b)
+  const allTotal = total.filter(value => value !== undefined ).reduce((a,b) => a+b)
+  // console.log('normal', normal, 'special', special, 'total', total)
+  console.log('allNormal', allNormal)
+
+// let totalDemo = 0;
+// const demo =  hours.days.map(day => totalDemo += day.totalHours)
+
   return (
     <div>
       <h1>{hours.month.toUpperCase()}</h1>
@@ -64,13 +76,14 @@ const ScreenThree = ({ hours }) => {
           hours &&
           hours.days.map(day => 
             <li key={day.dayNumber}>
-              <p>Day: {day.dayNumber} Job description: {day.jobDescription} Start: {day.startWork}, End: {day.endWork}</p>
-              <p>Total Hours: {hours.totalHours}</p>
+              {/* <p>Day: {day.dayNumber} Job description: {day.jobDescription} Start: {day.startWork}, End: {day.endWork} Total Hours: {day.totalHours && day.totalHours.total} Normal rate: {day.totalHours && day.totalHours.normal} Special rate: {day.totalHours && day.totalHours.special}</p> */}
+              <span>Day: {day.dayNumber}</span><span> Job description: {day.jobDescription}</span><span> Start: {day.startWork},</span> End: {day.endWork}<span> Total Hours: {day.totalHours && day.totalHours.total}</span> Normal rate: {day.totalHours && day.totalHours.normal}<span> Special rate: {day.totalHours && day.totalHours.special}</span>
+              {/* <p>Total Hours: {hours.totalHours}</p> */}
             </li>
           )
         }
       </ul>
-      <p>Month total Hours: {hours.monthHours}</p>
+      <p>Month total Hours: {allTotal}, Normal rate: {allNormal}, Special rate: {allSpecial}</p>
     </div>
   )
 }
