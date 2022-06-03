@@ -48,6 +48,16 @@ form{
   margin: 5em 0;
 }
 
+ul{
+  padding-left: 0;
+}
+
+li{
+  list-style: none;
+  border: solid 0.01em;
+  margin-bottom: 0.5em;
+}
+
 .timeCardHeader{
   display: flex;
     align-items: center;
@@ -58,6 +68,10 @@ form{
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.eachDay p {
+  margin-right: 1em;
 }
 
 .left22{
