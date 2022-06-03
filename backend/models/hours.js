@@ -37,7 +37,7 @@ const hourSchema = new mongoose.Schema({
             type: String,
             // required: true
         },
-        totalHours: String
+        totalHours: {}
     }],
 
     monthHours: String,
