@@ -7,6 +7,8 @@ import hoursService from '../services/hours'
 // https://blog.logrocket.com/a-guide-to-usestate-in-react-ecb9952e406c/
 // ------------------------------------------------------------------------------------------------------------------------------
 
+// component containing inner components for each screen: employee list of time cards, specific time card,
+// create time card & update time card 
 const TimeCard = ({ user, setErrorMessage }) => {
     const [screen, setScreen] = useState('1')
     const [hours, setHours] = useState(null)
@@ -21,6 +23,7 @@ const TimeCard = ({ user, setErrorMessage }) => {
     }
 
     const ScreenOne = ({ user }) => {
+        console.log(user.hours[0].date);
         return (
             <div>                
                 <h1>{ loading() }</h1>
@@ -39,7 +42,7 @@ const TimeCard = ({ user, setErrorMessage }) => {
                             </li>
                         )
                     }
-                </ul>                
+                </ul>
             </div>            
         )
     }
@@ -136,6 +139,7 @@ const TimeCard = ({ user, setErrorMessage }) => {
             // console.log('normal', normal, 'special', special)
 
             return {
+                // normal: parseFloat(normal).toFixed(2),
                 normal: normal,
                 special: special,
                 total: total
@@ -275,69 +279,71 @@ const TimeCard = ({ user, setErrorMessage }) => {
                 
             } = description
             
-            hours.days[0].startWork = startWork0
-            hours.days[1].startWork = startWork1
-            hours.days[2].startWork = startWork2
-            hours.days[3].startWork = startWork3
-            hours.days[4].startWork = startWork4
-            hours.days[5].startWork = startWork5
-            hours.days[6].startWork = startWork6
-            hours.days[7].startWork = startWork7
-            hours.days[8].startWork = startWork8
-            hours.days[9].startWork = startWork9
-            hours.days[10].startWork = startWork10
-            hours.days[11].startWork = startWork11
-            hours.days[12].startWork = startWork12
-            hours.days[13].startWork = startWork13
-            hours.days[14].startWork = startWork14
-            hours.days[15].startWork = startWork15
-            hours.days[16].startWork = startWork16
-            hours.days[17].startWork = startWork17
-            hours.days[18].startWork = startWork18
-            hours.days[19].startWork = startWork19
-            hours.days[20].startWork = startWork20
-            hours.days[21].startWork = startWork21
-            hours.days[22].startWork = startWork22
-            hours.days[23].startWork = startWork23
-            hours.days[24].startWork = startWork24
-            hours.days[25].startWork = startWork25
-            hours.days[26].startWork = startWork26
-            hours.days[27].startWork = startWork27
-            hours.days[28].startWork = startWork28
-            hours.days[29].startWork = startWork29
-            hours.days[30].startWork = startWork30
+            // if startWork is not defined, leave default value time 00:00
+            hours.days[0].startWork = startWork0 ? startWork0 : '00:00'
+            hours.days[1].startWork = startWork1 ? startWork1 : '00:00'
+            hours.days[2].startWork = startWork2 ? startWork2 : '00:00'
+            hours.days[3].startWork = startWork3 ? startWork3 : '00:00'
+            hours.days[4].startWork = startWork4 ? startWork4 : '00:00'
+            hours.days[5].startWork = startWork5 ? startWork5 : '00:00'
+            hours.days[6].startWork = startWork6 ? startWork6 : '00:00'
+            hours.days[7].startWork = startWork7 ? startWork7 : '00:00'
+            hours.days[8].startWork = startWork8 ? startWork8 : '00:00'
+            hours.days[9].startWork = startWork9 ? startWork9 : '00:00'
+            hours.days[10].startWork = startWork10 ? startWork10 : '00:00'
+            hours.days[11].startWork = startWork11 ? startWork11 : '00:00'
+            hours.days[12].startWork = startWork12 ? startWork12 : '00:00'
+            hours.days[13].startWork = startWork13 ? startWork13 : '00:00'
+            hours.days[14].startWork = startWork14 ? startWork14 : '00:00'
+            hours.days[15].startWork = startWork15 ? startWork15 : '00:00'
+            hours.days[16].startWork = startWork16 ? startWork16 : '00:00'
+            hours.days[17].startWork = startWork17 ? startWork17 : '00:00'
+            hours.days[18].startWork = startWork18 ? startWork18 : '00:00'
+            hours.days[19].startWork = startWork19 ? startWork19 : '00:00'
+            hours.days[20].startWork = startWork20 ? startWork20 : '00:00'
+            hours.days[21].startWork = startWork21 ? startWork21 : '00:00'
+            hours.days[22].startWork = startWork22 ? startWork22 : '00:00'
+            hours.days[23].startWork = startWork23 ? startWork23 : '00:00'
+            hours.days[24].startWork = startWork24 ? startWork24 : '00:00'
+            hours.days[25].startWork = startWork25 ? startWork25 : '00:00'
+            hours.days[26].startWork = startWork26 ? startWork26 : '00:00'
+            hours.days[27].startWork = startWork27 ? startWork27 : '00:00'
+            hours.days[28].startWork = startWork28 ? startWork28 : '00:00'
+            hours.days[29].startWork = startWork29 ? startWork29 : '00:00'
+            hours.days[30].startWork = startWork30 ? startWork30 : '00:00'
             
-            hours.days[0].endWork = endWork0
-            hours.days[1].endWork = endWork1
-            hours.days[2].endWork = endWork2
-            hours.days[3].endWork = endWork3
-            hours.days[4].endWork = endWork4
-            hours.days[5].endWork = endWork5
-            hours.days[6].endWork = endWork6
-            hours.days[7].endWork = endWork7
-            hours.days[8].endWork = endWork8
-            hours.days[9].endWork = endWork9
-            hours.days[10].endWork = endWork10
-            hours.days[11].endWork = endWork11
-            hours.days[12].endWork = endWork12
-            hours.days[13].endWork = endWork13
-            hours.days[14].endWork = endWork14
-            hours.days[15].endWork = endWork15
-            hours.days[16].endWork = endWork16
-            hours.days[17].endWork = endWork17
-            hours.days[18].endWork = endWork18
-            hours.days[19].endWork = endWork19
-            hours.days[20].endWork = endWork20
-            hours.days[21].endWork = endWork21
-            hours.days[22].endWork = endWork22
-            hours.days[23].endWork = endWork23
-            hours.days[24].endWork = endWork24
-            hours.days[25].endWork = endWork25
-            hours.days[26].endWork = endWork26
-            hours.days[27].endWork = endWork27
-            hours.days[28].endWork = endWork28
-            hours.days[29].endWork = endWork29
-            hours.days[30].endWork = endWork30
+            // if endWork is not defined, leave default value time 00:00
+            hours.days[0].endWork = endWork0 ? endWork0 : '00:00'
+            hours.days[1].endWork = endWork1 ? endWork1 : '00:00'
+            hours.days[2].endWork = endWork2 ? endWork2 : '00:00'
+            hours.days[3].endWork = endWork3 ? endWork3 : '00:00'
+            hours.days[4].endWork = endWork4 ? endWork4 : '00:00'
+            hours.days[5].endWork = endWork5 ? endWork5 : '00:00'
+            hours.days[6].endWork = endWork6 ? endWork6 : '00:00'
+            hours.days[7].endWork = endWork7 ? endWork7 : '00:00'
+            hours.days[8].endWork = endWork8 ? endWork8 : '00:00'
+            hours.days[9].endWork = endWork9 ? endWork9 : '00:00'
+            hours.days[10].endWork = endWork10 ? endWork10 : '00:00'
+            hours.days[11].endWork = endWork11 ? endWork11 : '00:00'
+            hours.days[12].endWork = endWork12 ? endWork12 : '00:00'
+            hours.days[13].endWork = endWork13 ? endWork13 : '00:00'
+            hours.days[14].endWork = endWork14 ? endWork14 : '00:00'
+            hours.days[15].endWork = endWork15 ? endWork15 : '00:00'
+            hours.days[16].endWork = endWork16 ? endWork16 : '00:00'
+            hours.days[17].endWork = endWork17 ? endWork17 : '00:00'
+            hours.days[18].endWork = endWork18 ? endWork18 : '00:00'
+            hours.days[19].endWork = endWork19 ? endWork19 : '00:00'
+            hours.days[20].endWork = endWork20 ? endWork20 : '00:00'
+            hours.days[21].endWork = endWork21 ? endWork21 : '00:00'
+            hours.days[22].endWork = endWork22 ? endWork22 : '00:00'
+            hours.days[23].endWork = endWork23 ? endWork23 : '00:00'
+            hours.days[24].endWork = endWork24 ? endWork24 : '00:00'
+            hours.days[25].endWork = endWork25 ? endWork25 : '00:00'
+            hours.days[26].endWork = endWork26 ? endWork26 : '00:00'
+            hours.days[27].endWork = endWork27 ? endWork27 : '00:00'
+            hours.days[28].endWork = endWork28 ? endWork28 : '00:00'
+            hours.days[29].endWork = endWork29 ? endWork29 : '00:00'
+            hours.days[30].endWork = endWork30 ? endWork30 : '00:00'
             
             hours.days[0].jobDescription = jobDescription0
             hours.days[1].jobDescription = jobDescription1
@@ -371,13 +377,89 @@ const TimeCard = ({ user, setErrorMessage }) => {
             hours.days[29].jobDescription = jobDescription29
             hours.days[30].jobDescription = jobDescription30
 
+            // hours.days[0].totalHours = JSON.stringify(calculate(timeToDecimal(startWork0), timeToDecimal(endWork0)))
+
+            // hours.days[0].totalHours = startWork0 && endWork0 && calculate(timeToDecimal(startWork0), timeToDecimal(endWork0))            
+            // hours.days[1].totalHours = startWork1 && endWork1 && calculate(timeToDecimal(startWork1), timeToDecimal(endWork1))
+            // hours.days[2].totalHours = startWork2 && endWork2 && calculate(timeToDecimal(startWork2), timeToDecimal(endWork2))
+            // hours.days[3].totalHours = startWork3 && endWork3 && calculate(timeToDecimal(startWork3), timeToDecimal(endWork3))
+            // hours.days[4].totalHours = startWork4 && endWork4 && calculate(timeToDecimal(startWork4), timeToDecimal(endWork4))
+            // hours.days[5].totalHours = startWork5 && endWork5 && calculate(timeToDecimal(startWork5), timeToDecimal(endWork5))
+            // hours.days[6].totalHours = startWork6 && endWork6 && calculate(timeToDecimal(startWork6), timeToDecimal(endWork6))
+            // hours.days[7].totalHours = startWork7 && endWork7 && calculate(timeToDecimal(startWork7), timeToDecimal(endWork7))
+            // hours.days[8].totalHours = startWork8 && endWork8 && calculate(timeToDecimal(startWork8), timeToDecimal(endWork8))
+            // hours.days[9].totalHours = startWork9 && endWork9 && calculate(timeToDecimal(startWork9), timeToDecimal(endWork9))
+            // hours.days[10].totalHours = startWork10 && endWork10 && calculate(timeToDecimal(startWork10), timeToDecimal(endWork10))
+            // hours.days[11].totalHours = startWork11 && endWork11 && calculate(timeToDecimal(startWork11), timeToDecimal(endWork11))
+            // hours.days[12].totalHours = startWork12 && endWork12 && calculate(timeToDecimal(startWork12), timeToDecimal(endWork12))
+            // hours.days[13].totalHours = startWork13 && endWork13 && calculate(timeToDecimal(startWork13), timeToDecimal(endWork13))
+            // hours.days[14].totalHours = startWork14 && endWork14 && calculate(timeToDecimal(startWork14), timeToDecimal(endWork14))
+            // hours.days[15].totalHours = startWork15 && endWork15 && calculate(timeToDecimal(startWork15), timeToDecimal(endWork15))
+            // hours.days[16].totalHours = startWork16 && endWork16 && calculate(timeToDecimal(startWork16), timeToDecimal(endWork16))
+            // hours.days[17].totalHours = startWork17 && endWork17 && calculate(timeToDecimal(startWork17), timeToDecimal(endWork17))
+            // hours.days[18].totalHours = startWork18 && endWork18 && calculate(timeToDecimal(startWork18), timeToDecimal(endWork18))
+            // hours.days[19].totalHours = startWork19 && endWork19 && calculate(timeToDecimal(startWork19), timeToDecimal(endWork19))
+            // hours.days[20].totalHours = startWork20 && endWork20 && calculate(timeToDecimal(startWork20), timeToDecimal(endWork20))
+            // hours.days[21].totalHours = startWork21 && endWork21 && calculate(timeToDecimal(startWork21), timeToDecimal(endWork21))
+            // hours.days[22].totalHours = startWork22 && endWork22 && calculate(timeToDecimal(startWork22), timeToDecimal(endWork22))
+            // hours.days[23].totalHours = startWork23 && endWork23 && calculate(timeToDecimal(startWork23), timeToDecimal(endWork23))
+            // hours.days[24].totalHours = startWork24 && endWork24 && calculate(timeToDecimal(startWork24), timeToDecimal(endWork24))
+            // hours.days[25].totalHours = startWork25 && endWork25 && calculate(timeToDecimal(startWork25), timeToDecimal(endWork25))
+            // hours.days[26].totalHours = startWork26 && endWork26 && calculate(timeToDecimal(startWork26), timeToDecimal(endWork26))
+            // hours.days[27].totalHours = startWork27 && endWork27 && calculate(timeToDecimal(startWork27), timeToDecimal(endWork27))
+            // hours.days[28].totalHours = startWork28 && endWork28 && calculate(timeToDecimal(startWork28), timeToDecimal(endWork28))
+            // hours.days[29].totalHours = startWork29 && endWork29 && calculate(timeToDecimal(startWork29), timeToDecimal(endWork29))
+            // hours.days[30].totalHours = startWork30 && endWork30 && calculate(timeToDecimal(startWork30), timeToDecimal(endWork30))
+
+            // use default value time 00:00
+            hours.days[0].totalHours = calculate(timeToDecimal(hours.days[0].startWork), timeToDecimal(hours.days[0].endWork))
+            hours.days[1].totalHours = calculate(timeToDecimal(hours.days[1].startWork), timeToDecimal(hours.days[1].endWork))
+            hours.days[2].totalHours = calculate(timeToDecimal(hours.days[2].startWork), timeToDecimal(hours.days[2].endWork))
+            hours.days[3].totalHours = calculate(timeToDecimal(hours.days[3].startWork), timeToDecimal(hours.days[3].endWork))
+            hours.days[4].totalHours = calculate(timeToDecimal(hours.days[4].startWork), timeToDecimal(hours.days[4].endWork))
+            hours.days[5].totalHours = calculate(timeToDecimal(hours.days[5].startWork), timeToDecimal(hours.days[5].endWork))
+            hours.days[6].totalHours = calculate(timeToDecimal(hours.days[6].startWork), timeToDecimal(hours.days[6].endWork))
+            hours.days[7].totalHours = calculate(timeToDecimal(hours.days[7].startWork), timeToDecimal(hours.days[7].endWork))
+            hours.days[8].totalHours = calculate(timeToDecimal(hours.days[8].startWork), timeToDecimal(hours.days[8].endWork))
+            hours.days[9].totalHours = calculate(timeToDecimal(hours.days[9].startWork), timeToDecimal(hours.days[9].endWork))
+            hours.days[10].totalHours = calculate(timeToDecimal(hours.days[10].startWork), timeToDecimal(hours.days[10].endWork))
+            hours.days[11].totalHours = calculate(timeToDecimal(hours.days[11].startWork), timeToDecimal(hours.days[11].endWork))
+            hours.days[12].totalHours = calculate(timeToDecimal(hours.days[12].startWork), timeToDecimal(hours.days[12].endWork))
+            hours.days[13].totalHours = calculate(timeToDecimal(hours.days[13].startWork), timeToDecimal(hours.days[13].endWork))
+            hours.days[14].totalHours = calculate(timeToDecimal(hours.days[14].startWork), timeToDecimal(hours.days[14].endWork))
+            hours.days[15].totalHours = calculate(timeToDecimal(hours.days[15].startWork), timeToDecimal(hours.days[15].endWork))
+            hours.days[16].totalHours = calculate(timeToDecimal(hours.days[16].startWork), timeToDecimal(hours.days[16].endWork))
+            hours.days[17].totalHours = calculate(timeToDecimal(hours.days[17].startWork), timeToDecimal(hours.days[17].endWork))
+            hours.days[18].totalHours = calculate(timeToDecimal(hours.days[18].startWork), timeToDecimal(hours.days[18].endWork))
+            hours.days[19].totalHours = calculate(timeToDecimal(hours.days[19].startWork), timeToDecimal(hours.days[19].endWork))
+            hours.days[20].totalHours = calculate(timeToDecimal(hours.days[20].startWork), timeToDecimal(hours.days[20].endWork))
+            hours.days[21].totalHours = calculate(timeToDecimal(hours.days[21].startWork), timeToDecimal(hours.days[21].endWork))
+            hours.days[22].totalHours = calculate(timeToDecimal(hours.days[22].startWork), timeToDecimal(hours.days[22].endWork))
+            hours.days[23].totalHours = calculate(timeToDecimal(hours.days[23].startWork), timeToDecimal(hours.days[23].endWork))
+            hours.days[24].totalHours = calculate(timeToDecimal(hours.days[24].startWork), timeToDecimal(hours.days[24].endWork))
+            hours.days[25].totalHours = calculate(timeToDecimal(hours.days[25].startWork), timeToDecimal(hours.days[25].endWork))
+            hours.days[26].totalHours = calculate(timeToDecimal(hours.days[26].startWork), timeToDecimal(hours.days[26].endWork))
+            hours.days[27].totalHours = calculate(timeToDecimal(hours.days[27].startWork), timeToDecimal(hours.days[27].endWork))
+            hours.days[28].totalHours = calculate(timeToDecimal(hours.days[28].startWork), timeToDecimal(hours.days[28].endWork))
+            hours.days[29].totalHours = calculate(timeToDecimal(hours.days[29].startWork), timeToDecimal(hours.days[29].endWork))
+            hours.days[30].totalHours = calculate(timeToDecimal(hours.days[30].startWork), timeToDecimal(hours.days[30].endWork))
+            
+          
+
+            // console.log(hours)
+            // const total = hours.days.totalHours && hours.days.map(day => day.totalHours.total)
+            // const special = hours.days.totalHours && hours.days.map(day => day.totalHours.special)
+            // const normal = hours.days.totalHours && hours.days.map(day => day.totalHours.normal)
+
+            // hours.monthHours = `Total: ${total} Special rate: ${special} Normal rate: ${normal}`
+
             
 
-            hours.month = inputs.month            
+            hours.month = inputs.month
             
             await hoursService
               .create(hours)
-            console.log(inputs)
+            // console.log(inputs)
               setErrorMessage('Time card created')
               setTimeout(() => {
                 setErrorMessage(null)
@@ -451,6 +533,9 @@ const TimeCard = ({ user, setErrorMessage }) => {
                                     value={end.endWork0 || '00:00'}
                                     onChange={handleChange}
                                 />
+
+                                {/* <p>{ start.startWork0 !== end.endWork0 &&
+                                    JSON.stringify(calculate(timeToDecimal(start.startWork0), timeToDecimal(end.endWork0))) }</p> */}
                             </div>
 
                             <div className='eachDay'>
