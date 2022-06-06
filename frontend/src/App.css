@@ -44,34 +44,104 @@
   /* grid-template-rows: 3; */
 }
 
-form{
-  margin: 5em 0;
-}
-
-ul{
-  padding-left: 0;
-}
-
-li{
-  list-style: none;
-  border: solid 0.01em;
-  margin-bottom: 0.5em;
-}
-
-.timeCardHeader{
-  display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.eachDay{
+.timeCardHeader {
   display: flex;
   align-items: center;
   justify-content: center;
+  /* background-color: cadetblue; */
+  /* border-radius: 3px; */
+  margin-top: 1em;
+  justify-content: space-between;
+  padding: 0 1em;
+}
+
+.userTable{
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin: 2em 0;
+}
+
+.userTableHeader{
+  background-color: rgb(201, 197, 197);
+}
+
+.userSpan{
+  border: solid 0.01em;
+  background-color: #ffffc4;
+}
+
+.totalHoursStyle{
+  background-color: yellow;
+}
+
+.headerTitle{
+  border: solid 0.01em;
+  font-weight: bolder;
+}
+/* 
+li span{
+  margin: 0 2em;
+} */
+
+.eachDay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1em;
 }
 
 .eachDay p {
   margin-right: 1em;
+}
+
+.monthTitle{
+  margin: auto;
+}
+
+form{
+  margin: 5em 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+ul{
+  margin: auto;
+  padding-left: 0;
+  max-width: fit-content;
+}
+
+.freeWidth{
+  max-width: none ;
+}
+
+li{  
+  list-style: none;
+  /* border: solid 0.01em; */
+  margin-bottom: 0.5em;
+}
+
+button{
+  min-width: 100%;
+  padding: 0.5em 1em;
+}
+
+p{
+  text-align: left;
+}
+
+.screenBtn{
+  min-width: fit-content;
+  margin-bottom: 1em;  
+}
+
+.errorMessage{
+  position: fixed;
+  margin: auto;
+  top: 50%;
+  z-index: 1;
+  color: #282c34;
+  font-size: 3em;
 }
 
 .left22{

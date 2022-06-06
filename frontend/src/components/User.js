@@ -20,13 +20,10 @@ const User = ({ user, employees }) => {
             'Loading' :
             employees.filter(worker => worker.username !== user.username).map(employee =>
                 <li key={employee.username}>                  
-                  <button onClick={() => handleGetEmployee(employee)}>                  
-                  <b>Name: </b>{employee.username[0].toUpperCase() + employee.username.slice(1).toLowerCase()}
-                  <br/>
-                  <b>Last update: </b>{employee.hours.length > 0 && employee.hours[0].date}  {/* some employees don't have hours uploaded */}
-                  <br/>
-                  <b>Period: </b>{employee.hours.length > 0 && employee.hours[0].month}  {/* some employees don't have hours uploaded */}
-                  <br/>
+                  <button onClick={() => handleGetEmployee(employee)}>
+                  <p><b>Name: </b>{employee.username[0].toUpperCase() + employee.username.slice(1).toLowerCase()}</p>                  
+                  <p><b>Last update: </b>{employee.hours.length > 0 && employee.hours[0].date}  {/* some employees don't have hours uploaded */}</p>                  
+                  <p><b>Period: </b>{employee.hours.length > 0 && employee.hours[0].month}  {/* some employees don't have hours uploaded */}</p>                  
                   </button>
                 </li>
             )
@@ -41,7 +38,7 @@ const ScreenTwo = ({ worker }) => {
   return (
     <div>
       <h1>{worker.username[0].toUpperCase() + worker.username.slice(1).toLowerCase()}</h1>
-      <button onClick={() => toScreen('1')} >Back</button>
+      <button className='screenBtn' onClick={() => toScreen('1')} >Back</button>
       <ul>
         {worker &&
         worker.hours.map(hours => 
@@ -64,26 +61,47 @@ const ScreenThree = ({ hours }) => {
   // console.log('normal', normal, 'special', special, 'total', total)
   console.log('allNormal', allNormal)
 
-// let totalDemo = 0;
-// const demo =  hours.days.map(day => totalDemo += day.totalHours)
+  // let totalDemo = 0;
+  // const demo =  hours.days.map(day => totalDemo += day.totalHours)
 
   return (
     <div>
       <h1>{hours.month.toUpperCase()}</h1>
-      <button onClick={() => toScreen('2')} >Back</button>
-      <ul>
+      <button className='screenBtn' onClick={() => toScreen('2')} >Back</button>
+      
+      <div className='userTable userTableHeader'>
+          <span className='headerTitle'>DATE</span>
+          <span className='headerTitle'>JOB DESCRIPTION</span>
+          <span className='headerTitle'>START</span>
+          <span className='headerTitle'>FINISH</span>
+          <span className='headerTitle'>TOTAL</span>
+          <span className='headerTitle'>NORMAL</span>
+          <span className='headerTitle'>SPECIAL</span>
+          {/* <p className='left'>TOTAL HOURS/TIMER</p> */}
+      </div>
+      
+      
+      <ul className='freeWidth'>
         {
           hours &&
           hours.days.map(day => 
             <li key={day.dayNumber}>
               {/* <p>Day: {day.dayNumber} Job description: {day.jobDescription} Start: {day.startWork}, End: {day.endWork} Total Hours: {day.totalHours && day.totalHours.total} Normal rate: {day.totalHours && day.totalHours.normal} Special rate: {day.totalHours && day.totalHours.special}</p> */}
-              <span>Day: {day.dayNumber}</span><span> Job description: {day.jobDescription}</span><span> Start: {day.startWork},</span> End: {day.endWork}<span> Total Hours: {day.totalHours && day.totalHours.total}</span> Normal rate: {day.totalHours && day.totalHours.normal}<span> Special rate: {day.totalHours && day.totalHours.special}</span>
+              <div className='userTable'>
+                <span className='userSpan'>{day.dayNumber}</span>
+                <span className='userSpan'>{day.jobDescription}</span>
+                <span className='userSpan'>{day.startWork}</span>
+                <span className='userSpan'>{day.endWork}</span>
+                <span className='userSpan'>{day.totalHours && day.totalHours.total}</span>
+                <span className='userSpan'>{day.totalHours && day.totalHours.normal}</span>
+                <span className='userSpan'>{day.totalHours && day.totalHours.special}</span>
+              </div>
               {/* <p>Total Hours: {hours.totalHours}</p> */}
             </li>
           )
         }
-      </ul>
-      <p>Month total Hours: {allTotal}, Normal rate: {allNormal}, Special rate: {allSpecial}</p>
+      </ul>      
+      <h3>Month total Hours: <span className='totalHoursStyle'>{allTotal}</span>, Normal rate: <span className='totalHoursStyle'>{allNormal}</span>, Special rate: <span className='totalHoursStyle'>{allSpecial}</span></h3>
     </div>
   )
 }

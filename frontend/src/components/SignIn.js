@@ -20,7 +20,7 @@ const SignIn = ({handleSignin, username, setUsername, password, setPassword} ) =
                     name="Password"
                     onChange={({ target }) => setPassword(target.value)} />
             </div>
-            <button type="submit">login</button>
+            <button className='screenBtn' type="submit">login</button>
         </form></>
     )
   }

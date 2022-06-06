@@ -151,12 +151,13 @@ const App = () => {
     <div className="App">
       
       <header className="App-header">        
-        <h1>{errorMessage}</h1>
+        <h1 className='errorMessage'>{errorMessage}</h1>
         <br/>
         <h1>{ user && user.username[0].toUpperCase() + user.username.slice(1).toLowerCase() }</h1>
         {
           user &&
-          <button onClick={() => handleLogout()}>Logout</button>
+          <p><button onClick={() => handleLogout()}>Logout</button></p>
+          
         }
         <br/>
         

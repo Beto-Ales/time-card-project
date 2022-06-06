@@ -28,7 +28,7 @@ const TimeCard = ({ user, setErrorMessage }) => {
             <div>                
                 <h1>{ loading() }</h1>
                 <br/>
-                <button onClick={() => toScreen('3')} >New time card</button>
+                <button className='screenBtn' onClick={() => toScreen('3')} >New time card</button>
                 <ul>
                     {
                         user &&
@@ -36,8 +36,8 @@ const TimeCard = ({ user, setErrorMessage }) => {
                             hours =>
                             <li key={hours.id}>
                                 <button onClick={() => handleGetHours(hours)}>
-                                    <b>Period: {hours.month}</b>
-                                    <b>Last update: {hours.date}</b>
+                                    <p><b>Period: </b>{hours.month}</p>
+                                    <p><b>Last update: </b>{hours.date}</p>                                    
                                 </button>
                             </li>
                         )
@@ -49,28 +49,83 @@ const TimeCard = ({ user, setErrorMessage }) => {
         
     const ScreenTwo = ({ hours }) => {
 
-        console.log(hours)
-        return (
-          <div>
-              <h1>{ hours.month.toUpperCase()}</h1>
-              <button onClick={() => toScreen('1')} >Back</button>
-              <button onClick={() => toScreen('4')} >Edit</button>
-              <ul>
-                  {
-                      hours &&
-                      hours.days.map(
-                          day =>
-                          <li key={day.dayNumber}>
-                              <p>Day: {day.dayNumber} Job description: {day.jobDescription} Start: {day.startWork}, End: {day.endWork}</p>
-                              <p>Total Hours: {hours.totalHours}</p>
-                          </li>
-                      )
-                  }
-              </ul>
-              <p>Month total Hours: {hours.monthHours}</p>
-              <p>Last update: { hours.date }</p>
-          </div>
-        )
+        // console.log(hours)
+        // return (
+        //   <div>
+        //       <h1>{ hours.month.toUpperCase()}</h1>
+        //       <button className='screenBtn' onClick={() => toScreen('1')} >Back</button>
+        //       <button className='screenBtn' onClick={() => toScreen('4')} >Edit</button>
+        //       <ul>
+        //           {
+        //               hours &&
+        //               hours.days.map(
+        //                   day =>
+        //                   <li key={day.dayNumber}>                              
+        //                       <p>Day: {day.dayNumber} Job description: {day.jobDescription} Start: {day.startWork}, End: {day.endWork}</p>
+        //                       <p>Total Hours: {hours.totalHours}</p>
+        //                   </li>
+        //               )
+        //           }
+        //       </ul>
+        //       <p>Month total Hours: {hours.monthHours}</p>
+        //       <p>Last update: { hours.date }</p>
+        //   </div>
+        // )
+
+        const normal = hours.days.map(day => day.totalHours && day.totalHours.normal)
+  const special = hours.days.map(day => day.totalHours && day.totalHours.special)
+  const total = hours.days.map(day => day.totalHours && day.totalHours.total)
+  const allNormal = normal.filter(value => value !== undefined ).reduce((a,b) => a+b)
+  const allSpecial = special.filter(value => value !== undefined ).reduce((a,b) => a+b)
+  const allTotal = total.filter(value => value !== undefined ).reduce((a,b) => a+b)
+  // console.log('normal', normal, 'special', special, 'total', total)
+  console.log('allNormal', allNormal)
+
+  // let totalDemo = 0;
+  // const demo =  hours.days.map(day => totalDemo += day.totalHours)
+
+  return (
+    <div>
+      <h1>{hours.month.toUpperCase()}</h1>
+      <button className='screenBtn' onClick={() => toScreen('1')} >Back</button>
+<button className='screenBtn' onClick={() => toScreen('4')} >Edit</button>
+      
+      <div className='userTable userTableHeader'>
+          <span className='headerTitle'>DATE</span>
+          <span className='headerTitle'>JOB DESCRIPTION</span>
+          <span className='headerTitle'>START</span>
+          <span className='headerTitle'>FINISH</span>
+          <span className='headerTitle'>TOTAL</span>
+          <span className='headerTitle'>NORMAL</span>
+          <span className='headerTitle'>SPECIAL</span>
+          {/* <p className='left'>TOTAL HOURS/TIMER</p> */}
+      </div>
+      
+      
+      <ul className='freeWidth'>
+        {
+          hours &&
+          hours.days.map(day => 
+            <li key={day.dayNumber}>
+              {/* <p>Day: {day.dayNumber} Job description: {day.jobDescription} Start: {day.startWork}, End: {day.endWork} Total Hours: {day.totalHours && day.totalHours.total} Normal rate: {day.totalHours && day.totalHours.normal} Special rate: {day.totalHours && day.totalHours.special}</p> */}
+              <div className='userTable'>
+                <span className='userSpan'>{day.dayNumber}</span>
+                <span className='userSpan'>{day.jobDescription}</span>
+                <span className='userSpan'>{day.startWork}</span>
+                <span className='userSpan'>{day.endWork}</span>
+                <span className='userSpan'>{day.totalHours && day.totalHours.total}</span>
+                <span className='userSpan'>{day.totalHours && day.totalHours.normal}</span>
+                <span className='userSpan'>{day.totalHours && day.totalHours.special}</span>
+              </div>
+              {/* <p>Total Hours: {hours.totalHours}</p> */}
+            </li>
+          )
+        }
+      </ul>      
+      <h3>Month total Hours: <span className='totalHoursStyle'>{allTotal}</span>, Normal rate: <span className='totalHoursStyle'>{allNormal}</span>, Special rate: <span className='totalHoursStyle'>{allSpecial}</span></h3>
+    </div>
+  )
+
     }
       
     const ScreenThree = () => {
@@ -174,7 +229,12 @@ const TimeCard = ({ user, setErrorMessage }) => {
             event.preventDefault()
             const {month} = inputs
             if (!month) {
-                return console.log('Month is a required field')
+                // return console.log('Month is a required field')
+                setErrorMessage('Month is a required field')
+                setTimeout(() => {
+                setErrorMessage(null)
+                }, 5000)
+                return
             }
 
             const {
@@ -473,7 +533,7 @@ const TimeCard = ({ user, setErrorMessage }) => {
             <div>
                 <h1>TIMESEDDEL / TIME CARD</h1>
                 <br/>
-                <button onClick={() => toScreen('1')} >Back</button>
+                <button className='screenBtn' onClick={() => toScreen('1')} >Back</button>
                 <br/>
 
                 {/* https://www.w3schools.com/react/react_forms.asp */}
@@ -493,7 +553,7 @@ const TimeCard = ({ user, setErrorMessage }) => {
                 To update the state, use square brackets [bracket notation] around the property name. */}
                 
                 <form onSubmit={addTimeCard}>
-                <p>MONTH/MÅNED</p>
+                <p>MONTH</p>
                 <input
                     type="text"
                     name="month"
@@ -503,11 +563,11 @@ const TimeCard = ({ user, setErrorMessage }) => {
                     <div className='timecard'>
                         
                             <div className='timeCardHeader'>
-                                <p className='left'>DATO / DATE</p>
+                                <p className='left'>DATE</p>
                                 <p className='left'>JOB DESCRIPTION</p>
-                                <p className='left'>START: TIME</p>
-                                <p className='left'>FINISH: TIME</p>
-                                <p className='left'>TOTAL HOURS/TIMER</p>
+                                <p className='left'>START</p>
+                                <p className='left'>FINISH</p>
+                                {/* <p className='left'>TOTAL HOURS/TIMER</p> */}
                             </div>
 
                             <div className='eachDay'>
@@ -1480,7 +1540,7 @@ const TimeCard = ({ user, setErrorMessage }) => {
                             JSON.stringify(calculate(timeToDecimal(inputs.startTime22), timeToDecimal(inputs.finishTime22))) }</p>
                         
                     </div> */}
-                    <button className='uploadBtn' type="submit">Upload</button>
+                    <button className='uploadBtn screenBtn' type="submit">Upload</button>
                 </form>
             </div>
         )
@@ -1701,7 +1761,11 @@ const TimeCard = ({ user, setErrorMessage }) => {
             event.preventDefault()
             const {month} = inputs
             if (!month) {
-                return console.log('Month is a required field')
+                setErrorMessage('Month is a required field')
+                setTimeout(() => {
+                setErrorMessage(null)
+                }, 5000)
+                return
             }
 
             const {
@@ -1966,11 +2030,11 @@ const TimeCard = ({ user, setErrorMessage }) => {
             <div>
                 <h1>TIMESEDDEL / TIME CARD</h1>
                 <br/>
-                <button onClick={() => toScreen('1')} >Back</button>
+                <button className='screenBtn' onClick={() => toScreen('1')} >Back</button>
                 <br/>
                 
                 <form onSubmit={addTimeCard}>
-                <p>MONTH/MÅNED</p>
+                <p>MONTH</p>
                 <input
                     type="text"
                     name="month"
@@ -1980,11 +2044,11 @@ const TimeCard = ({ user, setErrorMessage }) => {
                     <div className='timecard'>
                         
                             <div className='timeCardHeader'>
-                                <p className='left'>DATO / DATE</p>
+                                <p className='left'>DATE</p>
                                 <p className='left'>JOB DESCRIPTION</p>
-                                <p className='left'>START: TIME</p>
-                                <p className='left'>FINISH: TIME</p>
-                                <p className='left'>TOTAL HOURS/TIMER</p>
+                                <p className='left'>START</p>
+                                <p className='left'>FINISH</p>
+                                {/* <p className='left'>TOTAL HOURS/TIMER</p> */}
                             </div>
 
                             <div className='eachDay'>
@@ -2857,7 +2921,7 @@ const TimeCard = ({ user, setErrorMessage }) => {
                             </div>
                     </div>
                     
-                    <button className='uploadBtn' type="submit">Upload</button>
+                    <button className='uploadBtn screenBtn' type="submit">Upload</button>
                 </form>
             </div>
         )
