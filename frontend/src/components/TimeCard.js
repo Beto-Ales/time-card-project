@@ -181,10 +181,18 @@ const TimeCard = ({ user, setErrorMessage }) => {
             let end = endTime
             let normal = 0
             let special = 0
+
             if (end < 4) {
                 end += 24
             }
-            const total = end - start
+
+            // check if it works
+            if(startTime === endTime) {
+                start = 0
+                end = 0
+            }
+            
+            let total = end - start
             
             if (end > 18) {
                 special = end - 18
@@ -192,6 +200,10 @@ const TimeCard = ({ user, setErrorMessage }) => {
             }else {
                 normal = total
             }
+
+            // normal = normal % 1 !== 0 ? normal.toFixed(1) : normal
+            // special = special % 1 !== 0 ? special.toFixed(1) : special
+            // total = total % 1 !== 0 ? total.toFixed(1) : total
 
             // setInputs(values => ({...values, total: total, normal: normal, special: special}))
             // console.log('normal', normal, 'special', special)
@@ -516,7 +528,18 @@ const TimeCard = ({ user, setErrorMessage }) => {
 
             // hours.monthHours = `Total: ${total} Special rate: ${special} Normal rate: ${normal}`
 
-            
+            const normal = hours.days.map(day => day.totalHours && day.totalHours.normal)
+            const special = hours.days.map(day => day.totalHours && day.totalHours.special)
+            const total = hours.days.map(day => day.totalHours && day.totalHours.total)
+            const allNormal = normal.filter(value => value !== undefined ).reduce((a,b) => a+b)
+            const allSpecial = special.filter(value => value !== undefined ).reduce((a,b) => a+b)
+            const allTotal = total.filter(value => value !== undefined ).reduce((a,b) => a+b)
+
+            hours.monthHours = {
+                totalHours: allTotal,
+                normalRate: allNormal,
+                specialRate: allSpecial,
+            }
 
             hours.month = inputs.month
             

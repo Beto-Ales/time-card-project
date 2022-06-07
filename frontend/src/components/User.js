@@ -52,17 +52,17 @@ const ScreenTwo = ({ worker }) => {
   )
 }
 const ScreenThree = ({ hours }) => {  
-  const normal = hours.days.map(day => day.totalHours && day.totalHours.normal)
-  const special = hours.days.map(day => day.totalHours && day.totalHours.special)
-  const total = hours.days.map(day => day.totalHours && day.totalHours.total)
-  const allNormal = normal.filter(value => value !== undefined ).reduce((a,b) => a+b)
-  const allSpecial = special.filter(value => value !== undefined ).reduce((a,b) => a+b)
-  const allTotal = total.filter(value => value !== undefined ).reduce((a,b) => a+b)
-  // console.log('normal', normal, 'special', special, 'total', total)
-  console.log('allNormal', allNormal)
+  // done when creating timecard line 531
+  // const normal = hours.days.map(day => day.totalHours && day.totalHours.normal)
+  // const special = hours.days.map(day => day.totalHours && day.totalHours.special)
+  // const total = hours.days.map(day => day.totalHours && day.totalHours.total)
+  // const allNormal = normal.filter(value => value !== undefined ).reduce((a,b) => a+b)
+  // const allSpecial = special.filter(value => value !== undefined ).reduce((a,b) => a+b)
+  // const allTotal = total.filter(value => value !== undefined ).reduce((a,b) => a+b)
+  // // console.log('normal', normal, 'special', special, 'total', total)
+  // console.log('allNormal', allNormal)
 
-  // let totalDemo = 0;
-  // const demo =  hours.days.map(day => totalDemo += day.totalHours)
+  
 
   return (
     <div>
@@ -101,7 +101,9 @@ const ScreenThree = ({ hours }) => {
           )
         }
       </ul>      
-      <h3>Month total Hours: <span className='totalHoursStyle'>{allTotal}</span>, Normal rate: <span className='totalHoursStyle'>{allNormal}</span>, Special rate: <span className='totalHoursStyle'>{allSpecial}</span></h3>
+      {/* <h3>Month total Hours: <span className='totalHoursStyle'>{allTotal}</span>, Normal rate: <span className='totalHoursStyle'>{allNormal}</span>, Special rate: <span className='totalHoursStyle'>{allSpecial}</span></h3> */}
+      <h3>Month total Hours: <span className='totalHoursStyle'>{hours.monthHours.totalHours}</span>, Normal rate: <span className='totalHoursStyle'>{hours.monthHours.normalRate}</span>, Special rate: <span className='totalHoursStyle'>{hours.monthHours.specialRate}</span></h3>
+      {/* <h3>{hours.monthHours}</h3> */}
     </div>
   )
 }
