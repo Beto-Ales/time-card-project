@@ -62,7 +62,7 @@ const App = () => {
       })       
       setUsername('')
       setPassword('')
-      setErrorMessage(JSON.stringify(newUser))  /* maybe newUser.username signed in */
+      setErrorMessage(`${JSON.stringify(newUser.username)} signed in`)  /* maybe newUser.username signed in */
         setTimeout(() => {
           setErrorMessage(null)
         }, 5000)
