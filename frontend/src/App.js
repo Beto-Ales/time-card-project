@@ -78,7 +78,7 @@ const App = () => {
     if(user) {
       if (user.username === 'beto') {
         try {
-          console.log('first try');
+          // console.log('first try');
           usersService.getAll()        
           .then(users => setEmployees(users))
         } catch (error) {
@@ -87,7 +87,7 @@ const App = () => {
               setErrorMessage(null)
             }, 5000)
           }
-      }
+      }      
     }
   }, [user])
 
@@ -134,6 +134,7 @@ const App = () => {
     }else if (user.username !== 'beto') {
       return <TimeCard
       user={ user }
+      setUser={setUser}
       setErrorMessage={setErrorMessage}
       // addTimeCard={ addTimeCard }
       // newTimeCard={ newTimeCard }

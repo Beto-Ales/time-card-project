@@ -20,6 +20,17 @@ const getAll = async () => {
   return response.data
 }
 
+const getOne = async (id) => {
+  const config = {
+    headers: { Authorization: token }
+  }
+
+  const response = await axios.get(`${baseUrl}/${id}`, config)
+  // reverse?
+  response.data.hours.reverse()
+  return response.data
+}
+
 // no needed for now. solution given with login populate hours
 // -----------------------------------------------------------
 // const getOneUser = async (id) => {
@@ -49,4 +60,4 @@ const create = async newObject => {
 
 // export default { getAll, create, update, setToken }
 // export default { getAll, getOneUser, create, setToken }
-export default { getAll, create, setToken }
+export default { getAll, create, getOne, setToken }

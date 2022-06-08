@@ -1,6 +1,7 @@
-import React from 'react'
-import { useState } from 'react'
+// import React, { useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import hoursService from '../services/hours'
+import usersService from '../services/users'
 
 // ------------------------------------------------------------------------------------------------------------------------------
 // How to update state in a nested object in React with Hooks
@@ -9,9 +10,25 @@ import hoursService from '../services/hours'
 
 // component containing inner components for each screen: employee list of time cards, specific time card,
 // create time card & update time card 
-const TimeCard = ({ user, setErrorMessage }) => {
+const TimeCard = ({ user, setUser, setErrorMessage }) => {
     const [screen, setScreen] = useState('1')
     const [hours, setHours] = useState(null)
+
+    useEffect(() => {
+        if (user) {
+            if (user.username !== 'beto') {
+        try {
+          usersService.getOne(user.id)
+            .then(user => setUser(user))
+        } catch (error) {
+          setErrorMessage(error)
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
+        }
+      }
+        }
+    }, [screen])
 
     const loading = () => {
         if (user === null) {
@@ -22,8 +39,7 @@ const TimeCard = ({ user, setErrorMessage }) => {
         }
     }
 
-    const ScreenOne = ({ user }) => {
-        console.log(user.hours[0].date);
+    const ScreenOne = ({ user }) => {        
         return (
             <div>                
                 <h1>{ loading() }</h1>
@@ -49,46 +65,21 @@ const TimeCard = ({ user, setErrorMessage }) => {
         
     const ScreenTwo = ({ hours }) => {
 
-        // console.log(hours)
-        // return (
-        //   <div>
-        //       <h1>{ hours.month.toUpperCase()}</h1>
-        //       <button className='screenBtn' onClick={() => toScreen('1')} >Back</button>
-        //       <button className='screenBtn' onClick={() => toScreen('4')} >Edit</button>
-        //       <ul>
-        //           {
-        //               hours &&
-        //               hours.days.map(
-        //                   day =>
-        //                   <li key={day.dayNumber}>                              
-        //                       <p>Day: {day.dayNumber} Job description: {day.jobDescription} Start: {day.startWork}, End: {day.endWork}</p>
-        //                       <p>Total Hours: {hours.totalHours}</p>
-        //                   </li>
-        //               )
-        //           }
-        //       </ul>
-        //       <p>Month total Hours: {hours.monthHours}</p>
-        //       <p>Last update: { hours.date }</p>
-        //   </div>
-        // )
+        // const normal = hours.days.map(day => day.totalHours && day.totalHours.normal)
+        // const special = hours.days.map(day => day.totalHours && day.totalHours.special)
+        // const total = hours.days.map(day => day.totalHours && day.totalHours.total)
+        // const allNormal = normal.filter(value => value !== undefined ).reduce((a,b) => a+b)
+        // const allSpecial = special.filter(value => value !== undefined ).reduce((a,b) => a+b)
+        // const allTotal = total.filter(value => value !== undefined ).reduce((a,b) => a+b)        
+        // console.log('allNormal', allNormal)
 
-        const normal = hours.days.map(day => day.totalHours && day.totalHours.normal)
-  const special = hours.days.map(day => day.totalHours && day.totalHours.special)
-  const total = hours.days.map(day => day.totalHours && day.totalHours.total)
-  const allNormal = normal.filter(value => value !== undefined ).reduce((a,b) => a+b)
-  const allSpecial = special.filter(value => value !== undefined ).reduce((a,b) => a+b)
-  const allTotal = total.filter(value => value !== undefined ).reduce((a,b) => a+b)
-  // console.log('normal', normal, 'special', special, 'total', total)
-  console.log('allNormal', allNormal)
-
-  // let totalDemo = 0;
-  // const demo =  hours.days.map(day => totalDemo += day.totalHours)
+  
 
   return (
     <div>
       <h1>{hours.month.toUpperCase()}</h1>
       <button className='screenBtn' onClick={() => toScreen('1')} >Back</button>
-<button className='screenBtn' onClick={() => toScreen('4')} >Edit</button>
+        <button className='screenBtn' onClick={() => toScreen('4')} >Edit</button>
       
       <div className='userTable userTableHeader'>
           <span className='headerTitle'>DATE</span>
@@ -122,7 +113,8 @@ const TimeCard = ({ user, setErrorMessage }) => {
           )
         }
       </ul>      
-      <h3>Month total Hours: <span className='totalHoursStyle'>{allTotal}</span>, Normal rate: <span className='totalHoursStyle'>{allNormal}</span>, Special rate: <span className='totalHoursStyle'>{allSpecial}</span></h3>
+      {/* <h3>Month total Hours: <span className='totalHoursStyle'>{allTotal}</span>, Normal rate: <span className='totalHoursStyle'>{allNormal}</span>, Special rate: <span className='totalHoursStyle'>{allSpecial}</span></h3> */}
+      <h3>Month total Hours: <span className='totalHoursStyle'>{hours.monthHours.totalHours}</span>, Normal rate: <span className='totalHoursStyle'>{hours.monthHours.normalRate}</span>, Special rate: <span className='totalHoursStyle'>{hours.monthHours.specialRate}</span></h3>
     </div>
   )
 
@@ -201,15 +193,11 @@ const TimeCard = ({ user, setErrorMessage }) => {
                 normal = total
             }
 
-            // normal = normal % 1 !== 0 ? normal.toFixed(1) : normal
-            // special = special % 1 !== 0 ? special.toFixed(1) : special
-            // total = total % 1 !== 0 ? total.toFixed(1) : total
+            normal = normal % 1 !== 0 ? normal.toFixed(1) : normal
+            special = special % 1 !== 0 ? special.toFixed(1) : special
+            total = total % 1 !== 0 ? total.toFixed(1) : total
 
-            // setInputs(values => ({...values, total: total, normal: normal, special: special}))
-            // console.log('normal', normal, 'special', special)
-
-            return {
-                // normal: parseFloat(normal).toFixed(2),
+            return {                
                 normal: normal,
                 special: special,
                 total: total
@@ -518,15 +506,7 @@ const TimeCard = ({ user, setErrorMessage }) => {
             hours.days[28].totalHours = calculate(timeToDecimal(hours.days[28].startWork), timeToDecimal(hours.days[28].endWork))
             hours.days[29].totalHours = calculate(timeToDecimal(hours.days[29].startWork), timeToDecimal(hours.days[29].endWork))
             hours.days[30].totalHours = calculate(timeToDecimal(hours.days[30].startWork), timeToDecimal(hours.days[30].endWork))
-            
-          
-
-            // console.log(hours)
-            // const total = hours.days.totalHours && hours.days.map(day => day.totalHours.total)
-            // const special = hours.days.totalHours && hours.days.map(day => day.totalHours.special)
-            // const normal = hours.days.totalHours && hours.days.map(day => day.totalHours.normal)
-
-            // hours.monthHours = `Total: ${total} Special rate: ${special} Normal rate: ${normal}`
+                        
 
             const normal = hours.days.map(day => day.totalHours && day.totalHours.normal)
             const special = hours.days.map(day => day.totalHours && day.totalHours.special)
@@ -535,10 +515,14 @@ const TimeCard = ({ user, setErrorMessage }) => {
             const allSpecial = special.filter(value => value !== undefined ).reduce((a,b) => a+b)
             const allTotal = total.filter(value => value !== undefined ).reduce((a,b) => a+b)
 
+            let numallNormal = allNormal % 1 !== 0 ? parseFloat(allNormal).toFixed(1) : allNormal
+            let numallSpecial = allSpecial % 1 !== 0 ? parseFloat(allSpecial).toFixed(1) : allSpecial
+            let numallTotal = allTotal % 1 !== 0 ? parseFloat(allTotal).toFixed(1) : allTotal
+
             hours.monthHours = {
-                totalHours: allTotal,
-                normalRate: allNormal,
-                specialRate: allSpecial,
+                totalHours: numallTotal,
+                normalRate: numallNormal,
+                specialRate: numallSpecial,
             }
 
             hours.month = inputs.month
@@ -1572,7 +1556,7 @@ const TimeCard = ({ user, setErrorMessage }) => {
     // edit and update time card
     const ScreenFour = ({ hours }) => {
 
-        console.log(hours)
+        const hoursToUpdate = hours
 
         // let days
         // if (hours) {
@@ -1583,109 +1567,109 @@ const TimeCard = ({ user, setErrorMessage }) => {
         // from screenThree
         // ----------------
         const [inputs, setInputs] = useState({
-            month: hours.month
+            month: hoursToUpdate.month
         })        
         const [start, setStart] = useState({
-            startWork0: hours.days[0].startWork,
-            startWork1: hours.days[1].startWork,
-            startWork2: hours.days[2].startWork,
-            startWork3: hours.days[3].startWork,
-            startWork4: hours.days[4].startWork,
-            startWork5: hours.days[5].startWork,
-            startWork6: hours.days[6].startWork,
-            startWork7: hours.days[7].startWork,
-            startWork8: hours.days[8].startWork,
-            startWork9: hours.days[9].startWork,
-            startWork10: hours.days[10].startWork,
-            startWork11: hours.days[11].startWork,
-            startWork12: hours.days[12].startWork,
-            startWork13: hours.days[13].startWork,
-            startWork14: hours.days[14].startWork,
-            startWork15: hours.days[15].startWork,
-            startWork16: hours.days[16].startWork,
-            startWork17: hours.days[17].startWork,
-            startWork18: hours.days[18].startWork,
-            startWork19: hours.days[19].startWork,
-            startWork20: hours.days[20].startWork,
-            startWork21: hours.days[21].startWork,
-            startWork22: hours.days[22].startWork,
-            startWork23: hours.days[23].startWork,
-            startWork24: hours.days[24].startWork,
-            startWork25: hours.days[25].startWork,
-            startWork26: hours.days[26].startWork,
-            startWork27: hours.days[27].startWork,
-            startWork28: hours.days[28].startWork,
-            startWork29: hours.days[29].startWork,
-            startWork30: hours.days[30].startWork,
+            startWork0: hoursToUpdate.days[0].startWork,
+            startWork1: hoursToUpdate.days[1].startWork,
+            startWork2: hoursToUpdate.days[2].startWork,
+            startWork3: hoursToUpdate.days[3].startWork,
+            startWork4: hoursToUpdate.days[4].startWork,
+            startWork5: hoursToUpdate.days[5].startWork,
+            startWork6: hoursToUpdate.days[6].startWork,
+            startWork7: hoursToUpdate.days[7].startWork,
+            startWork8: hoursToUpdate.days[8].startWork,
+            startWork9: hoursToUpdate.days[9].startWork,
+            startWork10: hoursToUpdate.days[10].startWork,
+            startWork11: hoursToUpdate.days[11].startWork,
+            startWork12: hoursToUpdate.days[12].startWork,
+            startWork13: hoursToUpdate.days[13].startWork,
+            startWork14: hoursToUpdate.days[14].startWork,
+            startWork15: hoursToUpdate.days[15].startWork,
+            startWork16: hoursToUpdate.days[16].startWork,
+            startWork17: hoursToUpdate.days[17].startWork,
+            startWork18: hoursToUpdate.days[18].startWork,
+            startWork19: hoursToUpdate.days[19].startWork,
+            startWork20: hoursToUpdate.days[20].startWork,
+            startWork21: hoursToUpdate.days[21].startWork,
+            startWork22: hoursToUpdate.days[22].startWork,
+            startWork23: hoursToUpdate.days[23].startWork,
+            startWork24: hoursToUpdate.days[24].startWork,
+            startWork25: hoursToUpdate.days[25].startWork,
+            startWork26: hoursToUpdate.days[26].startWork,
+            startWork27: hoursToUpdate.days[27].startWork,
+            startWork28: hoursToUpdate.days[28].startWork,
+            startWork29: hoursToUpdate.days[29].startWork,
+            startWork30: hoursToUpdate.days[30].startWork,
         })
         const [end, setEnd] = useState({
-            endWork0: hours.days[0].endWork,
-            endtWork1: hours.days[1].endtWork,
-            endtWork2: hours.days[2].endtWork,
-            endtWork3: hours.days[3].endtWork,
-            endtWork4: hours.days[4].endtWork,
-            endtWork5: hours.days[5].endtWork,
-            endtWork6: hours.days[6].endtWork,
-            endtWork7: hours.days[7].endtWork,
-            endtWork8: hours.days[8].endtWork,
-            endtWork9: hours.days[9].endtWork,
-            endtWork10: hours.days[10].endtWork,
-            endtWork11: hours.days[11].endtWork,
-            endtWork12: hours.days[12].endtWork,
-            endtWork13: hours.days[13].endtWork,
-            endtWork14: hours.days[14].endtWork,
-            endtWork15: hours.days[15].endtWork,
-            endtWork16: hours.days[16].endtWork,
-            endtWork17: hours.days[17].endtWork,
-            endtWork18: hours.days[18].endtWork,
-            endtWork19: hours.days[19].endtWork,
-            endtWork20: hours.days[20].endtWork,
-            endtWork21: hours.days[21].endtWork,
-            endtWork22: hours.days[22].endtWork,
-            endtWork23: hours.days[23].endtWork,
-            endtWork24: hours.days[24].endtWork,
-            endtWork25: hours.days[25].endtWork,
-            endtWork26: hours.days[26].endtWork,
-            endtWork27: hours.days[27].endtWork,
-            endtWork28: hours.days[28].endtWork,
-            endtWork29: hours.days[29].endtWork,
-            endtWork30: hours.days[30].endtWork,
+            endWork0: hoursToUpdate.days[0].endWork,
+            endWork1: hoursToUpdate.days[1].endWork,
+            endWork2: hoursToUpdate.days[2].endWork,
+            endWork3: hoursToUpdate.days[3].endWork,
+            endWork4: hoursToUpdate.days[4].endWork,
+            endWork5: hoursToUpdate.days[5].endWork,
+            endWork6: hoursToUpdate.days[6].endWork,
+            endWork7: hoursToUpdate.days[7].endWork,
+            endWork8: hoursToUpdate.days[8].endWork,
+            endWork9: hoursToUpdate.days[9].endWork,
+            endWork10: hoursToUpdate.days[10].endWork,
+            endWork11: hoursToUpdate.days[11].endWork,
+            endWork12: hoursToUpdate.days[12].endWork,
+            endWork13: hoursToUpdate.days[13].endWork,
+            endWork14: hoursToUpdate.days[14].endWork,
+            endWork15: hoursToUpdate.days[15].endWork,
+            endWork16: hoursToUpdate.days[16].endWork,
+            endWork17: hoursToUpdate.days[17].endWork,
+            endWork18: hoursToUpdate.days[18].endWork,
+            endWork19: hoursToUpdate.days[19].endWork,
+            endWork20: hoursToUpdate.days[20].endWork,
+            endWork21: hoursToUpdate.days[21].endWork,
+            endWork22: hoursToUpdate.days[22].endWork,
+            endWork23: hoursToUpdate.days[23].endWork,
+            endWork24: hoursToUpdate.days[24].endWork,
+            endWork25: hoursToUpdate.days[25].endWork,
+            endWork26: hoursToUpdate.days[26].endWork,
+            endWork27: hoursToUpdate.days[27].endWork,
+            endWork28: hoursToUpdate.days[28].endWork,
+            endWork29: hoursToUpdate.days[29].endWork,
+            endWork30: hoursToUpdate.days[30].endWork,
         })
         const [description, setDescription] = useState({
-            jobDescription0: hours.days[0].jobDescription,
-                jobDescription1: hours.days[1].jobDescription,
-                jobDescription2: hours.days[2].jobDescription,
-                jobDescription3: hours.days[3].jobDescription,
-                jobDescription4: hours.days[4].jobDescription,
-                jobDescription5: hours.days[5].jobDescription,
-                jobDescription6: hours.days[6].jobDescription,
-                jobDescription7: hours.days[7].jobDescription,
-                jobDescription8: hours.days[8].jobDescription,
-                jobDescription9: hours.days[9].jobDescription,
-                jobDescription10: hours.days[10].jobDescription,
-                jobDescription11: hours.days[11].jobDescription,
-                jobDescription12: hours.days[12].jobDescription,
-                jobDescription13: hours.days[13].jobDescription,
-                jobDescription14: hours.days[14].jobDescription,
-                jobDescription15: hours.days[15].jobDescription,
-                jobDescription16: hours.days[16].jobDescription,
-                jobDescription17: hours.days[17].jobDescription,
-                jobDescription18: hours.days[18].jobDescription,
-                jobDescription19: hours.days[19].jobDescription,
-                jobDescription20: hours.days[20].jobDescription,
-                jobDescription21: hours.days[21].jobDescription,
-                jobDescription22: hours.days[22].jobDescription,
-                jobDescription23: hours.days[23].jobDescription,
-                jobDescription24: hours.days[24].jobDescription,
-                jobDescription25: hours.days[25].jobDescription,
-                jobDescription26: hours.days[26].jobDescription,
-                jobDescription27: hours.days[27].jobDescription,
-                jobDescription28: hours.days[28].jobDescription,
-                jobDescription29: hours.days[29].jobDescription,
-                jobDescription30: hours.days[30].jobDescription,
+            jobDescription0: hoursToUpdate.days[0].jobDescription,
+                jobDescription1: hoursToUpdate.days[1].jobDescription,
+                jobDescription2: hoursToUpdate.days[2].jobDescription,
+                jobDescription3: hoursToUpdate.days[3].jobDescription,
+                jobDescription4: hoursToUpdate.days[4].jobDescription,
+                jobDescription5: hoursToUpdate.days[5].jobDescription,
+                jobDescription6: hoursToUpdate.days[6].jobDescription,
+                jobDescription7: hoursToUpdate.days[7].jobDescription,
+                jobDescription8: hoursToUpdate.days[8].jobDescription,
+                jobDescription9: hoursToUpdate.days[9].jobDescription,
+                jobDescription10: hoursToUpdate.days[10].jobDescription,
+                jobDescription11: hoursToUpdate.days[11].jobDescription,
+                jobDescription12: hoursToUpdate.days[12].jobDescription,
+                jobDescription13: hoursToUpdate.days[13].jobDescription,
+                jobDescription14: hoursToUpdate.days[14].jobDescription,
+                jobDescription15: hoursToUpdate.days[15].jobDescription,
+                jobDescription16: hoursToUpdate.days[16].jobDescription,
+                jobDescription17: hoursToUpdate.days[17].jobDescription,
+                jobDescription18: hoursToUpdate.days[18].jobDescription,
+                jobDescription19: hoursToUpdate.days[19].jobDescription,
+                jobDescription20: hoursToUpdate.days[20].jobDescription,
+                jobDescription21: hoursToUpdate.days[21].jobDescription,
+                jobDescription22: hoursToUpdate.days[22].jobDescription,
+                jobDescription23: hoursToUpdate.days[23].jobDescription,
+                jobDescription24: hoursToUpdate.days[24].jobDescription,
+                jobDescription25: hoursToUpdate.days[25].jobDescription,
+                jobDescription26: hoursToUpdate.days[26].jobDescription,
+                jobDescription27: hoursToUpdate.days[27].jobDescription,
+                jobDescription28: hoursToUpdate.days[28].jobDescription,
+                jobDescription29: hoursToUpdate.days[29].jobDescription,
+                jobDescription30: hoursToUpdate.days[30].jobDescription,
         })
         // const [days, setDays] = useState([])    // days is not defined
-        // setDays(hours.days) // days is not defined
+        // setDays(hoursToUpdate.days) // days is not defined
         
         const timeToDecimal = (t) => {
             var arr = t.split(':')
@@ -1700,10 +1684,18 @@ const TimeCard = ({ user, setErrorMessage }) => {
             let end = endTime
             let normal = 0
             let special = 0
+
             if (end < 4) {
                 end += 24
             }
-            const total = end - start
+
+            // check if it works
+            if(startTime === endTime) {
+                start = 0
+                end = 0
+            }
+            
+            let total = end - start
             
             if (end > 18) {
                 special = end - 18
@@ -1712,6 +1704,10 @@ const TimeCard = ({ user, setErrorMessage }) => {
                 normal = total
             }
 
+            normal = normal % 1 !== 0 ? normal.toFixed(1) : normal
+            special = special % 1 !== 0 ? special.toFixed(1) : special
+            total = total % 1 !== 0 ? total.toFixed(1) : total
+
             return {                
                 normal: normal,
                 special: special,
@@ -1719,41 +1715,41 @@ const TimeCard = ({ user, setErrorMessage }) => {
             }
         }
 
-        // set the inputs with the time card details from state hours
-        // doesn't work becous every time set is called it rerender the component
+        // set the inputs with the time card details from state hoursToUpdate
+        // doesn't work becouse every time set is called it rerender the component
         // use state default in declaration intead
         // setStart(values => ({...values,
-        //         startWork0: hours.days[0].startWork,
-        //         startWork1: hours.days[1].startWork,
-        //         startWork2: hours.days[2].startWork,
-        //         startWork3: hours.days[3].startWork,
-        //         startWork4: hours.days[4].startWork,
-        //         startWork5: hours.days[5].startWork,
-        //         startWork6: hours.days[6].startWork,
-        //         startWork7: hours.days[7].startWork,
-        //         startWork8: hours.days[8].startWork,
-        //         startWork9: hours.days[9].startWork,
-        //         startWork10: hours.days[10].startWork,
-        //         startWork11: hours.days[11].startWork,
-        //         startWork12: hours.days[12].startWork,
-        //         startWork13: hours.days[13].startWork,
-        //         startWork14: hours.days[14].startWork,
-        //         startWork15: hours.days[15].startWork,
-        //         startWork16: hours.days[16].startWork,
-        //         startWork17: hours.days[17].startWork,
-        //         startWork18: hours.days[18].startWork,
-        //         startWork19: hours.days[19].startWork,
-        //         startWork20: hours.days[20].startWork,
-        //         startWork21: hours.days[21].startWork,
-        //         startWork22: hours.days[22].startWork,
-        //         startWork23: hours.days[23].startWork,
-        //         startWork24: hours.days[24].startWork,
-        //         startWork25: hours.days[25].startWork,
-        //         startWork26: hours.days[26].startWork,
-        //         startWork27: hours.days[27].startWork,
-        //         startWork28: hours.days[28].startWork,
-        //         startWork29: hours.days[29].startWork,
-        //         startWork30: hours.days[30].startWork,
+        //         startWork0: hoursToUpdate.days[0].startWork,
+        //         startWork1: hoursToUpdate.days[1].startWork,
+        //         startWork2: hoursToUpdate.days[2].startWork,
+        //         startWork3: hoursToUpdate.days[3].startWork,
+        //         startWork4: hoursToUpdate.days[4].startWork,
+        //         startWork5: hoursToUpdate.days[5].startWork,
+        //         startWork6: hoursToUpdate.days[6].startWork,
+        //         startWork7: hoursToUpdate.days[7].startWork,
+        //         startWork8: hoursToUpdate.days[8].startWork,
+        //         startWork9: hoursToUpdate.days[9].startWork,
+        //         startWork10: hoursToUpdate.days[10].startWork,
+        //         startWork11: hoursToUpdate.days[11].startWork,
+        //         startWork12: hoursToUpdate.days[12].startWork,
+        //         startWork13: hoursToUpdate.days[13].startWork,
+        //         startWork14: hoursToUpdate.days[14].startWork,
+        //         startWork15: hoursToUpdate.days[15].startWork,
+        //         startWork16: hoursToUpdate.days[16].startWork,
+        //         startWork17: hoursToUpdate.days[17].startWork,
+        //         startWork18: hoursToUpdate.days[18].startWork,
+        //         startWork19: hoursToUpdate.days[19].startWork,
+        //         startWork20: hoursToUpdate.days[20].startWork,
+        //         startWork21: hoursToUpdate.days[21].startWork,
+        //         startWork22: hoursToUpdate.days[22].startWork,
+        //         startWork23: hoursToUpdate.days[23].startWork,
+        //         startWork24: hoursToUpdate.days[24].startWork,
+        //         startWork25: hoursToUpdate.days[25].startWork,
+        //         startWork26: hoursToUpdate.days[26].startWork,
+        //         startWork27: hoursToUpdate.days[27].startWork,
+        //         startWork28: hoursToUpdate.days[28].startWork,
+        //         startWork29: hoursToUpdate.days[29].startWork,
+        //         startWork30: hoursToUpdate.days[30].startWork,
         //     }))
 
             console.log(start)
@@ -1897,151 +1893,164 @@ const TimeCard = ({ user, setErrorMessage }) => {
             } = description
             
             // if startWork is not defined, leave default value time 00:00
-            hours.days[0].startWork = startWork0 ? startWork0 : '00:00'
-            hours.days[1].startWork = startWork1 ? startWork1 : '00:00'
-            hours.days[2].startWork = startWork2 ? startWork2 : '00:00'
-            hours.days[3].startWork = startWork3 ? startWork3 : '00:00'
-            hours.days[4].startWork = startWork4 ? startWork4 : '00:00'
-            hours.days[5].startWork = startWork5 ? startWork5 : '00:00'
-            hours.days[6].startWork = startWork6 ? startWork6 : '00:00'
-            hours.days[7].startWork = startWork7 ? startWork7 : '00:00'
-            hours.days[8].startWork = startWork8 ? startWork8 : '00:00'
-            hours.days[9].startWork = startWork9 ? startWork9 : '00:00'
-            hours.days[10].startWork = startWork10 ? startWork10 : '00:00'
-            hours.days[11].startWork = startWork11 ? startWork11 : '00:00'
-            hours.days[12].startWork = startWork12 ? startWork12 : '00:00'
-            hours.days[13].startWork = startWork13 ? startWork13 : '00:00'
-            hours.days[14].startWork = startWork14 ? startWork14 : '00:00'
-            hours.days[15].startWork = startWork15 ? startWork15 : '00:00'
-            hours.days[16].startWork = startWork16 ? startWork16 : '00:00'
-            hours.days[17].startWork = startWork17 ? startWork17 : '00:00'
-            hours.days[18].startWork = startWork18 ? startWork18 : '00:00'
-            hours.days[19].startWork = startWork19 ? startWork19 : '00:00'
-            hours.days[20].startWork = startWork20 ? startWork20 : '00:00'
-            hours.days[21].startWork = startWork21 ? startWork21 : '00:00'
-            hours.days[22].startWork = startWork22 ? startWork22 : '00:00'
-            hours.days[23].startWork = startWork23 ? startWork23 : '00:00'
-            hours.days[24].startWork = startWork24 ? startWork24 : '00:00'
-            hours.days[25].startWork = startWork25 ? startWork25 : '00:00'
-            hours.days[26].startWork = startWork26 ? startWork26 : '00:00'
-            hours.days[27].startWork = startWork27 ? startWork27 : '00:00'
-            hours.days[28].startWork = startWork28 ? startWork28 : '00:00'
-            hours.days[29].startWork = startWork29 ? startWork29 : '00:00'
-            hours.days[30].startWork = startWork30 ? startWork30 : '00:00'
+            hoursToUpdate.days[0].startWork = startWork0 ? startWork0 : '00:00'
+            hoursToUpdate.days[1].startWork = startWork1 ? startWork1 : '00:00'
+            hoursToUpdate.days[2].startWork = startWork2 ? startWork2 : '00:00'
+            hoursToUpdate.days[3].startWork = startWork3 ? startWork3 : '00:00'
+            hoursToUpdate.days[4].startWork = startWork4 ? startWork4 : '00:00'
+            hoursToUpdate.days[5].startWork = startWork5 ? startWork5 : '00:00'
+            hoursToUpdate.days[6].startWork = startWork6 ? startWork6 : '00:00'
+            hoursToUpdate.days[7].startWork = startWork7 ? startWork7 : '00:00'
+            hoursToUpdate.days[8].startWork = startWork8 ? startWork8 : '00:00'
+            hoursToUpdate.days[9].startWork = startWork9 ? startWork9 : '00:00'
+            hoursToUpdate.days[10].startWork = startWork10 ? startWork10 : '00:00'
+            hoursToUpdate.days[11].startWork = startWork11 ? startWork11 : '00:00'
+            hoursToUpdate.days[12].startWork = startWork12 ? startWork12 : '00:00'
+            hoursToUpdate.days[13].startWork = startWork13 ? startWork13 : '00:00'
+            hoursToUpdate.days[14].startWork = startWork14 ? startWork14 : '00:00'
+            hoursToUpdate.days[15].startWork = startWork15 ? startWork15 : '00:00'
+            hoursToUpdate.days[16].startWork = startWork16 ? startWork16 : '00:00'
+            hoursToUpdate.days[17].startWork = startWork17 ? startWork17 : '00:00'
+            hoursToUpdate.days[18].startWork = startWork18 ? startWork18 : '00:00'
+            hoursToUpdate.days[19].startWork = startWork19 ? startWork19 : '00:00'
+            hoursToUpdate.days[20].startWork = startWork20 ? startWork20 : '00:00'
+            hoursToUpdate.days[21].startWork = startWork21 ? startWork21 : '00:00'
+            hoursToUpdate.days[22].startWork = startWork22 ? startWork22 : '00:00'
+            hoursToUpdate.days[23].startWork = startWork23 ? startWork23 : '00:00'
+            hoursToUpdate.days[24].startWork = startWork24 ? startWork24 : '00:00'
+            hoursToUpdate.days[25].startWork = startWork25 ? startWork25 : '00:00'
+            hoursToUpdate.days[26].startWork = startWork26 ? startWork26 : '00:00'
+            hoursToUpdate.days[27].startWork = startWork27 ? startWork27 : '00:00'
+            hoursToUpdate.days[28].startWork = startWork28 ? startWork28 : '00:00'
+            hoursToUpdate.days[29].startWork = startWork29 ? startWork29 : '00:00'
+            hoursToUpdate.days[30].startWork = startWork30 ? startWork30 : '00:00'
             
             // if endWork is not defined, leave default value time 00:00
-            hours.days[0].endWork = endWork0 ? endWork0 : '00:00'
-            hours.days[1].endWork = endWork1 ? endWork1 : '00:00'
-            hours.days[2].endWork = endWork2 ? endWork2 : '00:00'
-            hours.days[3].endWork = endWork3 ? endWork3 : '00:00'
-            hours.days[4].endWork = endWork4 ? endWork4 : '00:00'
-            hours.days[5].endWork = endWork5 ? endWork5 : '00:00'
-            hours.days[6].endWork = endWork6 ? endWork6 : '00:00'
-            hours.days[7].endWork = endWork7 ? endWork7 : '00:00'
-            hours.days[8].endWork = endWork8 ? endWork8 : '00:00'
-            hours.days[9].endWork = endWork9 ? endWork9 : '00:00'
-            hours.days[10].endWork = endWork10 ? endWork10 : '00:00'
-            hours.days[11].endWork = endWork11 ? endWork11 : '00:00'
-            hours.days[12].endWork = endWork12 ? endWork12 : '00:00'
-            hours.days[13].endWork = endWork13 ? endWork13 : '00:00'
-            hours.days[14].endWork = endWork14 ? endWork14 : '00:00'
-            hours.days[15].endWork = endWork15 ? endWork15 : '00:00'
-            hours.days[16].endWork = endWork16 ? endWork16 : '00:00'
-            hours.days[17].endWork = endWork17 ? endWork17 : '00:00'
-            hours.days[18].endWork = endWork18 ? endWork18 : '00:00'
-            hours.days[19].endWork = endWork19 ? endWork19 : '00:00'
-            hours.days[20].endWork = endWork20 ? endWork20 : '00:00'
-            hours.days[21].endWork = endWork21 ? endWork21 : '00:00'
-            hours.days[22].endWork = endWork22 ? endWork22 : '00:00'
-            hours.days[23].endWork = endWork23 ? endWork23 : '00:00'
-            hours.days[24].endWork = endWork24 ? endWork24 : '00:00'
-            hours.days[25].endWork = endWork25 ? endWork25 : '00:00'
-            hours.days[26].endWork = endWork26 ? endWork26 : '00:00'
-            hours.days[27].endWork = endWork27 ? endWork27 : '00:00'
-            hours.days[28].endWork = endWork28 ? endWork28 : '00:00'
-            hours.days[29].endWork = endWork29 ? endWork29 : '00:00'
-            hours.days[30].endWork = endWork30 ? endWork30 : '00:00'
+            hoursToUpdate.days[0].endWork = endWork0 ? endWork0 : '00:00'
+            hoursToUpdate.days[1].endWork = endWork1 ? endWork1 : '00:00'
+            hoursToUpdate.days[2].endWork = endWork2 ? endWork2 : '00:00'
+            hoursToUpdate.days[3].endWork = endWork3 ? endWork3 : '00:00'
+            hoursToUpdate.days[4].endWork = endWork4 ? endWork4 : '00:00'
+            hoursToUpdate.days[5].endWork = endWork5 ? endWork5 : '00:00'
+            hoursToUpdate.days[6].endWork = endWork6 ? endWork6 : '00:00'
+            hoursToUpdate.days[7].endWork = endWork7 ? endWork7 : '00:00'
+            hoursToUpdate.days[8].endWork = endWork8 ? endWork8 : '00:00'
+            hoursToUpdate.days[9].endWork = endWork9 ? endWork9 : '00:00'
+            hoursToUpdate.days[10].endWork = endWork10 ? endWork10 : '00:00'
+            hoursToUpdate.days[11].endWork = endWork11 ? endWork11 : '00:00'
+            hoursToUpdate.days[12].endWork = endWork12 ? endWork12 : '00:00'
+            hoursToUpdate.days[13].endWork = endWork13 ? endWork13 : '00:00'
+            hoursToUpdate.days[14].endWork = endWork14 ? endWork14 : '00:00'
+            hoursToUpdate.days[15].endWork = endWork15 ? endWork15 : '00:00'
+            hoursToUpdate.days[16].endWork = endWork16 ? endWork16 : '00:00'
+            hoursToUpdate.days[17].endWork = endWork17 ? endWork17 : '00:00'
+            hoursToUpdate.days[18].endWork = endWork18 ? endWork18 : '00:00'
+            hoursToUpdate.days[19].endWork = endWork19 ? endWork19 : '00:00'
+            hoursToUpdate.days[20].endWork = endWork20 ? endWork20 : '00:00'
+            hoursToUpdate.days[21].endWork = endWork21 ? endWork21 : '00:00'
+            hoursToUpdate.days[22].endWork = endWork22 ? endWork22 : '00:00'
+            hoursToUpdate.days[23].endWork = endWork23 ? endWork23 : '00:00'
+            hoursToUpdate.days[24].endWork = endWork24 ? endWork24 : '00:00'
+            hoursToUpdate.days[25].endWork = endWork25 ? endWork25 : '00:00'
+            hoursToUpdate.days[26].endWork = endWork26 ? endWork26 : '00:00'
+            hoursToUpdate.days[27].endWork = endWork27 ? endWork27 : '00:00'
+            hoursToUpdate.days[28].endWork = endWork28 ? endWork28 : '00:00'
+            hoursToUpdate.days[29].endWork = endWork29 ? endWork29 : '00:00'
+            hoursToUpdate.days[30].endWork = endWork30 ? endWork30 : '00:00'
             
-            hours.days[0].jobDescription = jobDescription0
-            hours.days[1].jobDescription = jobDescription1
-            hours.days[2].jobDescription = jobDescription2
-            hours.days[3].jobDescription = jobDescription3
-            hours.days[4].jobDescription = jobDescription4
-            hours.days[5].jobDescription = jobDescription5
-            hours.days[6].jobDescription = jobDescription6
-            hours.days[7].jobDescription = jobDescription7
-            hours.days[8].jobDescription = jobDescription8
-            hours.days[9].jobDescription = jobDescription9
-            hours.days[10].jobDescription = jobDescription10
-            hours.days[11].jobDescription = jobDescription11
-            hours.days[12].jobDescription = jobDescription12
-            hours.days[13].jobDescription = jobDescription13
-            hours.days[14].jobDescription = jobDescription14
-            hours.days[15].jobDescription = jobDescription15
-            hours.days[16].jobDescription = jobDescription16
-            hours.days[17].jobDescription = jobDescription17
-            hours.days[18].jobDescription = jobDescription18
-            hours.days[19].jobDescription = jobDescription19
-            hours.days[20].jobDescription = jobDescription20
-            hours.days[21].jobDescription = jobDescription21
-            hours.days[22].jobDescription = jobDescription22
-            hours.days[23].jobDescription = jobDescription23
-            hours.days[24].jobDescription = jobDescription24
-            hours.days[25].jobDescription = jobDescription25
-            hours.days[26].jobDescription = jobDescription26
-            hours.days[27].jobDescription = jobDescription27
-            hours.days[28].jobDescription = jobDescription28
-            hours.days[29].jobDescription = jobDescription29
-            hours.days[30].jobDescription = jobDescription30
+            hoursToUpdate.days[0].jobDescription = jobDescription0
+            hoursToUpdate.days[1].jobDescription = jobDescription1
+            hoursToUpdate.days[2].jobDescription = jobDescription2
+            hoursToUpdate.days[3].jobDescription = jobDescription3
+            hoursToUpdate.days[4].jobDescription = jobDescription4
+            hoursToUpdate.days[5].jobDescription = jobDescription5
+            hoursToUpdate.days[6].jobDescription = jobDescription6
+            hoursToUpdate.days[7].jobDescription = jobDescription7
+            hoursToUpdate.days[8].jobDescription = jobDescription8
+            hoursToUpdate.days[9].jobDescription = jobDescription9
+            hoursToUpdate.days[10].jobDescription = jobDescription10
+            hoursToUpdate.days[11].jobDescription = jobDescription11
+            hoursToUpdate.days[12].jobDescription = jobDescription12
+            hoursToUpdate.days[13].jobDescription = jobDescription13
+            hoursToUpdate.days[14].jobDescription = jobDescription14
+            hoursToUpdate.days[15].jobDescription = jobDescription15
+            hoursToUpdate.days[16].jobDescription = jobDescription16
+            hoursToUpdate.days[17].jobDescription = jobDescription17
+            hoursToUpdate.days[18].jobDescription = jobDescription18
+            hoursToUpdate.days[19].jobDescription = jobDescription19
+            hoursToUpdate.days[20].jobDescription = jobDescription20
+            hoursToUpdate.days[21].jobDescription = jobDescription21
+            hoursToUpdate.days[22].jobDescription = jobDescription22
+            hoursToUpdate.days[23].jobDescription = jobDescription23
+            hoursToUpdate.days[24].jobDescription = jobDescription24
+            hoursToUpdate.days[25].jobDescription = jobDescription25
+            hoursToUpdate.days[26].jobDescription = jobDescription26
+            hoursToUpdate.days[27].jobDescription = jobDescription27
+            hoursToUpdate.days[28].jobDescription = jobDescription28
+            hoursToUpdate.days[29].jobDescription = jobDescription29
+            hoursToUpdate.days[30].jobDescription = jobDescription30
 
             // use default value time 00:00
-            hours.days[0].totalHours = calculate(timeToDecimal(hours.days[0].startWork), timeToDecimal(hours.days[0].endWork))
-            hours.days[1].totalHours = calculate(timeToDecimal(hours.days[1].startWork), timeToDecimal(hours.days[1].endWork))
-            hours.days[2].totalHours = calculate(timeToDecimal(hours.days[2].startWork), timeToDecimal(hours.days[2].endWork))
-            hours.days[3].totalHours = calculate(timeToDecimal(hours.days[3].startWork), timeToDecimal(hours.days[3].endWork))
-            hours.days[4].totalHours = calculate(timeToDecimal(hours.days[4].startWork), timeToDecimal(hours.days[4].endWork))
-            hours.days[5].totalHours = calculate(timeToDecimal(hours.days[5].startWork), timeToDecimal(hours.days[5].endWork))
-            hours.days[6].totalHours = calculate(timeToDecimal(hours.days[6].startWork), timeToDecimal(hours.days[6].endWork))
-            hours.days[7].totalHours = calculate(timeToDecimal(hours.days[7].startWork), timeToDecimal(hours.days[7].endWork))
-            hours.days[8].totalHours = calculate(timeToDecimal(hours.days[8].startWork), timeToDecimal(hours.days[8].endWork))
-            hours.days[9].totalHours = calculate(timeToDecimal(hours.days[9].startWork), timeToDecimal(hours.days[9].endWork))
-            hours.days[10].totalHours = calculate(timeToDecimal(hours.days[10].startWork), timeToDecimal(hours.days[10].endWork))
-            hours.days[11].totalHours = calculate(timeToDecimal(hours.days[11].startWork), timeToDecimal(hours.days[11].endWork))
-            hours.days[12].totalHours = calculate(timeToDecimal(hours.days[12].startWork), timeToDecimal(hours.days[12].endWork))
-            hours.days[13].totalHours = calculate(timeToDecimal(hours.days[13].startWork), timeToDecimal(hours.days[13].endWork))
-            hours.days[14].totalHours = calculate(timeToDecimal(hours.days[14].startWork), timeToDecimal(hours.days[14].endWork))
-            hours.days[15].totalHours = calculate(timeToDecimal(hours.days[15].startWork), timeToDecimal(hours.days[15].endWork))
-            hours.days[16].totalHours = calculate(timeToDecimal(hours.days[16].startWork), timeToDecimal(hours.days[16].endWork))
-            hours.days[17].totalHours = calculate(timeToDecimal(hours.days[17].startWork), timeToDecimal(hours.days[17].endWork))
-            hours.days[18].totalHours = calculate(timeToDecimal(hours.days[18].startWork), timeToDecimal(hours.days[18].endWork))
-            hours.days[19].totalHours = calculate(timeToDecimal(hours.days[19].startWork), timeToDecimal(hours.days[19].endWork))
-            hours.days[20].totalHours = calculate(timeToDecimal(hours.days[20].startWork), timeToDecimal(hours.days[20].endWork))
-            hours.days[21].totalHours = calculate(timeToDecimal(hours.days[21].startWork), timeToDecimal(hours.days[21].endWork))
-            hours.days[22].totalHours = calculate(timeToDecimal(hours.days[22].startWork), timeToDecimal(hours.days[22].endWork))
-            hours.days[23].totalHours = calculate(timeToDecimal(hours.days[23].startWork), timeToDecimal(hours.days[23].endWork))
-            hours.days[24].totalHours = calculate(timeToDecimal(hours.days[24].startWork), timeToDecimal(hours.days[24].endWork))
-            hours.days[25].totalHours = calculate(timeToDecimal(hours.days[25].startWork), timeToDecimal(hours.days[25].endWork))
-            hours.days[26].totalHours = calculate(timeToDecimal(hours.days[26].startWork), timeToDecimal(hours.days[26].endWork))
-            hours.days[27].totalHours = calculate(timeToDecimal(hours.days[27].startWork), timeToDecimal(hours.days[27].endWork))
-            hours.days[28].totalHours = calculate(timeToDecimal(hours.days[28].startWork), timeToDecimal(hours.days[28].endWork))
-            hours.days[29].totalHours = calculate(timeToDecimal(hours.days[29].startWork), timeToDecimal(hours.days[29].endWork))
-            hours.days[30].totalHours = calculate(timeToDecimal(hours.days[30].startWork), timeToDecimal(hours.days[30].endWork))
+            hoursToUpdate.days[0].totalHours = calculate(timeToDecimal(hoursToUpdate.days[0].startWork), timeToDecimal(hoursToUpdate.days[0].endWork))
+            hoursToUpdate.days[1].totalHours = calculate(timeToDecimal(hoursToUpdate.days[1].startWork), timeToDecimal(hoursToUpdate.days[1].endWork))
+            hoursToUpdate.days[2].totalHours = calculate(timeToDecimal(hoursToUpdate.days[2].startWork), timeToDecimal(hoursToUpdate.days[2].endWork))
+            hoursToUpdate.days[3].totalHours = calculate(timeToDecimal(hoursToUpdate.days[3].startWork), timeToDecimal(hoursToUpdate.days[3].endWork))
+            hoursToUpdate.days[4].totalHours = calculate(timeToDecimal(hoursToUpdate.days[4].startWork), timeToDecimal(hoursToUpdate.days[4].endWork))
+            hoursToUpdate.days[5].totalHours = calculate(timeToDecimal(hoursToUpdate.days[5].startWork), timeToDecimal(hoursToUpdate.days[5].endWork))
+            hoursToUpdate.days[6].totalHours = calculate(timeToDecimal(hoursToUpdate.days[6].startWork), timeToDecimal(hoursToUpdate.days[6].endWork))
+            hoursToUpdate.days[7].totalHours = calculate(timeToDecimal(hoursToUpdate.days[7].startWork), timeToDecimal(hoursToUpdate.days[7].endWork))
+            hoursToUpdate.days[8].totalHours = calculate(timeToDecimal(hoursToUpdate.days[8].startWork), timeToDecimal(hoursToUpdate.days[8].endWork))
+            hoursToUpdate.days[9].totalHours = calculate(timeToDecimal(hoursToUpdate.days[9].startWork), timeToDecimal(hoursToUpdate.days[9].endWork))
+            hoursToUpdate.days[10].totalHours = calculate(timeToDecimal(hoursToUpdate.days[10].startWork), timeToDecimal(hoursToUpdate.days[10].endWork))
+            hoursToUpdate.days[11].totalHours = calculate(timeToDecimal(hoursToUpdate.days[11].startWork), timeToDecimal(hoursToUpdate.days[11].endWork))
+            hoursToUpdate.days[12].totalHours = calculate(timeToDecimal(hoursToUpdate.days[12].startWork), timeToDecimal(hoursToUpdate.days[12].endWork))
+            hoursToUpdate.days[13].totalHours = calculate(timeToDecimal(hoursToUpdate.days[13].startWork), timeToDecimal(hoursToUpdate.days[13].endWork))
+            hoursToUpdate.days[14].totalHours = calculate(timeToDecimal(hoursToUpdate.days[14].startWork), timeToDecimal(hoursToUpdate.days[14].endWork))
+            hoursToUpdate.days[15].totalHours = calculate(timeToDecimal(hoursToUpdate.days[15].startWork), timeToDecimal(hoursToUpdate.days[15].endWork))
+            hoursToUpdate.days[16].totalHours = calculate(timeToDecimal(hoursToUpdate.days[16].startWork), timeToDecimal(hoursToUpdate.days[16].endWork))
+            hoursToUpdate.days[17].totalHours = calculate(timeToDecimal(hoursToUpdate.days[17].startWork), timeToDecimal(hoursToUpdate.days[17].endWork))
+            hoursToUpdate.days[18].totalHours = calculate(timeToDecimal(hoursToUpdate.days[18].startWork), timeToDecimal(hoursToUpdate.days[18].endWork))
+            hoursToUpdate.days[19].totalHours = calculate(timeToDecimal(hoursToUpdate.days[19].startWork), timeToDecimal(hoursToUpdate.days[19].endWork))
+            hoursToUpdate.days[20].totalHours = calculate(timeToDecimal(hoursToUpdate.days[20].startWork), timeToDecimal(hoursToUpdate.days[20].endWork))
+            hoursToUpdate.days[21].totalHours = calculate(timeToDecimal(hoursToUpdate.days[21].startWork), timeToDecimal(hoursToUpdate.days[21].endWork))
+            hoursToUpdate.days[22].totalHours = calculate(timeToDecimal(hoursToUpdate.days[22].startWork), timeToDecimal(hoursToUpdate.days[22].endWork))
+            hoursToUpdate.days[23].totalHours = calculate(timeToDecimal(hoursToUpdate.days[23].startWork), timeToDecimal(hoursToUpdate.days[23].endWork))
+            hoursToUpdate.days[24].totalHours = calculate(timeToDecimal(hoursToUpdate.days[24].startWork), timeToDecimal(hoursToUpdate.days[24].endWork))
+            hoursToUpdate.days[25].totalHours = calculate(timeToDecimal(hoursToUpdate.days[25].startWork), timeToDecimal(hoursToUpdate.days[25].endWork))
+            hoursToUpdate.days[26].totalHours = calculate(timeToDecimal(hoursToUpdate.days[26].startWork), timeToDecimal(hoursToUpdate.days[26].endWork))
+            hoursToUpdate.days[27].totalHours = calculate(timeToDecimal(hoursToUpdate.days[27].startWork), timeToDecimal(hoursToUpdate.days[27].endWork))
+            hoursToUpdate.days[28].totalHours = calculate(timeToDecimal(hoursToUpdate.days[28].startWork), timeToDecimal(hoursToUpdate.days[28].endWork))
+            hoursToUpdate.days[29].totalHours = calculate(timeToDecimal(hoursToUpdate.days[29].startWork), timeToDecimal(hoursToUpdate.days[29].endWork))
+            hoursToUpdate.days[30].totalHours = calculate(timeToDecimal(hoursToUpdate.days[30].startWork), timeToDecimal(hoursToUpdate.days[30].endWork))
             
           
 
-            // console.log(hours)
-            // const total = hours.days.totalHours && hours.days.map(day => day.totalHours.total)
-            // const special = hours.days.totalHours && hours.days.map(day => day.totalHours.special)
-            // const normal = hours.days.totalHours && hours.days.map(day => day.totalHours.normal)
+            const normal = hoursToUpdate.days.map(day => day.totalHours && day.totalHours.normal)
+            const special = hoursToUpdate.days.map(day => day.totalHours && day.totalHours.special)
+            const total = hoursToUpdate.days.map(day => day.totalHours && day.totalHours.total)
+            const allNormal = normal.filter(value => value !== undefined ).map(x => x = Number(x)).reduce((a,b) => a+b)
+            const allSpecial = special.filter(value => value !== undefined ).map(x => x = Number(x)).reduce((a,b) => a+b)
+            const allTotal = total.filter(value => value !== undefined ).map(x => x = Number(x)).reduce((a,b) => a+b)
 
-            // hours.monthHours = `Total: ${total} Special rate: ${special} Normal rate: ${normal}`
+            let numallNormal = allNormal % 1 !== 0 ? parseFloat(allNormal).toFixed(1) : allNormal
+            let numallSpecial = allSpecial % 1 !== 0 ? parseFloat(allSpecial).toFixed(1) : allSpecial
+            let numallTotal = allTotal % 1 !== 0 ? parseFloat(allTotal).toFixed(1) : allTotal
+
+            hoursToUpdate.monthHours = {
+                totalHours: numallTotal,
+                normalRate: numallNormal,
+                specialRate: numallSpecial,
+            }
+
+            console.log('normal', normal, 'allNormal', allNormal, 'numallNormal', numallNormal, 'hoursToUpdate.monthHours.normalRate', hoursToUpdate.monthHours.normalRate);
+            
 
             
 
-            hours.month = inputs.month
+            hoursToUpdate.month = inputs.month
             
             await hoursService
-              .update(hours.id, hours)
+              .update(hours.id, hoursToUpdate)
             // console.log(inputs)
               setErrorMessage('Time card created')
               setTimeout(() => {

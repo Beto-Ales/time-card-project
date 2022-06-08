@@ -62,8 +62,6 @@ const ScreenThree = ({ hours }) => {
   // // console.log('normal', normal, 'special', special, 'total', total)
   // console.log('allNormal', allNormal)
 
-  
-
   return (
     <div>
       <h1>{hours.month.toUpperCase()}</h1>
@@ -103,7 +101,6 @@ const ScreenThree = ({ hours }) => {
       </ul>      
       {/* <h3>Month total Hours: <span className='totalHoursStyle'>{allTotal}</span>, Normal rate: <span className='totalHoursStyle'>{allNormal}</span>, Special rate: <span className='totalHoursStyle'>{allSpecial}</span></h3> */}
       <h3>Month total Hours: <span className='totalHoursStyle'>{hours.monthHours.totalHours}</span>, Normal rate: <span className='totalHoursStyle'>{hours.monthHours.normalRate}</span>, Special rate: <span className='totalHoursStyle'>{hours.monthHours.specialRate}</span></h3>
-      {/* <h3>{hours.monthHours}</h3> */}
     </div>
   )
 }
