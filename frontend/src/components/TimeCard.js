@@ -511,9 +511,9 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             const normal = hours.days.map(day => day.totalHours && day.totalHours.normal)
             const special = hours.days.map(day => day.totalHours && day.totalHours.special)
             const total = hours.days.map(day => day.totalHours && day.totalHours.total)
-            const allNormal = normal.filter(value => value !== undefined ).reduce((a,b) => a+b)
-            const allSpecial = special.filter(value => value !== undefined ).reduce((a,b) => a+b)
-            const allTotal = total.filter(value => value !== undefined ).reduce((a,b) => a+b)
+            const allNormal = normal.filter(value => value !== undefined ).map(x => x = Number(x)).reduce((a,b) => a+b)
+            const allSpecial = special.filter(value => value !== undefined ).map(x => x = Number(x)).reduce((a,b) => a+b)
+            const allTotal = total.filter(value => value !== undefined ).map(x => x = Number(x)).reduce((a,b) => a+b)
 
             let numallNormal = allNormal % 1 !== 0 ? parseFloat(allNormal).toFixed(1) : allNormal
             let numallSpecial = allSpecial % 1 !== 0 ? parseFloat(allSpecial).toFixed(1) : allSpecial
