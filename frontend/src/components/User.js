@@ -51,7 +51,7 @@ const ScreenTwo = ({ worker }) => {
     </div>
   )
 }
-const ScreenThree = ({ hours }) => {  
+const ScreenThree = ({ hours, worker }) => {  
   // done when creating timecard line 531
   // const normal = hours.days.map(day => day.totalHours && day.totalHours.normal)
   // const special = hours.days.map(day => day.totalHours && day.totalHours.special)
@@ -61,10 +61,12 @@ const ScreenThree = ({ hours }) => {
   // const allTotal = total.filter(value => value !== undefined ).reduce((a,b) => a+b)
   // // console.log('normal', normal, 'special', special, 'total', total)
   // console.log('allNormal', allNormal)
+  console.log(worker);
 
   return (
     <div>
-      <h1>{hours.month.toUpperCase()}</h1>
+      <h1>{worker.username[0].toUpperCase() + worker.username.slice(1).toLowerCase()}</h1>
+      <h3>{hours.month.toUpperCase()}</h3>
       <button className='screenBtn' onClick={() => toScreen('2')} >Back</button>
       
       <div className='userTable userTableHeader'>
@@ -130,6 +132,7 @@ const display = () => {
     }else if (screen === '3') {
       return <ScreenThree
       hours={hours}
+      worker={worker}
       />
     }
   }
