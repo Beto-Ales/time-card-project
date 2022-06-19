@@ -76,7 +76,7 @@ const App = () => {
 
   useEffect(() => {
     if(user) {
-      if (user.username === 'beto') {
+      if (user.username === 'jan') {
         try {
           // console.log('first try');
           usersService.getAll()        
@@ -126,12 +126,12 @@ const App = () => {
       setPassword={ setPassword }
       handleSignin={ handleSignin }
       />
-    }else if (user.username === 'beto') {
+    }else if (user.username === 'jan') {
       return <User
       user={ user }          
       employees={ employees }
       />
-    }else if (user.username !== 'beto') {
+    }else if (user.username !== 'jan') {
       return <TimeCard
       user={ user }
       setUser={setUser}

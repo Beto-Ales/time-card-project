@@ -11,7 +11,7 @@ usersRouter.get('/', async (request, response) => {
         return response.status(401).json({ error: 'token missing or invalid' })
     }
 
-    if (!(superuser.username === 'beto')) {
+    if (!(superuser.username === 'jan')) {
         return response.status(401).json({ error: 'access denied' })
     }
 
@@ -30,7 +30,7 @@ usersRouter.get('/:id', async (request, response) => {
         return response.status(401).json({ error: 'token missing or invalid' })
     }
 
-    // if (!(superuser.username === 'beto') || !(request.params.id == request.user.id)) {
+    // if (!(superuser.username === 'jan') || !(request.params.id == request.user.id)) {
     //     return response.status(401).json({ error: 'access denied' })
     // }
     
@@ -75,7 +75,7 @@ usersRouter.delete('/:id', async (request, response) => {
         return response.status(401).json({ error: 'token missing or invalid' })
     }
 
-    if (!(user.username === 'beto')) {
+    if (!(user.username === 'jan')) {
         return response.status(401).json({ error: 'acces denied' })
     }
     
