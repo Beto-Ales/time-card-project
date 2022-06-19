@@ -26,14 +26,22 @@ const hourSchema = new mongoose.Schema({
     days: [{
         dayNumber: {
             type: String,
-            required: true
+            // required: true
         },
         jobDescription: String,
-        startWork: {
+        startWorkA: {
             type: String,
             // required: true
         },
-        endWork: {
+        endWorkA: {
+            type: String,
+            // required: true
+        },
+        startWorkB: {
+            type: String,
+            // required: true
+        },
+        endWorkB: {
             type: String,
             // required: true
         },
