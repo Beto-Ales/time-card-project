@@ -57,7 +57,7 @@
 
 .userTable{
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(9, 1fr);
   margin: 2em 0;
 }
 
@@ -90,8 +90,29 @@ li span{
   padding: 0 1em;
 }
 
+/* first input with descriptions */
+.topeachday{
+  margin-bottom: 1em;
+}
+
+.topDay{
+  position: relative;
+  bottom: -1.75em;
+}
+
+.startA, .endA{
+  color: #00ae9d;
+  /* color: #086048; */
+}
+
+.startB, .endB{
+  color: #ff3d00;
+  /* color: #563fc4; */
+}
+
 .eachDay p {
   margin-right: 1em;
+  /* margin: 0 1em 0 0; */
 }
 
 .monthTitle{

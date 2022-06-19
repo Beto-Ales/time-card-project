@@ -16,7 +16,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
     useEffect(() => {
         if (user) {
-            if (user.username !== 'beto') {
+            if (user.username !== 'jan') {
         try {
           usersService.getOne(user.id)
             .then(user => setUser(user))
@@ -84,8 +84,10 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
       <div className='userTable userTableHeader'>
           <span className='headerTitle'>DATE</span>
           <span className='headerTitle'>JOB DESCRIPTION</span>
-          <span className='headerTitle'>START</span>
-          <span className='headerTitle'>FINISH</span>
+          <span className='headerTitle startA'>START</span>
+          <span className='headerTitle endA'>FINISH</span>
+          <span className='headerTitle startB'>START</span>
+          <span className='headerTitle endB'>FINISH</span>
           <span className='headerTitle'>TOTAL</span>
           <span className='headerTitle'>NORMAL</span>
           <span className='headerTitle'>SPECIAL</span>
@@ -98,12 +100,14 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
           hours &&
           hours.days.map(day => 
             <li key={day.dayNumber}>
-              {/* <p>Day: {day.dayNumber} Job description: {day.jobDescription} Start: {day.startWork}, End: {day.endWork} Total Hours: {day.totalHours && day.totalHours.total} Normal rate: {day.totalHours && day.totalHours.normal} Special rate: {day.totalHours && day.totalHours.special}</p> */}
+              {/* <p>Day: {day.dayNumber} Job description: {day.jobDescription} Start: {day.startWorkA}, End: {day.endWorkA} Total Hours: {day.totalHours && day.totalHours.total} Normal rate: {day.totalHours && day.totalHours.normal} Special rate: {day.totalHours && day.totalHours.special}</p> */}
               <div className='userTable'>
                 <span className='userSpan'>{day.dayNumber}</span>
                 <span className='userSpan'>{day.jobDescription}</span>
-                <span className='userSpan'>{day.startWork}</span>
-                <span className='userSpan'>{day.endWork}</span>
+                <span className='userSpan startA'>{day.startWorkA}</span>
+                <span className='userSpan endA'>{day.endWorkA}</span>
+                <span className='userSpan startB'>{day.startWorkB}</span>
+                <span className='userSpan endB'>{day.endWorkB}</span>
                 <span className='userSpan'>{day.totalHours && day.totalHours.total}</span>
                 <span className='userSpan'>{day.totalHours && day.totalHours.normal}</span>
                 <span className='userSpan'>{day.totalHours && day.totalHours.special}</span>
@@ -137,8 +141,8 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                     days.push({
                     dayNumber: index + 21,  // day start from 21 'couse index is 0. once index is 10 day is 31
                     jobDescription: '',
-                    startWork: '00:00',
-                    endWork: '00:00',
+                    startWorkA: '00:00',
+                    endWorkA: '00:00',
                     totalHours: '',
                 })    
             } else {
@@ -146,8 +150,8 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                     days.push({
                     dayNumber: index - 10,  // once index is 11 substract 10 to start from this point with day 1
                     jobDescription: '',
-                    startWork: '00:00',
-                    endWork: '00:00',
+                    startWorkA: '00:00',
+                    endWorkA: '00:00',
                     totalHours: '',
                 })
             }
@@ -159,6 +163,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
         const [start, setStart] = useState({})
         const [end, setEnd] = useState({})
         const [description, setDescription] = useState({})
+        const [day, setDay] = useState({})
         
         const timeToDecimal = (t) => {
             var arr = t.split(':')
@@ -167,35 +172,70 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             return parseFloat(parseInt(arr[0], 10) + '.' + (dec<10?'0':'') + dec)
         }
 
-        // fix trailing digits
-        const calculate = (startTime, endTime) => {
-            let start = startTime
-            let end = endTime
+        
+        const calculate = (startTimeA, endTimeA, startTimeB, endTimeB, isWeekend) => {
+            let startA = startTimeA
+            let endA = endTimeA
+            let startB = startTimeB
+            let endB = endTimeB
+
+            // let startA = startTimeA ? startTimeA : 0
+            // let endA = endTimeA ? endTimeA : 0
+            // let startB = startTimeB ? startTimeB : 0
+            // let endB = endTimeB ? endTimeB : 0
+
             let normal = 0
             let special = 0
 
-            if (end < 4) {
-                end += 24
+            
+
+            if (endA < 4) {
+                endA += 24
             }
 
-            // check if it works
-            if(startTime === endTime) {
-                start = 0
-                end = 0
-            }
-            
-            let total = end - start
-            
-            if (end > 18) {
-                special = end - 18
-                normal = 18 - start
-            }else {
-                normal = total
+            if (endB < 4) {
+                endB += 24
             }
 
-            normal = normal % 1 !== 0 ? normal.toFixed(1) : normal
-            special = special % 1 !== 0 ? special.toFixed(1) : special
-            total = total % 1 !== 0 ? total.toFixed(1) : total
+            
+            if(startTimeA === endTimeA) {
+                startA = 0
+                endA = 0
+            }
+
+            if(startTimeB === endTimeB) {
+                startB = 0
+                endB = 0
+            }
+            
+            let total = endA - startA + endB - startB
+            
+            if (endA > 18) {
+                special += endA - 18
+                normal += 18 - startA
+            }
+            
+            if (endB > 18) {
+                special += endB - 18
+                normal += 18 - startB
+            }
+
+            if (endA < 18) {
+                normal += endA - startA
+            }
+
+            if (endB < 18) {
+                normal += endB - startB
+            }
+
+            normal = normal % 1 !== 0 ? normal.toFixed(2) : normal
+            special = special % 1 !== 0 ? special.toFixed(2) : special
+            total = total % 1 !== 0 ? total.toFixed(2) : total
+
+            if (isWeekend === 0 || isWeekend === 6) {
+                special = total
+                normal = 0
+            }
 
             return {                
                 normal: normal,
@@ -223,6 +263,10 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             setDescription(values => ({...values,
                 [name]: value,
             }))
+
+            setDay(values => ({...values,
+                [name]: value,
+            }))
         }
 
         const addTimeCard = async (event) => {
@@ -238,75 +282,145 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             }
 
             const {
-                startWork0,
-                startWork1,
-                startWork2,
-                startWork3,
-                startWork4,
-                startWork5,
-                startWork6,
-                startWork7,
-                startWork8,
-                startWork9,
-                startWork10,
-                startWork11,
-                startWork12,
-                startWork13,
-                startWork14,
-                startWork15,
-                startWork16,
-                startWork17,
-                startWork18,
-                startWork19,
-                startWork20,
-                startWork21,
-                startWork22,
-                startWork23,
-                startWork24,
-                startWork25,
-                startWork26,
-                startWork27,
-                startWork28,
-                startWork29,
-                startWork30,
+                startWorkA0,
+                startWorkA1,
+                startWorkA2,
+                startWorkA3,
+                startWorkA4,
+                startWorkA5,
+                startWorkA6,
+                startWorkA7,
+                startWorkA8,
+                startWorkA9,
+                startWorkA10,
+                startWorkA11,
+                startWorkA12,
+                startWorkA13,
+                startWorkA14,
+                startWorkA15,
+                startWorkA16,
+                startWorkA17,
+                startWorkA18,
+                startWorkA19,
+                startWorkA20,
+                startWorkA21,
+                startWorkA22,
+                startWorkA23,
+                startWorkA24,
+                startWorkA25,
+                startWorkA26,
+                startWorkA27,
+                startWorkA28,
+                startWorkA29,
+                startWorkA30,
                 
             } = start
 
             const {
-                endWork0,
-                endWork1,
-                endWork2,
-                endWork3,
-                endWork4,
-                endWork5,
-                endWork6,
-                endWork7,
-                endWork8,
-                endWork9,
-                endWork10,
-                endWork11,
-                endWork12,
-                endWork13,
-                endWork14,
-                endWork15,
-                endWork16,
-                endWork17,
-                endWork18,
-                endWork19,
-                endWork20,
-                endWork21,
-                endWork22,
-                endWork23,
-                endWork24,
-                endWork25,
-                endWork26,
-                endWork27,
-                endWork28,
-                endWork29,
-                endWork30,
+                endWorkA0,
+                endWorkA1,
+                endWorkA2,
+                endWorkA3,
+                endWorkA4,
+                endWorkA5,
+                endWorkA6,
+                endWorkA7,
+                endWorkA8,
+                endWorkA9,
+                endWorkA10,
+                endWorkA11,
+                endWorkA12,
+                endWorkA13,
+                endWorkA14,
+                endWorkA15,
+                endWorkA16,
+                endWorkA17,
+                endWorkA18,
+                endWorkA19,
+                endWorkA20,
+                endWorkA21,
+                endWorkA22,
+                endWorkA23,
+                endWorkA24,
+                endWorkA25,
+                endWorkA26,
+                endWorkA27,
+                endWorkA28,
+                endWorkA29,
+                endWorkA30,
                 
             } = end
 
+            const {
+                startWorkB0,
+                startWorkB1,
+                startWorkB2,
+                startWorkB3,
+                startWorkB4,
+                startWorkB5,
+                startWorkB6,
+                startWorkB7,
+                startWorkB8,
+                startWorkB9,
+                startWorkB10,
+                startWorkB11,
+                startWorkB12,
+                startWorkB13,
+                startWorkB14,
+                startWorkB15,
+                startWorkB16,
+                startWorkB17,
+                startWorkB18,
+                startWorkB19,
+                startWorkB20,
+                startWorkB21,
+                startWorkB22,
+                startWorkB23,
+                startWorkB24,
+                startWorkB25,
+                startWorkB26,
+                startWorkB27,
+                startWorkB28,
+                startWorkB29,
+                startWorkB30,
+                
+            } = start
+
+            const {
+                endWorkB0,
+                endWorkB1,
+                endWorkB2,
+                endWorkB3,
+                endWorkB4,
+                endWorkB5,
+                endWorkB6,
+                endWorkB7,
+                endWorkB8,
+                endWorkB9,
+                endWorkB10,
+                endWorkB11,
+                endWorkB12,
+                endWorkB13,
+                endWorkB14,
+                endWorkB15,
+                endWorkB16,
+                endWorkB17,
+                endWorkB18,
+                endWorkB19,
+                endWorkB20,
+                endWorkB21,
+                endWorkB22,
+                endWorkB23,
+                endWorkB24,
+                endWorkB25,
+                endWorkB26,
+                endWorkB27,
+                endWorkB28,
+                endWorkB29,
+                endWorkB30,
+                
+            } = end
+            
             const {
                 jobDescription0,
                 jobDescription1,
@@ -341,72 +455,172 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                 jobDescription30,
                 
             } = description
+
+            const {
+                day0,
+                day1,
+                day2,
+                day3,
+                day4,
+                day5,
+                day6,
+                day7,
+                day8,
+                day9,
+                day10,
+                day11,
+                day12,
+                day13,
+                day14,
+                day15,
+                day16,
+                day17,
+                day18,
+                day19,
+                day20,
+                day21,
+                day22,
+                day23,
+                day24,
+                day25,
+                day26,
+                day27,
+                day28,
+                day29,
+                day30,
+            } = day
             
-            // if startWork is not defined, leave default value time 00:00
-            hours.days[0].startWork = startWork0 ? startWork0 : '00:00'
-            hours.days[1].startWork = startWork1 ? startWork1 : '00:00'
-            hours.days[2].startWork = startWork2 ? startWork2 : '00:00'
-            hours.days[3].startWork = startWork3 ? startWork3 : '00:00'
-            hours.days[4].startWork = startWork4 ? startWork4 : '00:00'
-            hours.days[5].startWork = startWork5 ? startWork5 : '00:00'
-            hours.days[6].startWork = startWork6 ? startWork6 : '00:00'
-            hours.days[7].startWork = startWork7 ? startWork7 : '00:00'
-            hours.days[8].startWork = startWork8 ? startWork8 : '00:00'
-            hours.days[9].startWork = startWork9 ? startWork9 : '00:00'
-            hours.days[10].startWork = startWork10 ? startWork10 : '00:00'
-            hours.days[11].startWork = startWork11 ? startWork11 : '00:00'
-            hours.days[12].startWork = startWork12 ? startWork12 : '00:00'
-            hours.days[13].startWork = startWork13 ? startWork13 : '00:00'
-            hours.days[14].startWork = startWork14 ? startWork14 : '00:00'
-            hours.days[15].startWork = startWork15 ? startWork15 : '00:00'
-            hours.days[16].startWork = startWork16 ? startWork16 : '00:00'
-            hours.days[17].startWork = startWork17 ? startWork17 : '00:00'
-            hours.days[18].startWork = startWork18 ? startWork18 : '00:00'
-            hours.days[19].startWork = startWork19 ? startWork19 : '00:00'
-            hours.days[20].startWork = startWork20 ? startWork20 : '00:00'
-            hours.days[21].startWork = startWork21 ? startWork21 : '00:00'
-            hours.days[22].startWork = startWork22 ? startWork22 : '00:00'
-            hours.days[23].startWork = startWork23 ? startWork23 : '00:00'
-            hours.days[24].startWork = startWork24 ? startWork24 : '00:00'
-            hours.days[25].startWork = startWork25 ? startWork25 : '00:00'
-            hours.days[26].startWork = startWork26 ? startWork26 : '00:00'
-            hours.days[27].startWork = startWork27 ? startWork27 : '00:00'
-            hours.days[28].startWork = startWork28 ? startWork28 : '00:00'
-            hours.days[29].startWork = startWork29 ? startWork29 : '00:00'
-            hours.days[30].startWork = startWork30 ? startWork30 : '00:00'
+            // if startWorkA is not defined, leave default value time 00:00
+            hours.days[0].startWorkA = startWorkA0 ? startWorkA0 : '00:00'
+            hours.days[1].startWorkA = startWorkA1 ? startWorkA1 : '00:00'
+            hours.days[2].startWorkA = startWorkA2 ? startWorkA2 : '00:00'
+            hours.days[3].startWorkA = startWorkA3 ? startWorkA3 : '00:00'
+            hours.days[4].startWorkA = startWorkA4 ? startWorkA4 : '00:00'
+            hours.days[5].startWorkA = startWorkA5 ? startWorkA5 : '00:00'
+            hours.days[6].startWorkA = startWorkA6 ? startWorkA6 : '00:00'
+            hours.days[7].startWorkA = startWorkA7 ? startWorkA7 : '00:00'
+            hours.days[8].startWorkA = startWorkA8 ? startWorkA8 : '00:00'
+            hours.days[9].startWorkA = startWorkA9 ? startWorkA9 : '00:00'
+            hours.days[10].startWorkA = startWorkA10 ? startWorkA10 : '00:00'
+            hours.days[11].startWorkA = startWorkA11 ? startWorkA11 : '00:00'
+            hours.days[12].startWorkA = startWorkA12 ? startWorkA12 : '00:00'
+            hours.days[13].startWorkA = startWorkA13 ? startWorkA13 : '00:00'
+            hours.days[14].startWorkA = startWorkA14 ? startWorkA14 : '00:00'
+            hours.days[15].startWorkA = startWorkA15 ? startWorkA15 : '00:00'
+            hours.days[16].startWorkA = startWorkA16 ? startWorkA16 : '00:00'
+            hours.days[17].startWorkA = startWorkA17 ? startWorkA17 : '00:00'
+            hours.days[18].startWorkA = startWorkA18 ? startWorkA18 : '00:00'
+            hours.days[19].startWorkA = startWorkA19 ? startWorkA19 : '00:00'
+            hours.days[20].startWorkA = startWorkA20 ? startWorkA20 : '00:00'
+            hours.days[21].startWorkA = startWorkA21 ? startWorkA21 : '00:00'
+            hours.days[22].startWorkA = startWorkA22 ? startWorkA22 : '00:00'
+            hours.days[23].startWorkA = startWorkA23 ? startWorkA23 : '00:00'
+            hours.days[24].startWorkA = startWorkA24 ? startWorkA24 : '00:00'
+            hours.days[25].startWorkA = startWorkA25 ? startWorkA25 : '00:00'
+            hours.days[26].startWorkA = startWorkA26 ? startWorkA26 : '00:00'
+            hours.days[27].startWorkA = startWorkA27 ? startWorkA27 : '00:00'
+            hours.days[28].startWorkA = startWorkA28 ? startWorkA28 : '00:00'
+            hours.days[29].startWorkA = startWorkA29 ? startWorkA29 : '00:00'
+            hours.days[30].startWorkA = startWorkA30 ? startWorkA30 : '00:00'
             
-            // if endWork is not defined, leave default value time 00:00
-            hours.days[0].endWork = endWork0 ? endWork0 : '00:00'
-            hours.days[1].endWork = endWork1 ? endWork1 : '00:00'
-            hours.days[2].endWork = endWork2 ? endWork2 : '00:00'
-            hours.days[3].endWork = endWork3 ? endWork3 : '00:00'
-            hours.days[4].endWork = endWork4 ? endWork4 : '00:00'
-            hours.days[5].endWork = endWork5 ? endWork5 : '00:00'
-            hours.days[6].endWork = endWork6 ? endWork6 : '00:00'
-            hours.days[7].endWork = endWork7 ? endWork7 : '00:00'
-            hours.days[8].endWork = endWork8 ? endWork8 : '00:00'
-            hours.days[9].endWork = endWork9 ? endWork9 : '00:00'
-            hours.days[10].endWork = endWork10 ? endWork10 : '00:00'
-            hours.days[11].endWork = endWork11 ? endWork11 : '00:00'
-            hours.days[12].endWork = endWork12 ? endWork12 : '00:00'
-            hours.days[13].endWork = endWork13 ? endWork13 : '00:00'
-            hours.days[14].endWork = endWork14 ? endWork14 : '00:00'
-            hours.days[15].endWork = endWork15 ? endWork15 : '00:00'
-            hours.days[16].endWork = endWork16 ? endWork16 : '00:00'
-            hours.days[17].endWork = endWork17 ? endWork17 : '00:00'
-            hours.days[18].endWork = endWork18 ? endWork18 : '00:00'
-            hours.days[19].endWork = endWork19 ? endWork19 : '00:00'
-            hours.days[20].endWork = endWork20 ? endWork20 : '00:00'
-            hours.days[21].endWork = endWork21 ? endWork21 : '00:00'
-            hours.days[22].endWork = endWork22 ? endWork22 : '00:00'
-            hours.days[23].endWork = endWork23 ? endWork23 : '00:00'
-            hours.days[24].endWork = endWork24 ? endWork24 : '00:00'
-            hours.days[25].endWork = endWork25 ? endWork25 : '00:00'
-            hours.days[26].endWork = endWork26 ? endWork26 : '00:00'
-            hours.days[27].endWork = endWork27 ? endWork27 : '00:00'
-            hours.days[28].endWork = endWork28 ? endWork28 : '00:00'
-            hours.days[29].endWork = endWork29 ? endWork29 : '00:00'
-            hours.days[30].endWork = endWork30 ? endWork30 : '00:00'
+            // if endWorkA is not defined, leave default value time 00:00
+            hours.days[0].endWorkA = endWorkA0 ? endWorkA0 : '00:00'
+            hours.days[1].endWorkA = endWorkA1 ? endWorkA1 : '00:00'
+            hours.days[2].endWorkA = endWorkA2 ? endWorkA2 : '00:00'
+            hours.days[3].endWorkA = endWorkA3 ? endWorkA3 : '00:00'
+            hours.days[4].endWorkA = endWorkA4 ? endWorkA4 : '00:00'
+            hours.days[5].endWorkA = endWorkA5 ? endWorkA5 : '00:00'
+            hours.days[6].endWorkA = endWorkA6 ? endWorkA6 : '00:00'
+            hours.days[7].endWorkA = endWorkA7 ? endWorkA7 : '00:00'
+            hours.days[8].endWorkA = endWorkA8 ? endWorkA8 : '00:00'
+            hours.days[9].endWorkA = endWorkA9 ? endWorkA9 : '00:00'
+            hours.days[10].endWorkA = endWorkA10 ? endWorkA10 : '00:00'
+            hours.days[11].endWorkA = endWorkA11 ? endWorkA11 : '00:00'
+            hours.days[12].endWorkA = endWorkA12 ? endWorkA12 : '00:00'
+            hours.days[13].endWorkA = endWorkA13 ? endWorkA13 : '00:00'
+            hours.days[14].endWorkA = endWorkA14 ? endWorkA14 : '00:00'
+            hours.days[15].endWorkA = endWorkA15 ? endWorkA15 : '00:00'
+            hours.days[16].endWorkA = endWorkA16 ? endWorkA16 : '00:00'
+            hours.days[17].endWorkA = endWorkA17 ? endWorkA17 : '00:00'
+            hours.days[18].endWorkA = endWorkA18 ? endWorkA18 : '00:00'
+            hours.days[19].endWorkA = endWorkA19 ? endWorkA19 : '00:00'
+            hours.days[20].endWorkA = endWorkA20 ? endWorkA20 : '00:00'
+            hours.days[21].endWorkA = endWorkA21 ? endWorkA21 : '00:00'
+            hours.days[22].endWorkA = endWorkA22 ? endWorkA22 : '00:00'
+            hours.days[23].endWorkA = endWorkA23 ? endWorkA23 : '00:00'
+            hours.days[24].endWorkA = endWorkA24 ? endWorkA24 : '00:00'
+            hours.days[25].endWorkA = endWorkA25 ? endWorkA25 : '00:00'
+            hours.days[26].endWorkA = endWorkA26 ? endWorkA26 : '00:00'
+            hours.days[27].endWorkA = endWorkA27 ? endWorkA27 : '00:00'
+            hours.days[28].endWorkA = endWorkA28 ? endWorkA28 : '00:00'
+            hours.days[29].endWorkA = endWorkA29 ? endWorkA29 : '00:00'
+            hours.days[30].endWorkA = endWorkA30 ? endWorkA30 : '00:00'
+
+            // if startWorkA is not defined, leave default value time 00:00
+            hours.days[0].startWorkB = startWorkB0 ? startWorkB0 : '00:00'
+            hours.days[1].startWorkB = startWorkB1 ? startWorkB1 : '00:00'
+            hours.days[2].startWorkB = startWorkB2 ? startWorkB2 : '00:00'
+            hours.days[3].startWorkB = startWorkB3 ? startWorkB3 : '00:00'
+            hours.days[4].startWorkB = startWorkB4 ? startWorkB4 : '00:00'
+            hours.days[5].startWorkB = startWorkB5 ? startWorkB5 : '00:00'
+            hours.days[6].startWorkB = startWorkB6 ? startWorkB6 : '00:00'
+            hours.days[7].startWorkB = startWorkB7 ? startWorkB7 : '00:00'
+            hours.days[8].startWorkB = startWorkB8 ? startWorkB8 : '00:00'
+            hours.days[9].startWorkB = startWorkB9 ? startWorkB9 : '00:00'
+            hours.days[10].startWorkB = startWorkB10 ? startWorkB10 : '00:00'
+            hours.days[11].startWorkB = startWorkB11 ? startWorkB11 : '00:00'
+            hours.days[12].startWorkB = startWorkB12 ? startWorkB12 : '00:00'
+            hours.days[13].startWorkB = startWorkB13 ? startWorkB13 : '00:00'
+            hours.days[14].startWorkB = startWorkB14 ? startWorkB14 : '00:00'
+            hours.days[15].startWorkB = startWorkB15 ? startWorkB15 : '00:00'
+            hours.days[16].startWorkB = startWorkB16 ? startWorkB16 : '00:00'
+            hours.days[17].startWorkB = startWorkB17 ? startWorkB17 : '00:00'
+            hours.days[18].startWorkB = startWorkB18 ? startWorkB18 : '00:00'
+            hours.days[19].startWorkB = startWorkB19 ? startWorkB19 : '00:00'
+            hours.days[20].startWorkB = startWorkB20 ? startWorkB20 : '00:00'
+            hours.days[21].startWorkB = startWorkB21 ? startWorkB21 : '00:00'
+            hours.days[22].startWorkB = startWorkB22 ? startWorkB22 : '00:00'
+            hours.days[23].startWorkB = startWorkB23 ? startWorkB23 : '00:00'
+            hours.days[24].startWorkB = startWorkB24 ? startWorkB24 : '00:00'
+            hours.days[25].startWorkB = startWorkB25 ? startWorkB25 : '00:00'
+            hours.days[26].startWorkB = startWorkB26 ? startWorkB26 : '00:00'
+            hours.days[27].startWorkB = startWorkB27 ? startWorkB27 : '00:00'
+            hours.days[28].startWorkB = startWorkB28 ? startWorkB28 : '00:00'
+            hours.days[29].startWorkB = startWorkB29 ? startWorkB29 : '00:00'
+            hours.days[30].startWorkB = startWorkB30 ? startWorkB30 : '00:00'
+            
+            // if endWorkA is not defined, leave default value time 00:00
+            hours.days[0].endWorkB = endWorkB0 ? endWorkB0 : '00:00'
+            hours.days[1].endWorkB = endWorkB1 ? endWorkB1 : '00:00'
+            hours.days[2].endWorkB = endWorkB2 ? endWorkB2 : '00:00'
+            hours.days[3].endWorkB = endWorkB3 ? endWorkB3 : '00:00'
+            hours.days[4].endWorkB = endWorkB4 ? endWorkB4 : '00:00'
+            hours.days[5].endWorkB = endWorkB5 ? endWorkB5 : '00:00'
+            hours.days[6].endWorkB = endWorkB6 ? endWorkB6 : '00:00'
+            hours.days[7].endWorkB = endWorkB7 ? endWorkB7 : '00:00'
+            hours.days[8].endWorkB = endWorkB8 ? endWorkB8 : '00:00'
+            hours.days[9].endWorkB = endWorkB9 ? endWorkB9 : '00:00'
+            hours.days[10].endWorkB = endWorkB10 ? endWorkB10 : '00:00'
+            hours.days[11].endWorkB = endWorkB11 ? endWorkB11 : '00:00'
+            hours.days[12].endWorkB = endWorkB12 ? endWorkB12 : '00:00'
+            hours.days[13].endWorkB = endWorkB13 ? endWorkB13 : '00:00'
+            hours.days[14].endWorkB = endWorkB14 ? endWorkB14 : '00:00'
+            hours.days[15].endWorkB = endWorkB15 ? endWorkB15 : '00:00'
+            hours.days[16].endWorkB = endWorkB16 ? endWorkB16 : '00:00'
+            hours.days[17].endWorkB = endWorkB17 ? endWorkB17 : '00:00'
+            hours.days[18].endWorkB = endWorkB18 ? endWorkB18 : '00:00'
+            hours.days[19].endWorkB = endWorkB19 ? endWorkB19 : '00:00'
+            hours.days[20].endWorkB = endWorkB20 ? endWorkB20 : '00:00'
+            hours.days[21].endWorkB = endWorkB21 ? endWorkB21 : '00:00'
+            hours.days[22].endWorkB = endWorkB22 ? endWorkB22 : '00:00'
+            hours.days[23].endWorkB = endWorkB23 ? endWorkB23 : '00:00'
+            hours.days[24].endWorkB = endWorkB24 ? endWorkB24 : '00:00'
+            hours.days[25].endWorkB = endWorkB25 ? endWorkB25 : '00:00'
+            hours.days[26].endWorkB = endWorkB26 ? endWorkB26 : '00:00'
+            hours.days[27].endWorkB = endWorkB27 ? endWorkB27 : '00:00'
+            hours.days[28].endWorkB = endWorkB28 ? endWorkB28 : '00:00'
+            hours.days[29].endWorkB = endWorkB29 ? endWorkB29 : '00:00'
+            hours.days[30].endWorkB = endWorkB30 ? endWorkB30 : '00:00'
             
             hours.days[0].jobDescription = jobDescription0
             hours.days[1].jobDescription = jobDescription1
@@ -439,73 +653,142 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             hours.days[28].jobDescription = jobDescription28
             hours.days[29].jobDescription = jobDescription29
             hours.days[30].jobDescription = jobDescription30
+            
+            const dayName = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
-            // hours.days[0].totalHours = JSON.stringify(calculate(timeToDecimal(startWork0), timeToDecimal(endWork0)))
+            hours.days[0].dayNumber = day0 ? `${day0} ${dayName[new Date(day0).getDay()]}` : ''
+            hours.days[1].dayNumber = day1 ? `${day1} ${dayName[new Date(day1).getDay()]}` : ''
+            hours.days[2].dayNumber = day2 ? `${day2} ${dayName[new Date(day2).getDay()]}` : ''
+            hours.days[3].dayNumber = day3 ? `${day3} ${dayName[new Date(day3).getDay()]}` : ''
+            hours.days[4].dayNumber = day4 ? `${day4} ${dayName[new Date(day4).getDay()]}` : ''
+            hours.days[5].dayNumber = day5 ? `${day5} ${dayName[new Date(day5).getDay()]}` : ''
+            hours.days[6].dayNumber = day6 ? `${day6} ${dayName[new Date(day6).getDay()]}` : ''
+            hours.days[7].dayNumber = day7 ? `${day7} ${dayName[new Date(day7).getDay()]}` : ''
+            hours.days[8].dayNumber = day8 ? `${day8} ${dayName[new Date(day8).getDay()]}` : ''
+            hours.days[9].dayNumber = day9 ? `${day9} ${dayName[new Date(day9).getDay()]}` : ''
+            hours.days[10].dayNumber = day10 ? `${day10} ${dayName[new Date(day10).getDay()]}` : ''
+            hours.days[11].dayNumber = day11 ? `${day11} ${dayName[new Date(day11).getDay()]}` : ''
+            hours.days[12].dayNumber = day12 ? `${day12} ${dayName[new Date(day12).getDay()]}` : ''
+            hours.days[13].dayNumber = day13 ? `${day13} ${dayName[new Date(day13).getDay()]}` : ''
+            hours.days[14].dayNumber = day14 ? `${day14} ${dayName[new Date(day14).getDay()]}` : ''
+            hours.days[15].dayNumber = day15 ? `${day15} ${dayName[new Date(day15).getDay()]}` : ''
+            hours.days[16].dayNumber = day16 ? `${day16} ${dayName[new Date(day16).getDay()]}` : ''
+            hours.days[17].dayNumber = day17 ? `${day17} ${dayName[new Date(day17).getDay()]}` : ''
+            hours.days[18].dayNumber = day18 ? `${day18} ${dayName[new Date(day18).getDay()]}` : ''
+            hours.days[19].dayNumber = day19 ? `${day19} ${dayName[new Date(day19).getDay()]}` : ''
+            hours.days[20].dayNumber = day20 ? `${day20} ${dayName[new Date(day20).getDay()]}` : ''
+            hours.days[21].dayNumber = day21 ? `${day21} ${dayName[new Date(day21).getDay()]}` : ''
+            hours.days[22].dayNumber = day22 ? `${day22} ${dayName[new Date(day22).getDay()]}` : ''
+            hours.days[23].dayNumber = day23 ? `${day23} ${dayName[new Date(day23).getDay()]}` : ''
+            hours.days[24].dayNumber = day24 ? `${day24} ${dayName[new Date(day24).getDay()]}` : ''
+            hours.days[25].dayNumber = day25 ? `${day25} ${dayName[new Date(day25).getDay()]}` : ''
+            hours.days[26].dayNumber = day26 ? `${day26} ${dayName[new Date(day26).getDay()]}` : ''
+            hours.days[27].dayNumber = day27 ? `${day27} ${dayName[new Date(day27).getDay()]}` : ''
+            hours.days[28].dayNumber = day28 ? `${day28} ${dayName[new Date(day28).getDay()]}` : ''
+            hours.days[29].dayNumber = day29 ? `${day29} ${dayName[new Date(day29).getDay()]}` : ''
+            hours.days[30].dayNumber = day30 ? `${day30} ${dayName[new Date(day30).getDay()]}` : ''
 
-            // hours.days[0].totalHours = startWork0 && endWork0 && calculate(timeToDecimal(startWork0), timeToDecimal(endWork0))            
-            // hours.days[1].totalHours = startWork1 && endWork1 && calculate(timeToDecimal(startWork1), timeToDecimal(endWork1))
-            // hours.days[2].totalHours = startWork2 && endWork2 && calculate(timeToDecimal(startWork2), timeToDecimal(endWork2))
-            // hours.days[3].totalHours = startWork3 && endWork3 && calculate(timeToDecimal(startWork3), timeToDecimal(endWork3))
-            // hours.days[4].totalHours = startWork4 && endWork4 && calculate(timeToDecimal(startWork4), timeToDecimal(endWork4))
-            // hours.days[5].totalHours = startWork5 && endWork5 && calculate(timeToDecimal(startWork5), timeToDecimal(endWork5))
-            // hours.days[6].totalHours = startWork6 && endWork6 && calculate(timeToDecimal(startWork6), timeToDecimal(endWork6))
-            // hours.days[7].totalHours = startWork7 && endWork7 && calculate(timeToDecimal(startWork7), timeToDecimal(endWork7))
-            // hours.days[8].totalHours = startWork8 && endWork8 && calculate(timeToDecimal(startWork8), timeToDecimal(endWork8))
-            // hours.days[9].totalHours = startWork9 && endWork9 && calculate(timeToDecimal(startWork9), timeToDecimal(endWork9))
-            // hours.days[10].totalHours = startWork10 && endWork10 && calculate(timeToDecimal(startWork10), timeToDecimal(endWork10))
-            // hours.days[11].totalHours = startWork11 && endWork11 && calculate(timeToDecimal(startWork11), timeToDecimal(endWork11))
-            // hours.days[12].totalHours = startWork12 && endWork12 && calculate(timeToDecimal(startWork12), timeToDecimal(endWork12))
-            // hours.days[13].totalHours = startWork13 && endWork13 && calculate(timeToDecimal(startWork13), timeToDecimal(endWork13))
-            // hours.days[14].totalHours = startWork14 && endWork14 && calculate(timeToDecimal(startWork14), timeToDecimal(endWork14))
-            // hours.days[15].totalHours = startWork15 && endWork15 && calculate(timeToDecimal(startWork15), timeToDecimal(endWork15))
-            // hours.days[16].totalHours = startWork16 && endWork16 && calculate(timeToDecimal(startWork16), timeToDecimal(endWork16))
-            // hours.days[17].totalHours = startWork17 && endWork17 && calculate(timeToDecimal(startWork17), timeToDecimal(endWork17))
-            // hours.days[18].totalHours = startWork18 && endWork18 && calculate(timeToDecimal(startWork18), timeToDecimal(endWork18))
-            // hours.days[19].totalHours = startWork19 && endWork19 && calculate(timeToDecimal(startWork19), timeToDecimal(endWork19))
-            // hours.days[20].totalHours = startWork20 && endWork20 && calculate(timeToDecimal(startWork20), timeToDecimal(endWork20))
-            // hours.days[21].totalHours = startWork21 && endWork21 && calculate(timeToDecimal(startWork21), timeToDecimal(endWork21))
-            // hours.days[22].totalHours = startWork22 && endWork22 && calculate(timeToDecimal(startWork22), timeToDecimal(endWork22))
-            // hours.days[23].totalHours = startWork23 && endWork23 && calculate(timeToDecimal(startWork23), timeToDecimal(endWork23))
-            // hours.days[24].totalHours = startWork24 && endWork24 && calculate(timeToDecimal(startWork24), timeToDecimal(endWork24))
-            // hours.days[25].totalHours = startWork25 && endWork25 && calculate(timeToDecimal(startWork25), timeToDecimal(endWork25))
-            // hours.days[26].totalHours = startWork26 && endWork26 && calculate(timeToDecimal(startWork26), timeToDecimal(endWork26))
-            // hours.days[27].totalHours = startWork27 && endWork27 && calculate(timeToDecimal(startWork27), timeToDecimal(endWork27))
-            // hours.days[28].totalHours = startWork28 && endWork28 && calculate(timeToDecimal(startWork28), timeToDecimal(endWork28))
-            // hours.days[29].totalHours = startWork29 && endWork29 && calculate(timeToDecimal(startWork29), timeToDecimal(endWork29))
-            // hours.days[30].totalHours = startWork30 && endWork30 && calculate(timeToDecimal(startWork30), timeToDecimal(endWork30))
+            // hours.days[0].totalHours = JSON.stringify(calculate(timeToDecimal(startWorkA0), timeToDecimal(endWorkA0)))
+
+            // hours.days[0].totalHours = startWorkA0 && endWorkA0 && calculate(timeToDecimal(startWorkA0), timeToDecimal(endWorkA0))            
+            // hours.days[1].totalHours = startWorkA1 && endWorkA1 && calculate(timeToDecimal(startWorkA1), timeToDecimal(endWorkA1))
+            // hours.days[2].totalHours = startWorkA2 && endWorkA2 && calculate(timeToDecimal(startWorkA2), timeToDecimal(endWorkA2))
+            // hours.days[3].totalHours = startWorkA3 && endWorkA3 && calculate(timeToDecimal(startWorkA3), timeToDecimal(endWorkA3))
+            // hours.days[4].totalHours = startWorkA4 && endWorkA4 && calculate(timeToDecimal(startWorkA4), timeToDecimal(endWorkA4))
+            // hours.days[5].totalHours = startWorkA5 && endWorkA5 && calculate(timeToDecimal(startWorkA5), timeToDecimal(endWorkA5))
+            // hours.days[6].totalHours = startWorkA6 && endWorkA6 && calculate(timeToDecimal(startWorkA6), timeToDecimal(endWorkA6))
+            // hours.days[7].totalHours = startWorkA7 && endWorkA7 && calculate(timeToDecimal(startWorkA7), timeToDecimal(endWorkA7))
+            // hours.days[8].totalHours = startWorkA8 && endWorkA8 && calculate(timeToDecimal(startWorkA8), timeToDecimal(endWorkA8))
+            // hours.days[9].totalHours = startWorkA9 && endWorkA9 && calculate(timeToDecimal(startWorkA9), timeToDecimal(endWorkA9))
+            // hours.days[10].totalHours = startWorkA10 && endWorkA10 && calculate(timeToDecimal(startWorkA10), timeToDecimal(endWorkA10))
+            // hours.days[11].totalHours = startWorkA11 && endWorkA11 && calculate(timeToDecimal(startWorkA11), timeToDecimal(endWorkA11))
+            // hours.days[12].totalHours = startWorkA12 && endWorkA12 && calculate(timeToDecimal(startWorkA12), timeToDecimal(endWorkA12))
+            // hours.days[13].totalHours = startWorkA13 && endWorkA13 && calculate(timeToDecimal(startWorkA13), timeToDecimal(endWorkA13))
+            // hours.days[14].totalHours = startWorkA14 && endWorkA14 && calculate(timeToDecimal(startWorkA14), timeToDecimal(endWorkA14))
+            // hours.days[15].totalHours = startWorkA15 && endWorkA15 && calculate(timeToDecimal(startWorkA15), timeToDecimal(endWorkA15))
+            // hours.days[16].totalHours = startWorkA16 && endWorkA16 && calculate(timeToDecimal(startWorkA16), timeToDecimal(endWorkA16))
+            // hours.days[17].totalHours = startWorkA17 && endWorkA17 && calculate(timeToDecimal(startWorkA17), timeToDecimal(endWorkA17))
+            // hours.days[18].totalHours = startWorkA18 && endWorkA18 && calculate(timeToDecimal(startWorkA18), timeToDecimal(endWorkA18))
+            // hours.days[19].totalHours = startWorkA19 && endWorkA19 && calculate(timeToDecimal(startWorkA19), timeToDecimal(endWorkA19))
+            // hours.days[20].totalHours = startWorkA20 && endWorkA20 && calculate(timeToDecimal(startWorkA20), timeToDecimal(endWorkA20))
+            // hours.days[21].totalHours = startWorkA21 && endWorkA21 && calculate(timeToDecimal(startWorkA21), timeToDecimal(endWorkA21))
+            // hours.days[22].totalHours = startWorkA22 && endWorkA22 && calculate(timeToDecimal(startWorkA22), timeToDecimal(endWorkA22))
+            // hours.days[23].totalHours = startWorkA23 && endWorkA23 && calculate(timeToDecimal(startWorkA23), timeToDecimal(endWorkA23))
+            // hours.days[24].totalHours = startWorkA24 && endWorkA24 && calculate(timeToDecimal(startWorkA24), timeToDecimal(endWorkA24))
+            // hours.days[25].totalHours = startWorkA25 && endWorkA25 && calculate(timeToDecimal(startWorkA25), timeToDecimal(endWorkA25))
+            // hours.days[26].totalHours = startWorkA26 && endWorkA26 && calculate(timeToDecimal(startWorkA26), timeToDecimal(endWorkA26))
+            // hours.days[27].totalHours = startWorkA27 && endWorkA27 && calculate(timeToDecimal(startWorkA27), timeToDecimal(endWorkA27))
+            // hours.days[28].totalHours = startWorkA28 && endWorkA28 && calculate(timeToDecimal(startWorkA28), timeToDecimal(endWorkA28))
+            // hours.days[29].totalHours = startWorkA29 && endWorkA29 && calculate(timeToDecimal(startWorkA29), timeToDecimal(endWorkA29))
+            // hours.days[30].totalHours = startWorkA30 && endWorkA30 && calculate(timeToDecimal(startWorkA30), timeToDecimal(endWorkA30))
 
             // use default value time 00:00
-            hours.days[0].totalHours = calculate(timeToDecimal(hours.days[0].startWork), timeToDecimal(hours.days[0].endWork))
-            hours.days[1].totalHours = calculate(timeToDecimal(hours.days[1].startWork), timeToDecimal(hours.days[1].endWork))
-            hours.days[2].totalHours = calculate(timeToDecimal(hours.days[2].startWork), timeToDecimal(hours.days[2].endWork))
-            hours.days[3].totalHours = calculate(timeToDecimal(hours.days[3].startWork), timeToDecimal(hours.days[3].endWork))
-            hours.days[4].totalHours = calculate(timeToDecimal(hours.days[4].startWork), timeToDecimal(hours.days[4].endWork))
-            hours.days[5].totalHours = calculate(timeToDecimal(hours.days[5].startWork), timeToDecimal(hours.days[5].endWork))
-            hours.days[6].totalHours = calculate(timeToDecimal(hours.days[6].startWork), timeToDecimal(hours.days[6].endWork))
-            hours.days[7].totalHours = calculate(timeToDecimal(hours.days[7].startWork), timeToDecimal(hours.days[7].endWork))
-            hours.days[8].totalHours = calculate(timeToDecimal(hours.days[8].startWork), timeToDecimal(hours.days[8].endWork))
-            hours.days[9].totalHours = calculate(timeToDecimal(hours.days[9].startWork), timeToDecimal(hours.days[9].endWork))
-            hours.days[10].totalHours = calculate(timeToDecimal(hours.days[10].startWork), timeToDecimal(hours.days[10].endWork))
-            hours.days[11].totalHours = calculate(timeToDecimal(hours.days[11].startWork), timeToDecimal(hours.days[11].endWork))
-            hours.days[12].totalHours = calculate(timeToDecimal(hours.days[12].startWork), timeToDecimal(hours.days[12].endWork))
-            hours.days[13].totalHours = calculate(timeToDecimal(hours.days[13].startWork), timeToDecimal(hours.days[13].endWork))
-            hours.days[14].totalHours = calculate(timeToDecimal(hours.days[14].startWork), timeToDecimal(hours.days[14].endWork))
-            hours.days[15].totalHours = calculate(timeToDecimal(hours.days[15].startWork), timeToDecimal(hours.days[15].endWork))
-            hours.days[16].totalHours = calculate(timeToDecimal(hours.days[16].startWork), timeToDecimal(hours.days[16].endWork))
-            hours.days[17].totalHours = calculate(timeToDecimal(hours.days[17].startWork), timeToDecimal(hours.days[17].endWork))
-            hours.days[18].totalHours = calculate(timeToDecimal(hours.days[18].startWork), timeToDecimal(hours.days[18].endWork))
-            hours.days[19].totalHours = calculate(timeToDecimal(hours.days[19].startWork), timeToDecimal(hours.days[19].endWork))
-            hours.days[20].totalHours = calculate(timeToDecimal(hours.days[20].startWork), timeToDecimal(hours.days[20].endWork))
-            hours.days[21].totalHours = calculate(timeToDecimal(hours.days[21].startWork), timeToDecimal(hours.days[21].endWork))
-            hours.days[22].totalHours = calculate(timeToDecimal(hours.days[22].startWork), timeToDecimal(hours.days[22].endWork))
-            hours.days[23].totalHours = calculate(timeToDecimal(hours.days[23].startWork), timeToDecimal(hours.days[23].endWork))
-            hours.days[24].totalHours = calculate(timeToDecimal(hours.days[24].startWork), timeToDecimal(hours.days[24].endWork))
-            hours.days[25].totalHours = calculate(timeToDecimal(hours.days[25].startWork), timeToDecimal(hours.days[25].endWork))
-            hours.days[26].totalHours = calculate(timeToDecimal(hours.days[26].startWork), timeToDecimal(hours.days[26].endWork))
-            hours.days[27].totalHours = calculate(timeToDecimal(hours.days[27].startWork), timeToDecimal(hours.days[27].endWork))
-            hours.days[28].totalHours = calculate(timeToDecimal(hours.days[28].startWork), timeToDecimal(hours.days[28].endWork))
-            hours.days[29].totalHours = calculate(timeToDecimal(hours.days[29].startWork), timeToDecimal(hours.days[29].endWork))
-            hours.days[30].totalHours = calculate(timeToDecimal(hours.days[30].startWork), timeToDecimal(hours.days[30].endWork))
+            // simulate
+            // --------
+            hours.days[0].totalHours = calculate(timeToDecimal(hours.days[0].startWorkA), timeToDecimal(hours.days[0].endWorkA), timeToDecimal(hours.days[0].startWorkB), timeToDecimal(hours.days[0].endWorkB), new Date(day0).getDay())
+            hours.days[1].totalHours = calculate(timeToDecimal(hours.days[1].startWorkA), timeToDecimal(hours.days[1].endWorkA), timeToDecimal(hours.days[1].startWorkB), timeToDecimal(hours.days[1].endWorkB), new Date(day1).getDay())
+            hours.days[2].totalHours = calculate(timeToDecimal(hours.days[2].startWorkA), timeToDecimal(hours.days[2].endWorkA), timeToDecimal(hours.days[2].startWorkB), timeToDecimal(hours.days[2].endWorkB), new Date(day2).getDay())
+            hours.days[3].totalHours = calculate(timeToDecimal(hours.days[3].startWorkA), timeToDecimal(hours.days[3].endWorkA), timeToDecimal(hours.days[3].startWorkB), timeToDecimal(hours.days[3].endWorkB), new Date(day3).getDay())
+            hours.days[4].totalHours = calculate(timeToDecimal(hours.days[4].startWorkA), timeToDecimal(hours.days[4].endWorkA), timeToDecimal(hours.days[4].startWorkB), timeToDecimal(hours.days[4].endWorkB), new Date(day4).getDay())
+            hours.days[5].totalHours = calculate(timeToDecimal(hours.days[5].startWorkA), timeToDecimal(hours.days[5].endWorkA), timeToDecimal(hours.days[5].startWorkB), timeToDecimal(hours.days[5].endWorkB), new Date(day5).getDay())
+            hours.days[6].totalHours = calculate(timeToDecimal(hours.days[6].startWorkA), timeToDecimal(hours.days[6].endWorkA), timeToDecimal(hours.days[6].startWorkB), timeToDecimal(hours.days[6].endWorkB), new Date(day6).getDay())
+            hours.days[7].totalHours = calculate(timeToDecimal(hours.days[7].startWorkA), timeToDecimal(hours.days[7].endWorkA), timeToDecimal(hours.days[7].startWorkB), timeToDecimal(hours.days[7].endWorkB), new Date(day7).getDay())
+            hours.days[8].totalHours = calculate(timeToDecimal(hours.days[8].startWorkA), timeToDecimal(hours.days[8].endWorkA), timeToDecimal(hours.days[8].startWorkB), timeToDecimal(hours.days[8].endWorkB), new Date(day8).getDay())
+            hours.days[9].totalHours = calculate(timeToDecimal(hours.days[9].startWorkA), timeToDecimal(hours.days[9].endWorkA), timeToDecimal(hours.days[9].startWorkB), timeToDecimal(hours.days[9].endWorkB), new Date(day9).getDay())
+            hours.days[10].totalHours = calculate(timeToDecimal(hours.days[10].startWorkA), timeToDecimal(hours.days[10].endWorkA), timeToDecimal(hours.days[10].startWorkB), timeToDecimal(hours.days[10].endWorkB), new Date(day10).getDay())
+            hours.days[11].totalHours = calculate(timeToDecimal(hours.days[11].startWorkA), timeToDecimal(hours.days[11].endWorkA), timeToDecimal(hours.days[11].startWorkB), timeToDecimal(hours.days[11].endWorkB), new Date(day11).getDay())
+            hours.days[12].totalHours = calculate(timeToDecimal(hours.days[12].startWorkA), timeToDecimal(hours.days[12].endWorkA), timeToDecimal(hours.days[12].startWorkB), timeToDecimal(hours.days[12].endWorkB), new Date(day12).getDay())
+            hours.days[13].totalHours = calculate(timeToDecimal(hours.days[13].startWorkA), timeToDecimal(hours.days[13].endWorkA), timeToDecimal(hours.days[13].startWorkB), timeToDecimal(hours.days[13].endWorkB), new Date(day13).getDay())
+            hours.days[14].totalHours = calculate(timeToDecimal(hours.days[14].startWorkA), timeToDecimal(hours.days[14].endWorkA), timeToDecimal(hours.days[14].startWorkB), timeToDecimal(hours.days[14].endWorkB), new Date(day14).getDay())
+            hours.days[15].totalHours = calculate(timeToDecimal(hours.days[15].startWorkA), timeToDecimal(hours.days[15].endWorkA), timeToDecimal(hours.days[15].startWorkB), timeToDecimal(hours.days[15].endWorkB), new Date(day15).getDay())
+            hours.days[16].totalHours = calculate(timeToDecimal(hours.days[16].startWorkA), timeToDecimal(hours.days[16].endWorkA), timeToDecimal(hours.days[16].startWorkB), timeToDecimal(hours.days[16].endWorkB), new Date(day16).getDay())
+            hours.days[17].totalHours = calculate(timeToDecimal(hours.days[17].startWorkA), timeToDecimal(hours.days[17].endWorkA), timeToDecimal(hours.days[17].startWorkB), timeToDecimal(hours.days[17].endWorkB), new Date(day17).getDay())
+            hours.days[18].totalHours = calculate(timeToDecimal(hours.days[18].startWorkA), timeToDecimal(hours.days[18].endWorkA), timeToDecimal(hours.days[18].startWorkB), timeToDecimal(hours.days[18].endWorkB), new Date(day18).getDay())
+            hours.days[19].totalHours = calculate(timeToDecimal(hours.days[19].startWorkA), timeToDecimal(hours.days[19].endWorkA), timeToDecimal(hours.days[19].startWorkB), timeToDecimal(hours.days[19].endWorkB), new Date(day19).getDay())
+            hours.days[20].totalHours = calculate(timeToDecimal(hours.days[20].startWorkA), timeToDecimal(hours.days[20].endWorkA), timeToDecimal(hours.days[20].startWorkB), timeToDecimal(hours.days[20].endWorkB), new Date(day20).getDay())
+            hours.days[21].totalHours = calculate(timeToDecimal(hours.days[21].startWorkA), timeToDecimal(hours.days[21].endWorkA), timeToDecimal(hours.days[21].startWorkB), timeToDecimal(hours.days[21].endWorkB), new Date(day21).getDay())
+            hours.days[22].totalHours = calculate(timeToDecimal(hours.days[22].startWorkA), timeToDecimal(hours.days[22].endWorkA), timeToDecimal(hours.days[22].startWorkB), timeToDecimal(hours.days[22].endWorkB), new Date(day22).getDay())
+            hours.days[23].totalHours = calculate(timeToDecimal(hours.days[23].startWorkA), timeToDecimal(hours.days[23].endWorkA), timeToDecimal(hours.days[23].startWorkB), timeToDecimal(hours.days[23].endWorkB), new Date(day23).getDay())
+            hours.days[24].totalHours = calculate(timeToDecimal(hours.days[24].startWorkA), timeToDecimal(hours.days[24].endWorkA), timeToDecimal(hours.days[24].startWorkB), timeToDecimal(hours.days[24].endWorkB), new Date(day24).getDay())
+            hours.days[25].totalHours = calculate(timeToDecimal(hours.days[25].startWorkA), timeToDecimal(hours.days[25].endWorkA), timeToDecimal(hours.days[25].startWorkB), timeToDecimal(hours.days[25].endWorkB), new Date(day25).getDay())
+            hours.days[26].totalHours = calculate(timeToDecimal(hours.days[26].startWorkA), timeToDecimal(hours.days[26].endWorkA), timeToDecimal(hours.days[26].startWorkB), timeToDecimal(hours.days[26].endWorkB), new Date(day26).getDay())
+            hours.days[27].totalHours = calculate(timeToDecimal(hours.days[27].startWorkA), timeToDecimal(hours.days[27].endWorkA), timeToDecimal(hours.days[27].startWorkB), timeToDecimal(hours.days[27].endWorkB), new Date(day27).getDay())
+            hours.days[28].totalHours = calculate(timeToDecimal(hours.days[28].startWorkA), timeToDecimal(hours.days[28].endWorkA), timeToDecimal(hours.days[28].startWorkB), timeToDecimal(hours.days[28].endWorkB), new Date(day28).getDay())
+            hours.days[29].totalHours = calculate(timeToDecimal(hours.days[29].startWorkA), timeToDecimal(hours.days[29].endWorkA), timeToDecimal(hours.days[29].startWorkB), timeToDecimal(hours.days[29].endWorkB), new Date(day29).getDay())
+            hours.days[30].totalHours = calculate(timeToDecimal(hours.days[30].startWorkA), timeToDecimal(hours.days[30].endWorkA), timeToDecimal(hours.days[30].startWorkB), timeToDecimal(hours.days[30].endWorkB), new Date(day30).getDay())
+            // hours.days[0].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day0).getDay())
+            // hours.days[1].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day1).getDay())
+            // hours.days[2].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day2).getDay())
+            // hours.days[3].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day3).getDay())
+            // hours.days[4].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day4).getDay())
+            // hours.days[5].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day5).getDay())
+            // hours.days[6].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day6).getDay())
+            // hours.days[7].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day7).getDay())
+            // hours.days[8].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day8).getDay())
+            // hours.days[9].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day9).getDay())
+            // hours.days[10].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day10).getDay())
+            // hours.days[11].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day11).getDay())
+            // hours.days[12].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day12).getDay())
+            // hours.days[13].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day13).getDay())
+            // hours.days[14].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day14).getDay())
+            // hours.days[15].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day15).getDay())
+            // hours.days[16].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day16).getDay())
+            // hours.days[17].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day17).getDay())
+            // hours.days[18].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day18).getDay())
+            // hours.days[19].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day19).getDay())
+            // hours.days[20].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day20).getDay())
+            // hours.days[21].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day21).getDay())
+            // hours.days[22].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day22).getDay())
+            // hours.days[23].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day23).getDay())
+            // hours.days[24].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day24).getDay())
+            // hours.days[25].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day25).getDay())
+            // hours.days[26].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day26).getDay())
+            // hours.days[27].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day27).getDay())
+            // hours.days[28].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day28).getDay())
+            // hours.days[29].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day29).getDay())
+            // hours.days[30].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day30).getDay())
+            // simulate
+            // --------
                         
 
             const normal = hours.days.map(day => day.totalHours && day.totalHours.normal)
@@ -515,9 +798,9 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             const allSpecial = special.filter(value => value !== undefined ).map(x => x = Number(x)).reduce((a,b) => a+b)
             const allTotal = total.filter(value => value !== undefined ).map(x => x = Number(x)).reduce((a,b) => a+b)
 
-            let numallNormal = allNormal % 1 !== 0 ? parseFloat(allNormal).toFixed(1) : allNormal
-            let numallSpecial = allSpecial % 1 !== 0 ? parseFloat(allSpecial).toFixed(1) : allSpecial
-            let numallTotal = allTotal % 1 !== 0 ? parseFloat(allTotal).toFixed(1) : allTotal
+            let numallNormal = allNormal % 1 !== 0 ? parseFloat(allNormal).toFixed(2) : allNormal
+            let numallSpecial = allSpecial % 1 !== 0 ? parseFloat(allSpecial).toFixed(2) : allSpecial
+            let numallTotal = allTotal % 1 !== 0 ? parseFloat(allTotal).toFixed(2) : allTotal
 
             hours.monthHours = {
                 totalHours: numallTotal,
@@ -526,10 +809,12 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             }
 
             hours.month = inputs.month
+
+            console.log(hours)
             
             await hoursService
               .create(hours)
-            // console.log(inputs)
+            console.log('hours created')
               setErrorMessage('Time card created')
               setTimeout(() => {
                 setErrorMessage(null)
@@ -569,47 +854,100 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                 />
                     <div className='timecard'>
                         
-                            <div className='timeCardHeader'>
+                            {/* <div className='timeCardHeader'>
                                 <p className='left'>DATE</p>
                                 <p className='left'>JOB DESCRIPTION</p>
                                 <p className='left'>START</p>
-                                <p className='left'>FINISH</p>
+                                <p className='left'>FINISH</p> */}
                                 {/* <p className='left'>TOTAL HOURS/TIMER</p> */}
-                            </div>
+                            {/* </div> */}
 
-                            <div className='eachDay'>
-                                <p>{days[0].dayNumber}</p>
+                            <div className='eachDay topeachday'>
+                                <p className='topDay'>{days[0].dayNumber}</p>
 
-                                <input 
-                                    id='0'
-                                    type="text"
-                                    name="jobDescription0"
-                                    value={description.jobDescription0 || ''}
-                                    onChange={handleChange}
+                                <div>
+                                    <p>Date</p>
+                                    <input
+                                        id='0'
+                                        type="date"
+                                        label='Date'
+                                        name="day0"
+                                        value={day.day0 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                
+                                <div>
+                                    <p>Job Description</p>
+                                    <input 
+                                        id='0'
+                                        type="text"
+                                        name="jobDescription0"
+                                        value={description.jobDescription0 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+
+                                {/* <div style={{backgroundColor: '#4caf50'}}> */}
+                                <div>
+                                    <p className='startA'>Start</p>
+                                    <input className='startA'
+                                        id='0'
+                                        type="time"
+                                        name="startWorkA0"
+                                        value={start.startWorkA0 || '00:00'}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+
+                                {/* <div style={{backgroundColor: '#4caf50'}}> */}
+                                <div>
+                                    <p className='endA'>End</p>
+                                    <input className='endA'
+                                        id='0'
+                                        type="time"
+                                        name="endWorkA0"
+                                        value={end.endWorkA0 || '00:00'}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+
+                                <div>
+                                    <p className='startB'>Start</p>
+                                    <input  className='startB'
+                                        id='0'
+                                        type="time"
+                                        name="startWorkB0"
+                                        value={start.startWorkB0 || '00:00'}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+
+                                <div>
+                                    <p className='endB'>End</p>
+                                    <input  className='endB'
+                                        id='0'
+                                        type="time"
+                                        name="endWorkB0"
+                                        value={end.endWorkB0 || '00:00'}
+                                        onChange={handleChange}
                                 />
+                                </div>
 
-                                <input 
-                                    id='0'
-                                    type="time"
-                                    name="startWork0"
-                                    value={start.startWork0 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input 
-                                    id='0'
-                                    type="time"
-                                    name="endWork0"
-                                    value={end.endWork0 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                {/* <p>{ start.startWork0 !== end.endWork0 &&
-                                    JSON.stringify(calculate(timeToDecimal(start.startWork0), timeToDecimal(end.endWork0))) }</p> */}
+                                {/* <p>{ start.startWorkA0 !== end.endWorkA0 &&
+                                    JSON.stringify(calculate(timeToDecimal(start.startWorkA0), timeToDecimal(end.endWorkA0))) }</p> */}
                             </div>
 
                             <div className='eachDay'>
                                 <p>{days[1].dayNumber}</p>
+
+                                <input 
+                                    id='1'
+                                    type="date"
+                                    name="day1"
+                                    value={day.day1 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='1'
@@ -619,19 +957,35 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='1'
                                     type="time"
-                                    name="startWork1"
-                                    value={start.startWork1 || '00:00'}
+                                    name="startWorkA1"
+                                    value={start.startWorkA1 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='1'
                                     type="time"
-                                    name="endWork1"
-                                    value={end.endWork1 || '00:00'}
+                                    name="endWorkA1"
+                                    value={end.endWorkA1 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='1'
+                                    type="time"
+                                    name="startWorkB1"
+                                    value={start.startWorkB1 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='1'
+                                    type="time"
+                                    name="endWorkB1"
+                                    value={end.endWorkB1 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -641,25 +995,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='2'
+                                    type="date"
+                                    name="day2"
+                                    value={day.day2 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='2'
                                     type="text"
                                     name="jobDescription2"
                                     value={description.jobDescription2 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='2'
                                     type="time"
-                                    name="startWork2"
-                                    value={start.startWork2 || '00:00'}
+                                    name="startWorkA2"
+                                    value={start.startWorkA2 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='2'
                                     type="time"
-                                    name="endWork2"
-                                    value={end.endWork2 || '00:00'}
+                                    name="endWorkA2"
+                                    value={end.endWorkA2 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='2'
+                                    type="time"
+                                    name="startWorkB2"
+                                    value={start.startWorkB2 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='2'
+                                    type="time"
+                                    name="endWorkB2"
+                                    value={end.endWorkB2 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -669,25 +1047,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='3'
+                                    type="date"
+                                    name="day3"
+                                    value={day.day3 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='3'
                                     type="text"
                                     name="jobDescription3"
                                     value={description.jobDescription3 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='3'
                                     type="time"
-                                    name="startWork3"
-                                    value={start.startWork3 || '00:00'}
+                                    name="startWorkA3"
+                                    value={start.startWorkA3 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='3'
                                     type="time"
-                                    name="endWork3"
-                                    value={end.endWork3 || '00:00'}
+                                    name="endWorkA3"
+                                    value={end.endWorkA3 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='3'
+                                    type="time"
+                                    name="startWorkB3"
+                                    value={start.startWorkB3 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='3'
+                                    type="time"
+                                    name="endWorkB3"
+                                    value={end.endWorkB3 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -697,25 +1099,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='4'
+                                    type="date"
+                                    name="day4"
+                                    value={day.day4 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='4'
                                     type="text"
                                     name="jobDescription4"
                                     value={description.jobDescription4 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='4'
                                     type="time"
-                                    name="startWork4"
-                                    value={start.startWork4 || '00:00'}
+                                    name="startWorkA4"
+                                    value={start.startWorkA4 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='4'
                                     type="time"
-                                    name="endWork4"
-                                    value={end.endWork4 || '00:00'}
+                                    name="endWorkA4"
+                                    value={end.endWorkA4 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='4'
+                                    type="time"
+                                    name="startWorkB4"
+                                    value={start.startWorkB4 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='4'
+                                    type="time"
+                                    name="endWorkB4"
+                                    value={end.endWorkB4 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -725,25 +1151,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='5'
+                                    type="date"
+                                    name="day5"
+                                    value={day.day5 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='5'
                                     type="text"
                                     name="jobDescription5"
                                     value={description.jobDescription5 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='5'
                                     type="time"
-                                    name="startWork5"
-                                    value={start.startWork5 || '00:00'}
+                                    name="startWorkA5"
+                                    value={start.startWorkA5 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='5'
                                     type="time"
-                                    name="endWork5"
-                                    value={end.endWork5 || '00:00'}
+                                    name="endWorkA5"
+                                    value={end.endWorkA5 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='5'
+                                    type="time"
+                                    name="startWorkB5"
+                                    value={start.startWorkB5 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='5'
+                                    type="time"
+                                    name="endWorkB5"
+                                    value={end.endWorkB5 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -753,25 +1203,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='6'
+                                    type="date"
+                                    name="day6"
+                                    value={day.day6 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='6'
                                     type="text"
                                     name="jobDescription6"
                                     value={description.jobDescription6 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='6'
                                     type="time"
-                                    name="startWork6"
-                                    value={start.startWork6 || '00:00'}
+                                    name="startWorkA6"
+                                    value={start.startWorkA6 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='6'
                                     type="time"
-                                    name="endWork6"
-                                    value={end.endWork6 || '00:00'}
+                                    name="endWorkA6"
+                                    value={end.endWorkA6 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='6'
+                                    type="time"
+                                    name="startWorkB6"
+                                    value={start.startWorkB6 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='6'
+                                    type="time"
+                                    name="endWorkB6"
+                                    value={end.endWorkB6 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -781,25 +1255,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='7'
+                                    type="date"
+                                    name="day7"
+                                    value={day.day7 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='7'
                                     type="text"
                                     name="jobDescription7"
                                     value={description.jobDescription7 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='7'
                                     type="time"
-                                    name="startWork7"
-                                    value={start.startWork7 || '00:00'}
+                                    name="startWorkA7"
+                                    value={start.startWorkA7 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='7'
                                     type="time"
-                                    name="endWork7"
-                                    value={end.endWork7 || '00:00'}
+                                    name="endWorkA7"
+                                    value={end.endWorkA7 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='7'
+                                    type="time"
+                                    name="startWorkB7"
+                                    value={start.startWorkB7 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='7'
+                                    type="time"
+                                    name="endWorkB7"
+                                    value={end.endWorkB7 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -809,25 +1307,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='8'
+                                    type="date"
+                                    name="day8"
+                                    value={day.day8 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='8'
                                     type="text"
                                     name="jobDescription8"
                                     value={description.jobDescription8 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='8'
                                     type="time"
-                                    name="startWork8"
-                                    value={start.startWork8 || '00:00'}
+                                    name="startWorkA8"
+                                    value={start.startWorkA8 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='8'
                                     type="time"
-                                    name="endWork8"
-                                    value={end.endWork8 || '00:00'}
+                                    name="endWorkA8"
+                                    value={end.endWorkA8 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='8'
+                                    type="time"
+                                    name="startWorkB8"
+                                    value={start.startWorkB8 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='8'
+                                    type="time"
+                                    name="endWorkB8"
+                                    value={end.endWorkB8 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -837,25 +1359,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='9'
+                                    type="date"
+                                    name="day9"
+                                    value={day.day9 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='9'
                                     type="text"
                                     name="jobDescription9"
                                     value={description.jobDescription9 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='9'
                                     type="time"
-                                    name="startWork9"
-                                    value={start.startWork9 || '00:00'}
+                                    name="startWorkA9"
+                                    value={start.startWorkA9 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='9'
                                     type="time"
-                                    name="endWork9"
-                                    value={end.endWork9 || '00:00'}
+                                    name="endWorkA9"
+                                    value={end.endWorkA9 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='9'
+                                    type="time"
+                                    name="startWorkB9"
+                                    value={start.startWorkB9 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='9'
+                                    type="time"
+                                    name="endWorkB9"
+                                    value={end.endWorkB9 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -865,25 +1411,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='10'
+                                    type="date"
+                                    name="day10"
+                                    value={day.day10 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='10'
                                     type="text"
                                     name="jobDescription10"
                                     value={description.jobDescription10 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='10'
                                     type="time"
-                                    name="startWork10"
-                                    value={start.startWork10 || '00:00'}
+                                    name="startWorkA10"
+                                    value={start.startWorkA10 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='10'
                                     type="time"
-                                    name="endWork10"
-                                    value={end.endWork10 || '00:00'}
+                                    name="endWorkA10"
+                                    value={end.endWorkA10 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='10'
+                                    type="time"
+                                    name="startWorkB10"
+                                    value={start.startWorkB10 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='10'
+                                    type="time"
+                                    name="endWorkB10"
+                                    value={end.endWorkB10 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -893,25 +1463,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='11'
+                                    type="date"
+                                    name="day11"
+                                    value={day.day11 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='11'
                                     type="text"
                                     name="jobDescription11"
                                     value={description.jobDescription11 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='11'
                                     type="time"
-                                    name="startWork11"
-                                    value={start.startWork11 || '00:00'}
+                                    name="startWorkA11"
+                                    value={start.startWorkA11 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='11'
                                     type="time"
-                                    name="endWork11"
-                                    value={end.endWork11 || '00:00'}
+                                    name="endWorkA11"
+                                    value={end.endWorkA11 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='11'
+                                    type="time"
+                                    name="startWorkB11"
+                                    value={start.startWorkB11 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='11'
+                                    type="time"
+                                    name="endWorkB11"
+                                    value={end.endWorkB11 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -921,25 +1515,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='12'
+                                    type="date"
+                                    name="day12"
+                                    value={day.day12 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='12'
                                     type="text"
                                     name="jobDescription12"
                                     value={description.jobDescription12 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='12'
                                     type="time"
-                                    name="startWork12"
-                                    value={start.startWork12 || '00:00'}
+                                    name="startWorkA12"
+                                    value={start.startWorkA12 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='12'
                                     type="time"
-                                    name="endWork12"
-                                    value={end.endWork12 || '00:00'}
+                                    name="endWorkA12"
+                                    value={end.endWorkA12 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='12'
+                                    type="time"
+                                    name="startWorkB12"
+                                    value={start.startWorkB12 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='12'
+                                    type="time"
+                                    name="endWorkB12"
+                                    value={end.endWorkB12 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -949,25 +1567,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='13'
+                                    type="date"
+                                    name="day13"
+                                    value={day.day13 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='13'
                                     type="text"
                                     name="jobDescription13"
                                     value={description.jobDescription13 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='13'
                                     type="time"
-                                    name="startWork13"
-                                    value={start.startWork13 || '00:00'}
+                                    name="startWorkA13"
+                                    value={start.startWorkA13 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='13'
                                     type="time"
-                                    name="endWork13"
-                                    value={end.endWork13 || '00:00'}
+                                    name="endWorkA13"
+                                    value={end.endWorkA13 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='13'
+                                    type="time"
+                                    name="startWorkB13"
+                                    value={start.startWorkB13 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='13'
+                                    type="time"
+                                    name="endWorkB13"
+                                    value={end.endWorkB13 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -977,25 +1619,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='14'
+                                    type="date"
+                                    name="day14"
+                                    value={day.day14 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='14'
                                     type="text"
                                     name="jobDescription14"
                                     value={description.jobDescription14 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='14'
                                     type="time"
-                                    name="startWork14"
-                                    value={start.startWork14 || '00:00'}
+                                    name="startWorkA14"
+                                    value={start.startWorkA14 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='14'
                                     type="time"
-                                    name="endWork14"
-                                    value={end.endWork14 || '00:00'}
+                                    name="endWorkA14"
+                                    value={end.endWorkA14 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='14'
+                                    type="time"
+                                    name="startWorkB14"
+                                    value={start.startWorkB14 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='14'
+                                    type="time"
+                                    name="endWorkB14"
+                                    value={end.endWorkB14 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -1005,25 +1671,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='15'
+                                    type="date"
+                                    name="day15"
+                                    value={day.day15 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='15'
                                     type="text"
                                     name="jobDescription15"
                                     value={description.jobDescription15 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='15'
                                     type="time"
-                                    name="startWork15"
-                                    value={start.startWork15 || '00:00'}
+                                    name="startWorkA15"
+                                    value={start.startWorkA15 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='15'
                                     type="time"
-                                    name="endWork15"
-                                    value={end.endWork15 || '00:00'}
+                                    name="endWorkA15"
+                                    value={end.endWorkA15 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='15'
+                                    type="time"
+                                    name="startWorkB15"
+                                    value={start.startWorkB15 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='15'
+                                    type="time"
+                                    name="endWorkB15"
+                                    value={end.endWorkB15 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -1033,25 +1723,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='16'
+                                    type="date"
+                                    name="day16"
+                                    value={day.day16 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='16'
                                     type="text"
                                     name="jobDescription16"
                                     value={description.jobDescription16 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='16'
                                     type="time"
-                                    name="startWork16"
-                                    value={start.startWork16 || '00:00'}
+                                    name="startWorkA16"
+                                    value={start.startWorkA16 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='16'
                                     type="time"
-                                    name="endWork16"
-                                    value={end.endWork16 || '00:00'}
+                                    name="endWorkA16"
+                                    value={end.endWorkA16 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='16'
+                                    type="time"
+                                    name="startWorkB16"
+                                    value={start.startWorkB16 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='16'
+                                    type="time"
+                                    name="endWorkB16"
+                                    value={end.endWorkB16 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -1061,25 +1775,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='17'
+                                    type="date"
+                                    name="day17"
+                                    value={day.day17 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='17'
                                     type="text"
                                     name="jobDescription17"
                                     value={description.jobDescription17 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='17'
                                     type="time"
-                                    name="startWork17"
-                                    value={start.startWork17 || '00:00'}
+                                    name="startWorkA17"
+                                    value={start.startWorkA17 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='17'
                                     type="time"
-                                    name="endWork17"
-                                    value={end.endWork17 || '00:00'}
+                                    name="endWorkA17"
+                                    value={end.endWorkA17 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='17'
+                                    type="time"
+                                    name="startWorkB17"
+                                    value={start.startWorkB17 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='17'
+                                    type="time"
+                                    name="endWorkB17"
+                                    value={end.endWorkB17 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -1089,25 +1827,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='18'
+                                    type="date"
+                                    name="day18"
+                                    value={day.day18 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='18'
                                     type="text"
                                     name="jobDescription18"
                                     value={description.jobDescription18 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='18'
                                     type="time"
-                                    name="startWork18"
-                                    value={start.startWork18 || '00:00'}
+                                    name="startWorkA18"
+                                    value={start.startWorkA18 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='18'
                                     type="time"
-                                    name="endWork18"
-                                    value={end.endWork18 || '00:00'}
+                                    name="endWorkA18"
+                                    value={end.endWorkA18 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='18'
+                                    type="time"
+                                    name="startWorkB18"
+                                    value={start.startWorkB18 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='18'
+                                    type="time"
+                                    name="endWorkB18"
+                                    value={end.endWorkB18 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -1117,25 +1879,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='19'
+                                    type="date"
+                                    name="day19"
+                                    value={day.day19 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='19'
                                     type="text"
                                     name="jobDescription19"
                                     value={description.jobDescription19 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='19'
                                     type="time"
-                                    name="startWork19"
-                                    value={start.startWork19 || '00:00'}
+                                    name="startWorkA19"
+                                    value={start.startWorkA19 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='19'
                                     type="time"
-                                    name="endWork19"
-                                    value={end.endWork19 || '00:00'}
+                                    name="endWorkA19"
+                                    value={end.endWorkA19 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='19'
+                                    type="time"
+                                    name="startWorkB19"
+                                    value={start.startWorkB19 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='19'
+                                    type="time"
+                                    name="endWorkB19"
+                                    value={end.endWorkB19 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -1145,25 +1931,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='20'
+                                    type="date"
+                                    name="day20"
+                                    value={day.day20 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='20'
                                     type="text"
                                     name="jobDescription20"
                                     value={description.jobDescription20 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='20'
                                     type="time"
-                                    name="startWork20"
-                                    value={start.startWork20 || '00:00'}
+                                    name="startWorkA20"
+                                    value={start.startWorkA20 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='20'
                                     type="time"
-                                    name="endWork20"
-                                    value={end.endWork20 || '00:00'}
+                                    name="endWorkA20"
+                                    value={end.endWorkA20 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='20'
+                                    type="time"
+                                    name="startWorkB20"
+                                    value={start.startWorkB20 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='20'
+                                    type="time"
+                                    name="endWorkB20"
+                                    value={end.endWorkB20 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -1173,25 +1983,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='21'
+                                    type="date"
+                                    name="day21"
+                                    value={day.day21 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='21'
                                     type="text"
                                     name="jobDescription21"
                                     value={description.jobDescription21 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='21'
                                     type="time"
-                                    name="startWork21"
-                                    value={start.startWork21 || '00:00'}
+                                    name="startWorkA21"
+                                    value={start.startWorkA21 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='21'
                                     type="time"
-                                    name="endWork21"
-                                    value={end.endWork21 || '00:00'}
+                                    name="endWorkA21"
+                                    value={end.endWorkA21 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='21'
+                                    type="time"
+                                    name="startWorkB21"
+                                    value={start.startWorkB21 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='21'
+                                    type="time"
+                                    name="endWorkB21"
+                                    value={end.endWorkB21 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -1201,25 +2035,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='22'
+                                    type="date"
+                                    name="day22"
+                                    value={day.day22 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='22'
                                     type="text"
                                     name="jobDescription22"
                                     value={description.jobDescription22 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='22'
                                     type="time"
-                                    name="startWork22"
-                                    value={start.startWork22 || '00:00'}
+                                    name="startWorkA22"
+                                    value={start.startWorkA22 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='22'
                                     type="time"
-                                    name="endWork22"
-                                    value={end.endWork22 || '00:00'}
+                                    name="endWorkA22"
+                                    value={end.endWorkA22 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='22'
+                                    type="time"
+                                    name="startWorkB22"
+                                    value={start.startWorkB22 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='22'
+                                    type="time"
+                                    name="endWorkB22"
+                                    value={end.endWorkB22 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -1229,25 +2087,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='23'
+                                    type="date"
+                                    name="day23"
+                                    value={day.day23 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='23'
                                     type="text"
                                     name="jobDescription23"
                                     value={description.jobDescription23 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='23'
                                     type="time"
-                                    name="startWork23"
-                                    value={start.startWork23 || '00:00'}
+                                    name="startWorkA23"
+                                    value={start.startWorkA23 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='23'
                                     type="time"
-                                    name="endWork23"
-                                    value={end.endWork23 || '00:00'}
+                                    name="endWorkA23"
+                                    value={end.endWorkA23 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='23'
+                                    type="time"
+                                    name="startWorkB23"
+                                    value={start.startWorkB23 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='23'
+                                    type="time"
+                                    name="endWorkB23"
+                                    value={end.endWorkB23 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -1257,25 +2139,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='24'
+                                    type="date"
+                                    name="day24"
+                                    value={day.day24 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='24'
                                     type="text"
                                     name="jobDescription24"
                                     value={description.jobDescription24 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='24'
                                     type="time"
-                                    name="startWork24"
-                                    value={start.startWork24 || '00:00'}
+                                    name="startWorkA24"
+                                    value={start.startWorkA24 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='24'
                                     type="time"
-                                    name="endWork24"
-                                    value={end.endWork24 || '00:00'}
+                                    name="endWorkA24"
+                                    value={end.endWorkA24 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='24'
+                                    type="time"
+                                    name="startWorkB24"
+                                    value={start.startWorkB24 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='24'
+                                    type="time"
+                                    name="endWorkB24"
+                                    value={end.endWorkB24 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -1285,25 +2191,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='25'
+                                    type="date"
+                                    name="day25"
+                                    value={day.day25 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='25'
                                     type="text"
                                     name="jobDescription25"
                                     value={description.jobDescription25 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='25'
                                     type="time"
-                                    name="startWork25"
-                                    value={start.startWork25 || '00:00'}
+                                    name="startWorkA25"
+                                    value={start.startWorkA25 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='25'
                                     type="time"
-                                    name="endWork25"
-                                    value={end.endWork25 || '00:00'}
+                                    name="endWorkA25"
+                                    value={end.endWorkA25 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='25'
+                                    type="time"
+                                    name="startWorkB25"
+                                    value={start.startWorkB25 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='25'
+                                    type="time"
+                                    name="endWorkB25"
+                                    value={end.endWorkB25 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -1313,25 +2243,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='26'
+                                    type="date"
+                                    name="day26"
+                                    value={day.day26 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='26'
                                     type="text"
                                     name="jobDescription26"
                                     value={description.jobDescription26 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='26'
                                     type="time"
-                                    name="startWork26"
-                                    value={start.startWork26 || '00:00'}
+                                    name="startWorkA26"
+                                    value={start.startWorkA26 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='26'
                                     type="time"
-                                    name="endWork26"
-                                    value={end.endWork26 || '00:00'}
+                                    name="endWorkA26"
+                                    value={end.endWorkA26 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='26'
+                                    type="time"
+                                    name="startWorkB26"
+                                    value={start.startWorkB26 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='26'
+                                    type="time"
+                                    name="endWorkB26"
+                                    value={end.endWorkB26 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -1341,25 +2295,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='27'
+                                    type="date"
+                                    name="day27"
+                                    value={day.day27 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='27'
                                     type="text"
                                     name="jobDescription27"
                                     value={description.jobDescription27 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='27'
                                     type="time"
-                                    name="startWork27"
-                                    value={start.startWork27 || '00:00'}
+                                    name="startWorkA27"
+                                    value={start.startWorkA27 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='27'
                                     type="time"
-                                    name="endWork27"
-                                    value={end.endWork27 || '00:00'}
+                                    name="endWorkA27"
+                                    value={end.endWorkA27 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='27'
+                                    type="time"
+                                    name="startWorkB27"
+                                    value={start.startWorkB27 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='27'
+                                    type="time"
+                                    name="endWorkB27"
+                                    value={end.endWorkB27 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -1369,25 +2347,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='28'
+                                    type="date"
+                                    name="day28"
+                                    value={day.day28 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='28'
                                     type="text"
                                     name="jobDescription28"
                                     value={description.jobDescription28 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='28'
                                     type="time"
-                                    name="startWork28"
-                                    value={start.startWork28 || '00:00'}
+                                    name="startWorkA28"
+                                    value={start.startWorkA28 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='28'
                                     type="time"
-                                    name="endWork28"
-                                    value={end.endWork28 || '00:00'}
+                                    name="endWorkA28"
+                                    value={end.endWorkA28 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='28'
+                                    type="time"
+                                    name="startWorkB28"
+                                    value={start.startWorkB28 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='28'
+                                    type="time"
+                                    name="endWorkB28"
+                                    value={end.endWorkB28 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -1397,25 +2399,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='29'
+                                    type="date"
+                                    name="day29"
+                                    value={day.day29 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='29'
                                     type="text"
                                     name="jobDescription29"
                                     value={description.jobDescription29 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='29'
                                     type="time"
-                                    name="startWork29"
-                                    value={start.startWork29 || '00:00'}
+                                    name="startWorkA29"
+                                    value={start.startWorkA29 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='29'
                                     type="time"
-                                    name="endWork29"
-                                    value={end.endWork29 || '00:00'}
+                                    name="endWorkA29"
+                                    value={end.endWorkA29 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='29'
+                                    type="time"
+                                    name="startWorkB29"
+                                    value={start.startWorkB29 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='29'
+                                    type="time"
+                                    name="endWorkB29"
+                                    value={end.endWorkB29 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -1425,25 +2451,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                                 <input 
                                     id='30'
+                                    type="date"
+                                    name="day30"
+                                    value={day.day30 || ''}
+                                    onChange={handleChange}
+                                />
+
+                                <input 
+                                    id='30'
                                     type="text"
                                     name="jobDescription30"
                                     value={description.jobDescription30 || ''}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='30'
                                     type="time"
-                                    name="startWork30"
-                                    value={start.startWork30 || '00:00'}
+                                    name="startWorkA30"
+                                    value={start.startWorkA30 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='30'
                                     type="time"
-                                    name="endWork30"
-                                    value={end.endWork30 || '00:00'}
+                                    name="endWorkA30"
+                                    value={end.endWorkA30 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='30'
+                                    type="time"
+                                    name="startWorkB30"
+                                    value={start.startWorkB30 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='30'
+                                    type="time"
+                                    name="endWorkB30"
+                                    value={end.endWorkB30 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
@@ -1466,15 +2516,15 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     <input className='startright'
                                         id={day.dayNumber}
                                         type="time"
-                                        name="startWork"
-                                        value={inputs.startWork || ''}
+                                        name="startWorkA"
+                                        value={inputs.startWorkA || ''}
                                         onChange={handleChange}
                                     />
                                     <input className='finishright'
                                         id={day.dayNumber}
                                         type="time"
-                                        name="endWork"
-                                        value={inputs.endWork || ''}
+                                        name="endWorkA"
+                                        value={inputs.endWorkA || ''}
                                         onChange={handleChange}
                                     />                            
 
@@ -1570,103 +2620,238 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             month: hoursToUpdate.month
         })        
         const [start, setStart] = useState({
-            startWork0: hoursToUpdate.days[0].startWork,
-            startWork1: hoursToUpdate.days[1].startWork,
-            startWork2: hoursToUpdate.days[2].startWork,
-            startWork3: hoursToUpdate.days[3].startWork,
-            startWork4: hoursToUpdate.days[4].startWork,
-            startWork5: hoursToUpdate.days[5].startWork,
-            startWork6: hoursToUpdate.days[6].startWork,
-            startWork7: hoursToUpdate.days[7].startWork,
-            startWork8: hoursToUpdate.days[8].startWork,
-            startWork9: hoursToUpdate.days[9].startWork,
-            startWork10: hoursToUpdate.days[10].startWork,
-            startWork11: hoursToUpdate.days[11].startWork,
-            startWork12: hoursToUpdate.days[12].startWork,
-            startWork13: hoursToUpdate.days[13].startWork,
-            startWork14: hoursToUpdate.days[14].startWork,
-            startWork15: hoursToUpdate.days[15].startWork,
-            startWork16: hoursToUpdate.days[16].startWork,
-            startWork17: hoursToUpdate.days[17].startWork,
-            startWork18: hoursToUpdate.days[18].startWork,
-            startWork19: hoursToUpdate.days[19].startWork,
-            startWork20: hoursToUpdate.days[20].startWork,
-            startWork21: hoursToUpdate.days[21].startWork,
-            startWork22: hoursToUpdate.days[22].startWork,
-            startWork23: hoursToUpdate.days[23].startWork,
-            startWork24: hoursToUpdate.days[24].startWork,
-            startWork25: hoursToUpdate.days[25].startWork,
-            startWork26: hoursToUpdate.days[26].startWork,
-            startWork27: hoursToUpdate.days[27].startWork,
-            startWork28: hoursToUpdate.days[28].startWork,
-            startWork29: hoursToUpdate.days[29].startWork,
-            startWork30: hoursToUpdate.days[30].startWork,
+            startWorkA0: hoursToUpdate.days[0].startWorkA,
+            startWorkA1: hoursToUpdate.days[1].startWorkA,
+            startWorkA2: hoursToUpdate.days[2].startWorkA,
+            startWorkA3: hoursToUpdate.days[3].startWorkA,
+            startWorkA4: hoursToUpdate.days[4].startWorkA,
+            startWorkA5: hoursToUpdate.days[5].startWorkA,
+            startWorkA6: hoursToUpdate.days[6].startWorkA,
+            startWorkA7: hoursToUpdate.days[7].startWorkA,
+            startWorkA8: hoursToUpdate.days[8].startWorkA,
+            startWorkA9: hoursToUpdate.days[9].startWorkA,
+            startWorkA10: hoursToUpdate.days[10].startWorkA,
+            startWorkA11: hoursToUpdate.days[11].startWorkA,
+            startWorkA12: hoursToUpdate.days[12].startWorkA,
+            startWorkA13: hoursToUpdate.days[13].startWorkA,
+            startWorkA14: hoursToUpdate.days[14].startWorkA,
+            startWorkA15: hoursToUpdate.days[15].startWorkA,
+            startWorkA16: hoursToUpdate.days[16].startWorkA,
+            startWorkA17: hoursToUpdate.days[17].startWorkA,
+            startWorkA18: hoursToUpdate.days[18].startWorkA,
+            startWorkA19: hoursToUpdate.days[19].startWorkA,
+            startWorkA20: hoursToUpdate.days[20].startWorkA,
+            startWorkA21: hoursToUpdate.days[21].startWorkA,
+            startWorkA22: hoursToUpdate.days[22].startWorkA,
+            startWorkA23: hoursToUpdate.days[23].startWorkA,
+            startWorkA24: hoursToUpdate.days[24].startWorkA,
+            startWorkA25: hoursToUpdate.days[25].startWorkA,
+            startWorkA26: hoursToUpdate.days[26].startWorkA,
+            startWorkA27: hoursToUpdate.days[27].startWorkA,
+            startWorkA28: hoursToUpdate.days[28].startWorkA,
+            startWorkA29: hoursToUpdate.days[29].startWorkA,
+            startWorkA30: hoursToUpdate.days[30].startWorkA,
+            // ---------------------------------------------
+            startWorkB0: hoursToUpdate.days[0].startWorkB,
+            startWorkB1: hoursToUpdate.days[1].startWorkB,
+            startWorkB2: hoursToUpdate.days[2].startWorkB,
+            startWorkB3: hoursToUpdate.days[3].startWorkB,
+            startWorkB4: hoursToUpdate.days[4].startWorkB,
+            startWorkB5: hoursToUpdate.days[5].startWorkB,
+            startWorkB6: hoursToUpdate.days[6].startWorkB,
+            startWorkB7: hoursToUpdate.days[7].startWorkB,
+            startWorkB8: hoursToUpdate.days[8].startWorkB,
+            startWorkB9: hoursToUpdate.days[9].startWorkB,
+            startWorkB10: hoursToUpdate.days[10].startWorkB,
+            startWorkB11: hoursToUpdate.days[11].startWorkB,
+            startWorkB12: hoursToUpdate.days[12].startWorkB,
+            startWorkB13: hoursToUpdate.days[13].startWorkB,
+            startWorkB14: hoursToUpdate.days[14].startWorkB,
+            startWorkB15: hoursToUpdate.days[15].startWorkB,
+            startWorkB16: hoursToUpdate.days[16].startWorkB,
+            startWorkB17: hoursToUpdate.days[17].startWorkB,
+            startWorkB18: hoursToUpdate.days[18].startWorkB,
+            startWorkB19: hoursToUpdate.days[19].startWorkB,
+            startWorkB20: hoursToUpdate.days[20].startWorkB,
+            startWorkB21: hoursToUpdate.days[21].startWorkB,
+            startWorkB22: hoursToUpdate.days[22].startWorkB,
+            startWorkB23: hoursToUpdate.days[23].startWorkB,
+            startWorkB24: hoursToUpdate.days[24].startWorkB,
+            startWorkB25: hoursToUpdate.days[25].startWorkB,
+            startWorkB26: hoursToUpdate.days[26].startWorkB,
+            startWorkB27: hoursToUpdate.days[27].startWorkB,
+            startWorkB28: hoursToUpdate.days[28].startWorkB,
+            startWorkB29: hoursToUpdate.days[29].startWorkB,
+            startWorkB30: hoursToUpdate.days[30].startWorkB,
         })
         const [end, setEnd] = useState({
-            endWork0: hoursToUpdate.days[0].endWork,
-            endWork1: hoursToUpdate.days[1].endWork,
-            endWork2: hoursToUpdate.days[2].endWork,
-            endWork3: hoursToUpdate.days[3].endWork,
-            endWork4: hoursToUpdate.days[4].endWork,
-            endWork5: hoursToUpdate.days[5].endWork,
-            endWork6: hoursToUpdate.days[6].endWork,
-            endWork7: hoursToUpdate.days[7].endWork,
-            endWork8: hoursToUpdate.days[8].endWork,
-            endWork9: hoursToUpdate.days[9].endWork,
-            endWork10: hoursToUpdate.days[10].endWork,
-            endWork11: hoursToUpdate.days[11].endWork,
-            endWork12: hoursToUpdate.days[12].endWork,
-            endWork13: hoursToUpdate.days[13].endWork,
-            endWork14: hoursToUpdate.days[14].endWork,
-            endWork15: hoursToUpdate.days[15].endWork,
-            endWork16: hoursToUpdate.days[16].endWork,
-            endWork17: hoursToUpdate.days[17].endWork,
-            endWork18: hoursToUpdate.days[18].endWork,
-            endWork19: hoursToUpdate.days[19].endWork,
-            endWork20: hoursToUpdate.days[20].endWork,
-            endWork21: hoursToUpdate.days[21].endWork,
-            endWork22: hoursToUpdate.days[22].endWork,
-            endWork23: hoursToUpdate.days[23].endWork,
-            endWork24: hoursToUpdate.days[24].endWork,
-            endWork25: hoursToUpdate.days[25].endWork,
-            endWork26: hoursToUpdate.days[26].endWork,
-            endWork27: hoursToUpdate.days[27].endWork,
-            endWork28: hoursToUpdate.days[28].endWork,
-            endWork29: hoursToUpdate.days[29].endWork,
-            endWork30: hoursToUpdate.days[30].endWork,
+            endWorkA0: hoursToUpdate.days[0].endWorkA,
+            endWorkA1: hoursToUpdate.days[1].endWorkA,
+            endWorkA2: hoursToUpdate.days[2].endWorkA,
+            endWorkA3: hoursToUpdate.days[3].endWorkA,
+            endWorkA4: hoursToUpdate.days[4].endWorkA,
+            endWorkA5: hoursToUpdate.days[5].endWorkA,
+            endWorkA6: hoursToUpdate.days[6].endWorkA,
+            endWorkA7: hoursToUpdate.days[7].endWorkA,
+            endWorkA8: hoursToUpdate.days[8].endWorkA,
+            endWorkA9: hoursToUpdate.days[9].endWorkA,
+            endWorkA10: hoursToUpdate.days[10].endWorkA,
+            endWorkA11: hoursToUpdate.days[11].endWorkA,
+            endWorkA12: hoursToUpdate.days[12].endWorkA,
+            endWorkA13: hoursToUpdate.days[13].endWorkA,
+            endWorkA14: hoursToUpdate.days[14].endWorkA,
+            endWorkA15: hoursToUpdate.days[15].endWorkA,
+            endWorkA16: hoursToUpdate.days[16].endWorkA,
+            endWorkA17: hoursToUpdate.days[17].endWorkA,
+            endWorkA18: hoursToUpdate.days[18].endWorkA,
+            endWorkA19: hoursToUpdate.days[19].endWorkA,
+            endWorkA20: hoursToUpdate.days[20].endWorkA,
+            endWorkA21: hoursToUpdate.days[21].endWorkA,
+            endWorkA22: hoursToUpdate.days[22].endWorkA,
+            endWorkA23: hoursToUpdate.days[23].endWorkA,
+            endWorkA24: hoursToUpdate.days[24].endWorkA,
+            endWorkA25: hoursToUpdate.days[25].endWorkA,
+            endWorkA26: hoursToUpdate.days[26].endWorkA,
+            endWorkA27: hoursToUpdate.days[27].endWorkA,
+            endWorkA28: hoursToUpdate.days[28].endWorkA,
+            endWorkA29: hoursToUpdate.days[29].endWorkA,
+            endWorkA30: hoursToUpdate.days[30].endWorkA,
+            // -----------------------------------------
+            endWorkB0: hoursToUpdate.days[0].endWorkB,
+            endWorkB1: hoursToUpdate.days[1].endWorkB,
+            endWorkB2: hoursToUpdate.days[2].endWorkB,
+            endWorkB3: hoursToUpdate.days[3].endWorkB,
+            endWorkB4: hoursToUpdate.days[4].endWorkB,
+            endWorkB5: hoursToUpdate.days[5].endWorkB,
+            endWorkB6: hoursToUpdate.days[6].endWorkB,
+            endWorkB7: hoursToUpdate.days[7].endWorkB,
+            endWorkB8: hoursToUpdate.days[8].endWorkB,
+            endWorkB9: hoursToUpdate.days[9].endWorkB,
+            endWorkB10: hoursToUpdate.days[10].endWorkB,
+            endWorkB11: hoursToUpdate.days[11].endWorkB,
+            endWorkB12: hoursToUpdate.days[12].endWorkB,
+            endWorkB13: hoursToUpdate.days[13].endWorkB,
+            endWorkB14: hoursToUpdate.days[14].endWorkB,
+            endWorkB15: hoursToUpdate.days[15].endWorkB,
+            endWorkB16: hoursToUpdate.days[16].endWorkB,
+            endWorkB17: hoursToUpdate.days[17].endWorkB,
+            endWorkB18: hoursToUpdate.days[18].endWorkB,
+            endWorkB19: hoursToUpdate.days[19].endWorkB,
+            endWorkB20: hoursToUpdate.days[20].endWorkB,
+            endWorkB21: hoursToUpdate.days[21].endWorkB,
+            endWorkB22: hoursToUpdate.days[22].endWorkB,
+            endWorkB23: hoursToUpdate.days[23].endWorkB,
+            endWorkB24: hoursToUpdate.days[24].endWorkB,
+            endWorkB25: hoursToUpdate.days[25].endWorkB,
+            endWorkB26: hoursToUpdate.days[26].endWorkB,
+            endWorkB27: hoursToUpdate.days[27].endWorkB,
+            endWorkB28: hoursToUpdate.days[28].endWorkB,
+            endWorkB29: hoursToUpdate.days[29].endWorkB,
+            endWorkB30: hoursToUpdate.days[30].endWorkB,
         })
         const [description, setDescription] = useState({
             jobDescription0: hoursToUpdate.days[0].jobDescription,
-                jobDescription1: hoursToUpdate.days[1].jobDescription,
-                jobDescription2: hoursToUpdate.days[2].jobDescription,
-                jobDescription3: hoursToUpdate.days[3].jobDescription,
-                jobDescription4: hoursToUpdate.days[4].jobDescription,
-                jobDescription5: hoursToUpdate.days[5].jobDescription,
-                jobDescription6: hoursToUpdate.days[6].jobDescription,
-                jobDescription7: hoursToUpdate.days[7].jobDescription,
-                jobDescription8: hoursToUpdate.days[8].jobDescription,
-                jobDescription9: hoursToUpdate.days[9].jobDescription,
-                jobDescription10: hoursToUpdate.days[10].jobDescription,
-                jobDescription11: hoursToUpdate.days[11].jobDescription,
-                jobDescription12: hoursToUpdate.days[12].jobDescription,
-                jobDescription13: hoursToUpdate.days[13].jobDescription,
-                jobDescription14: hoursToUpdate.days[14].jobDescription,
-                jobDescription15: hoursToUpdate.days[15].jobDescription,
-                jobDescription16: hoursToUpdate.days[16].jobDescription,
-                jobDescription17: hoursToUpdate.days[17].jobDescription,
-                jobDescription18: hoursToUpdate.days[18].jobDescription,
-                jobDescription19: hoursToUpdate.days[19].jobDescription,
-                jobDescription20: hoursToUpdate.days[20].jobDescription,
-                jobDescription21: hoursToUpdate.days[21].jobDescription,
-                jobDescription22: hoursToUpdate.days[22].jobDescription,
-                jobDescription23: hoursToUpdate.days[23].jobDescription,
-                jobDescription24: hoursToUpdate.days[24].jobDescription,
-                jobDescription25: hoursToUpdate.days[25].jobDescription,
-                jobDescription26: hoursToUpdate.days[26].jobDescription,
-                jobDescription27: hoursToUpdate.days[27].jobDescription,
-                jobDescription28: hoursToUpdate.days[28].jobDescription,
-                jobDescription29: hoursToUpdate.days[29].jobDescription,
-                jobDescription30: hoursToUpdate.days[30].jobDescription,
+            jobDescription1: hoursToUpdate.days[1].jobDescription,
+            jobDescription2: hoursToUpdate.days[2].jobDescription,
+            jobDescription3: hoursToUpdate.days[3].jobDescription,
+            jobDescription4: hoursToUpdate.days[4].jobDescription,
+            jobDescription5: hoursToUpdate.days[5].jobDescription,
+            jobDescription6: hoursToUpdate.days[6].jobDescription,
+            jobDescription7: hoursToUpdate.days[7].jobDescription,
+            jobDescription8: hoursToUpdate.days[8].jobDescription,
+            jobDescription9: hoursToUpdate.days[9].jobDescription,
+            jobDescription10: hoursToUpdate.days[10].jobDescription,
+            jobDescription11: hoursToUpdate.days[11].jobDescription,
+            jobDescription12: hoursToUpdate.days[12].jobDescription,
+            jobDescription13: hoursToUpdate.days[13].jobDescription,
+            jobDescription14: hoursToUpdate.days[14].jobDescription,
+            jobDescription15: hoursToUpdate.days[15].jobDescription,
+            jobDescription16: hoursToUpdate.days[16].jobDescription,
+            jobDescription17: hoursToUpdate.days[17].jobDescription,
+            jobDescription18: hoursToUpdate.days[18].jobDescription,
+            jobDescription19: hoursToUpdate.days[19].jobDescription,
+            jobDescription20: hoursToUpdate.days[20].jobDescription,
+            jobDescription21: hoursToUpdate.days[21].jobDescription,
+            jobDescription22: hoursToUpdate.days[22].jobDescription,
+            jobDescription23: hoursToUpdate.days[23].jobDescription,
+            jobDescription24: hoursToUpdate.days[24].jobDescription,
+            jobDescription25: hoursToUpdate.days[25].jobDescription,
+            jobDescription26: hoursToUpdate.days[26].jobDescription,
+            jobDescription27: hoursToUpdate.days[27].jobDescription,
+            jobDescription28: hoursToUpdate.days[28].jobDescription,
+            jobDescription29: hoursToUpdate.days[29].jobDescription,
+            jobDescription30: hoursToUpdate.days[30].jobDescription,
+        })
+
+        // hoursToUpdate.days[0].dayNumber has a string containing 2 values
+        // date in format dd/mm/yyy and day name
+        // split the string and get date dd/mm/yyy
+        // splitDate0[0] = dd/mm/yyy. splitDate0[1] = 'Saturday'
+
+        let splitDate0 = hoursToUpdate.days[0].dayNumber.split(" ")
+        let splitDate1 = hoursToUpdate.days[1].dayNumber.split(" ")
+        let splitDate2 = hoursToUpdate.days[2].dayNumber.split(" ")
+        let splitDate3 = hoursToUpdate.days[3].dayNumber.split(" ")
+        let splitDate4 = hoursToUpdate.days[4].dayNumber.split(" ")
+        let splitDate5 = hoursToUpdate.days[5].dayNumber.split(" ")
+        let splitDate6 = hoursToUpdate.days[6].dayNumber.split(" ")
+        let splitDate7 = hoursToUpdate.days[7].dayNumber.split(" ")
+        let splitDate8 = hoursToUpdate.days[8].dayNumber.split(" ")
+        let splitDate9 = hoursToUpdate.days[9].dayNumber.split(" ")
+        let splitDate10 = hoursToUpdate.days[10].dayNumber.split(" ")
+        let splitDate11 = hoursToUpdate.days[11].dayNumber.split(" ")
+        let splitDate12 = hoursToUpdate.days[12].dayNumber.split(" ")
+        let splitDate13 = hoursToUpdate.days[13].dayNumber.split(" ")
+        let splitDate14 = hoursToUpdate.days[14].dayNumber.split(" ")
+        let splitDate15 = hoursToUpdate.days[15].dayNumber.split(" ")
+        let splitDate16 = hoursToUpdate.days[16].dayNumber.split(" ")
+        let splitDate17 = hoursToUpdate.days[17].dayNumber.split(" ")
+        let splitDate18 = hoursToUpdate.days[18].dayNumber.split(" ")
+        let splitDate19 = hoursToUpdate.days[19].dayNumber.split(" ")
+        let splitDate20 = hoursToUpdate.days[20].dayNumber.split(" ")
+        let splitDate21 = hoursToUpdate.days[21].dayNumber.split(" ")
+        let splitDate22 = hoursToUpdate.days[22].dayNumber.split(" ")
+        let splitDate23 = hoursToUpdate.days[23].dayNumber.split(" ")
+        let splitDate24 = hoursToUpdate.days[24].dayNumber.split(" ")
+        let splitDate25 = hoursToUpdate.days[25].dayNumber.split(" ")
+        let splitDate26 = hoursToUpdate.days[26].dayNumber.split(" ")
+        let splitDate27 = hoursToUpdate.days[27].dayNumber.split(" ")
+        let splitDate28 = hoursToUpdate.days[28].dayNumber.split(" ")
+        let splitDate29 = hoursToUpdate.days[29].dayNumber.split(" ")
+        let splitDate30 = hoursToUpdate.days[30].dayNumber.split(" ")
+
+        const [day, setDay] = useState({
+            day0: splitDate0[0],
+            day1: splitDate1[0],
+            day2: splitDate2[0],
+            day3: splitDate3[0],
+            day4: splitDate4[0],
+            day5: splitDate5[0],
+            day6: splitDate6[0],
+            day7: splitDate7[0],
+            day8: splitDate8[0],
+            day9: splitDate9[0],
+            day10: splitDate10[0],
+            day11: splitDate11[0],
+            day12: splitDate12[0],
+            day13: splitDate13[0],
+            day14: splitDate14[0],
+            day15: splitDate15[0],
+            day16: splitDate16[0],
+            day17: splitDate17[0],
+            day18: splitDate18[0],
+            day19: splitDate19[0],
+            day20: splitDate20[0],
+            day21: splitDate21[0],
+            day22: splitDate22[0],
+            day23: splitDate23[0],
+            day24: splitDate24[0],
+            day25: splitDate25[0],
+            day26: splitDate26[0],
+            day27: splitDate27[0],
+            day28: splitDate28[0],
+            day29: splitDate29[0],
+            day30: splitDate30[0],
         })
         // const [days, setDays] = useState([])    // days is not defined
         // setDays(hoursToUpdate.days) // days is not defined
@@ -1678,35 +2863,69 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             return parseFloat(parseInt(arr[0], 10) + '.' + (dec<10?'0':'') + dec)
         }
 
-        // fix trailing digits
-        const calculate = (startTime, endTime) => {
-            let start = startTime
-            let end = endTime
+        const calculate = (startTimeA, endTimeA, startTimeB, endTimeB, isWeekend) => {
+            let startA = startTimeA
+            let endA = endTimeA
+            let startB = startTimeB
+            let endB = endTimeB
+
+            // let startA = startTimeA ? startTimeA : 0
+            // let endA = endTimeA ? endTimeA : 0
+            // let startB = startTimeB ? startTimeB : 0
+            // let endB = endTimeB ? endTimeB : 0
+
             let normal = 0
             let special = 0
 
-            if (end < 4) {
-                end += 24
+            
+
+            if (endA < 4) {
+                endA += 24
             }
 
-            // check if it works
-            if(startTime === endTime) {
-                start = 0
-                end = 0
-            }
-            
-            let total = end - start
-            
-            if (end > 18) {
-                special = end - 18
-                normal = 18 - start
-            }else {
-                normal = total
+            if (endB < 4) {
+                endB += 24
             }
 
-            normal = normal % 1 !== 0 ? normal.toFixed(1) : normal
-            special = special % 1 !== 0 ? special.toFixed(1) : special
-            total = total % 1 !== 0 ? total.toFixed(1) : total
+            
+            if(startTimeA === endTimeA) {
+                startA = 0
+                endA = 0
+            }
+
+            if(startTimeB === endTimeB) {
+                startB = 0
+                endB = 0
+            }
+            
+            let total = endA - startA + endB - startB
+            
+            if (endA > 18) {
+                special += endA - 18
+                normal += 18 - startA
+            }
+            
+            if (endB > 18) {
+                special += endB - 18
+                normal += 18 - startB
+            }
+
+            if (endA < 18) {
+                normal += endA - startA
+            }
+
+            if (endB < 18) {
+                normal += endB - startB
+            }
+
+            normal = normal % 1 !== 0 ? normal.toFixed(2) : normal
+            special = special % 1 !== 0 ? special.toFixed(2) : special
+            total = total % 1 !== 0 ? total.toFixed(2) : total
+
+            if (isWeekend === 0 || isWeekend === 6) {
+                special = total
+                normal = 0
+            }
 
             return {                
                 normal: normal,
@@ -1715,41 +2934,78 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             }
         }
 
+        // works but need to be updated
+        // const calculate = (startTime, endTime) => {
+        //     let start = startTime
+        //     let end = endTime
+        //     let normal = 0
+        //     let special = 0
+
+        //     if (end < 4) {
+        //         end += 24
+        //     }
+
+        //     // check if it works
+        //     if(startTime === endTime) {
+        //         start = 0
+        //         end = 0
+        //     }
+            
+        //     let total = end - start
+            
+        //     if (end > 18) {
+        //         special = end - 18
+        //         normal = 18 - start
+        //     }else {
+        //         normal = total
+        //     }
+
+        //     normal = normal % 1 !== 0 ? normal.toFixed(2) : normal
+        //     special = special % 1 !== 0 ? special.toFixed(2) : special
+        //     total = total % 1 !== 0 ? total.toFixed(2) : total
+
+        //     return {                
+        //         normal: normal,
+        //         special: special,
+        //         total: total
+        //     }
+        // }
+
         // set the inputs with the time card details from state hoursToUpdate
         // doesn't work becouse every time set is called it rerender the component
         // use state default in declaration intead
         // setStart(values => ({...values,
-        //         startWork0: hoursToUpdate.days[0].startWork,
-        //         startWork1: hoursToUpdate.days[1].startWork,
-        //         startWork2: hoursToUpdate.days[2].startWork,
-        //         startWork3: hoursToUpdate.days[3].startWork,
-        //         startWork4: hoursToUpdate.days[4].startWork,
-        //         startWork5: hoursToUpdate.days[5].startWork,
-        //         startWork6: hoursToUpdate.days[6].startWork,
-        //         startWork7: hoursToUpdate.days[7].startWork,
-        //         startWork8: hoursToUpdate.days[8].startWork,
-        //         startWork9: hoursToUpdate.days[9].startWork,
-        //         startWork10: hoursToUpdate.days[10].startWork,
-        //         startWork11: hoursToUpdate.days[11].startWork,
-        //         startWork12: hoursToUpdate.days[12].startWork,
-        //         startWork13: hoursToUpdate.days[13].startWork,
-        //         startWork14: hoursToUpdate.days[14].startWork,
-        //         startWork15: hoursToUpdate.days[15].startWork,
-        //         startWork16: hoursToUpdate.days[16].startWork,
-        //         startWork17: hoursToUpdate.days[17].startWork,
-        //         startWork18: hoursToUpdate.days[18].startWork,
-        //         startWork19: hoursToUpdate.days[19].startWork,
-        //         startWork20: hoursToUpdate.days[20].startWork,
-        //         startWork21: hoursToUpdate.days[21].startWork,
-        //         startWork22: hoursToUpdate.days[22].startWork,
-        //         startWork23: hoursToUpdate.days[23].startWork,
-        //         startWork24: hoursToUpdate.days[24].startWork,
-        //         startWork25: hoursToUpdate.days[25].startWork,
-        //         startWork26: hoursToUpdate.days[26].startWork,
-        //         startWork27: hoursToUpdate.days[27].startWork,
-        //         startWork28: hoursToUpdate.days[28].startWork,
-        //         startWork29: hoursToUpdate.days[29].startWork,
-        //         startWork30: hoursToUpdate.days[30].startWork,
+        //         startWorkA0: hoursToUpdate.days[0].startWorkA,
+        //         startWorkA1: hoursToUpdate.days[1].startWorkA,
+        //         startWorkA2: hoursToUpdate.days[2].startWorkA,
+        //         startWorkA3: hoursToUpdate.days[3].startWorkA,
+        //         startWorkA4: hoursToUpdate.days[4].startWorkA,
+        //         startWorkA5: hoursToUpdate.days[5].startWorkA,
+        //         startWorkA6: hoursToUpdate.days[6].startWorkA,
+        //         startWorkA7: hoursToUpdate.days[7].startWorkA,
+        //         startWorkA8: hoursToUpdate.days[8].startWorkA,
+        //         startWorkA9: hoursToUpdate.days[9].startWorkA,
+        //         startWorkA10: hoursToUpdate.days[10].startWorkA,
+        //         startWorkA11: hoursToUpdate.days[11].startWorkA,
+        //         startWorkA12: hoursToUpdate.days[12].startWorkA,
+        //         startWorkA13: hoursToUpdate.days[13].startWorkA,
+        //         startWorkA14: hoursToUpdate.days[14].startWorkA,
+        //         startWorkA15: hoursToUpdate.days[15].startWorkA,
+        //         startWorkA16: hoursToUpdate.days[16].startWorkA,
+        //         startWorkA17: hoursToUpdate.days[17].startWorkA,
+        //         startWorkA18: hoursToUpdate.days[18].startWorkA,
+        //         startWorkA19: hoursToUpdate.days[19].startWorkA,
+        //         startWorkA20: hoursToUpdate.days[20].startWorkA,
+        //         startWorkA21: hoursToUpdate.days[21].startWorkA,
+        //         startWorkA22: hoursToUpdate.days[22].startWorkA,
+        //         startWorkA23: hoursToUpdate.days[23].startWorkA,
+        //         startWorkA24: hoursToUpdate.days[24].startWorkA,
+        //         startWorkA25: hoursToUpdate.days[25].startWorkA,
+        //         startWorkA26: hoursToUpdate.days[26].startWorkA,
+        //         startWorkA27: hoursToUpdate.days[27].startWorkA,
+        //         startWorkA28: hoursToUpdate.days[28].startWorkA,
+        //         startWorkA29: hoursToUpdate.days[29].startWorkA,
+        //         startWorkA30: hoursToUpdate.days[30].startWorkA,
         //     }))
 
             console.log(start)
@@ -1773,6 +3029,10 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             setDescription(values => ({...values,
                 [name]: value,
             }))
+
+            setDay(values => ({...values,
+                [name]: value,
+            }))
         }
 
         // update
@@ -1788,72 +3048,136 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             }
 
             const {
-                startWork0,
-                startWork1,
-                startWork2,
-                startWork3,
-                startWork4,
-                startWork5,
-                startWork6,
-                startWork7,
-                startWork8,
-                startWork9,
-                startWork10,
-                startWork11,
-                startWork12,
-                startWork13,
-                startWork14,
-                startWork15,
-                startWork16,
-                startWork17,
-                startWork18,
-                startWork19,
-                startWork20,
-                startWork21,
-                startWork22,
-                startWork23,
-                startWork24,
-                startWork25,
-                startWork26,
-                startWork27,
-                startWork28,
-                startWork29,
-                startWork30,
+                startWorkA0,
+                startWorkA1,
+                startWorkA2,
+                startWorkA3,
+                startWorkA4,
+                startWorkA5,
+                startWorkA6,
+                startWorkA7,
+                startWorkA8,
+                startWorkA9,
+                startWorkA10,
+                startWorkA11,
+                startWorkA12,
+                startWorkA13,
+                startWorkA14,
+                startWorkA15,
+                startWorkA16,
+                startWorkA17,
+                startWorkA18,
+                startWorkA19,
+                startWorkA20,
+                startWorkA21,
+                startWorkA22,
+                startWorkA23,
+                startWorkA24,
+                startWorkA25,
+                startWorkA26,
+                startWorkA27,
+                startWorkA28,
+                startWorkA29,
+                startWorkA30,
+                // ----------
+                startWorkB0,
+                startWorkB1,
+                startWorkB2,
+                startWorkB3,
+                startWorkB4,
+                startWorkB5,
+                startWorkB6,
+                startWorkB7,
+                startWorkB8,
+                startWorkB9,
+                startWorkB10,
+                startWorkB11,
+                startWorkB12,
+                startWorkB13,
+                startWorkB14,
+                startWorkB15,
+                startWorkB16,
+                startWorkB17,
+                startWorkB18,
+                startWorkB19,
+                startWorkB20,
+                startWorkB21,
+                startWorkB22,
+                startWorkB23,
+                startWorkB24,
+                startWorkB25,
+                startWorkB26,
+                startWorkB27,
+                startWorkB28,
+                startWorkB29,
+                startWorkB30,
                 
             } = start
 
             const {
-                endWork0,
-                endWork1,
-                endWork2,
-                endWork3,
-                endWork4,
-                endWork5,
-                endWork6,
-                endWork7,
-                endWork8,
-                endWork9,
-                endWork10,
-                endWork11,
-                endWork12,
-                endWork13,
-                endWork14,
-                endWork15,
-                endWork16,
-                endWork17,
-                endWork18,
-                endWork19,
-                endWork20,
-                endWork21,
-                endWork22,
-                endWork23,
-                endWork24,
-                endWork25,
-                endWork26,
-                endWork27,
-                endWork28,
-                endWork29,
-                endWork30,
+                endWorkA0,
+                endWorkA1,
+                endWorkA2,
+                endWorkA3,
+                endWorkA4,
+                endWorkA5,
+                endWorkA6,
+                endWorkA7,
+                endWorkA8,
+                endWorkA9,
+                endWorkA10,
+                endWorkA11,
+                endWorkA12,
+                endWorkA13,
+                endWorkA14,
+                endWorkA15,
+                endWorkA16,
+                endWorkA17,
+                endWorkA18,
+                endWorkA19,
+                endWorkA20,
+                endWorkA21,
+                endWorkA22,
+                endWorkA23,
+                endWorkA24,
+                endWorkA25,
+                endWorkA26,
+                endWorkA27,
+                endWorkA28,
+                endWorkA29,
+                endWorkA30,
+                // --------
+                endWorkB0,
+                endWorkB1,
+                endWorkB2,
+                endWorkB3,
+                endWorkB4,
+                endWorkB5,
+                endWorkB6,
+                endWorkB7,
+                endWorkB8,
+                endWorkB9,
+                endWorkB10,
+                endWorkB11,
+                endWorkB12,
+                endWorkB13,
+                endWorkB14,
+                endWorkB15,
+                endWorkB16,
+                endWorkB17,
+                endWorkB18,
+                endWorkB19,
+                endWorkB20,
+                endWorkB21,
+                endWorkB22,
+                endWorkB23,
+                endWorkB24,
+                endWorkB25,
+                endWorkB26,
+                endWorkB27,
+                endWorkB28,
+                endWorkB29,
+                endWorkB30,
                 
             } = end
 
@@ -1891,72 +3215,170 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                 jobDescription30,
                 
             } = description
+
+            const {
+                day0,
+                day1,
+                day2,
+                day3,
+                day4,
+                day5,
+                day6,
+                day7,
+                day8,
+                day9,
+                day10,
+                day11,
+                day12,
+                day13,
+                day14,
+                day15,
+                day16,
+                day17,
+                day18,
+                day19,
+                day20,
+                day21,
+                day22,
+                day23,
+                day24,
+                day25,
+                day26,
+                day27,
+                day28,
+                day29,
+                day30,
+            } = day
             
-            // if startWork is not defined, leave default value time 00:00
-            hoursToUpdate.days[0].startWork = startWork0 ? startWork0 : '00:00'
-            hoursToUpdate.days[1].startWork = startWork1 ? startWork1 : '00:00'
-            hoursToUpdate.days[2].startWork = startWork2 ? startWork2 : '00:00'
-            hoursToUpdate.days[3].startWork = startWork3 ? startWork3 : '00:00'
-            hoursToUpdate.days[4].startWork = startWork4 ? startWork4 : '00:00'
-            hoursToUpdate.days[5].startWork = startWork5 ? startWork5 : '00:00'
-            hoursToUpdate.days[6].startWork = startWork6 ? startWork6 : '00:00'
-            hoursToUpdate.days[7].startWork = startWork7 ? startWork7 : '00:00'
-            hoursToUpdate.days[8].startWork = startWork8 ? startWork8 : '00:00'
-            hoursToUpdate.days[9].startWork = startWork9 ? startWork9 : '00:00'
-            hoursToUpdate.days[10].startWork = startWork10 ? startWork10 : '00:00'
-            hoursToUpdate.days[11].startWork = startWork11 ? startWork11 : '00:00'
-            hoursToUpdate.days[12].startWork = startWork12 ? startWork12 : '00:00'
-            hoursToUpdate.days[13].startWork = startWork13 ? startWork13 : '00:00'
-            hoursToUpdate.days[14].startWork = startWork14 ? startWork14 : '00:00'
-            hoursToUpdate.days[15].startWork = startWork15 ? startWork15 : '00:00'
-            hoursToUpdate.days[16].startWork = startWork16 ? startWork16 : '00:00'
-            hoursToUpdate.days[17].startWork = startWork17 ? startWork17 : '00:00'
-            hoursToUpdate.days[18].startWork = startWork18 ? startWork18 : '00:00'
-            hoursToUpdate.days[19].startWork = startWork19 ? startWork19 : '00:00'
-            hoursToUpdate.days[20].startWork = startWork20 ? startWork20 : '00:00'
-            hoursToUpdate.days[21].startWork = startWork21 ? startWork21 : '00:00'
-            hoursToUpdate.days[22].startWork = startWork22 ? startWork22 : '00:00'
-            hoursToUpdate.days[23].startWork = startWork23 ? startWork23 : '00:00'
-            hoursToUpdate.days[24].startWork = startWork24 ? startWork24 : '00:00'
-            hoursToUpdate.days[25].startWork = startWork25 ? startWork25 : '00:00'
-            hoursToUpdate.days[26].startWork = startWork26 ? startWork26 : '00:00'
-            hoursToUpdate.days[27].startWork = startWork27 ? startWork27 : '00:00'
-            hoursToUpdate.days[28].startWork = startWork28 ? startWork28 : '00:00'
-            hoursToUpdate.days[29].startWork = startWork29 ? startWork29 : '00:00'
-            hoursToUpdate.days[30].startWork = startWork30 ? startWork30 : '00:00'
+            // if startWorkA is not defined, leave default value time 00:00
+            hoursToUpdate.days[0].startWorkA = startWorkA0 ? startWorkA0 : '00:00'
+            hoursToUpdate.days[1].startWorkA = startWorkA1 ? startWorkA1 : '00:00'
+            hoursToUpdate.days[2].startWorkA = startWorkA2 ? startWorkA2 : '00:00'
+            hoursToUpdate.days[3].startWorkA = startWorkA3 ? startWorkA3 : '00:00'
+            hoursToUpdate.days[4].startWorkA = startWorkA4 ? startWorkA4 : '00:00'
+            hoursToUpdate.days[5].startWorkA = startWorkA5 ? startWorkA5 : '00:00'
+            hoursToUpdate.days[6].startWorkA = startWorkA6 ? startWorkA6 : '00:00'
+            hoursToUpdate.days[7].startWorkA = startWorkA7 ? startWorkA7 : '00:00'
+            hoursToUpdate.days[8].startWorkA = startWorkA8 ? startWorkA8 : '00:00'
+            hoursToUpdate.days[9].startWorkA = startWorkA9 ? startWorkA9 : '00:00'
+            hoursToUpdate.days[10].startWorkA = startWorkA10 ? startWorkA10 : '00:00'
+            hoursToUpdate.days[11].startWorkA = startWorkA11 ? startWorkA11 : '00:00'
+            hoursToUpdate.days[12].startWorkA = startWorkA12 ? startWorkA12 : '00:00'
+            hoursToUpdate.days[13].startWorkA = startWorkA13 ? startWorkA13 : '00:00'
+            hoursToUpdate.days[14].startWorkA = startWorkA14 ? startWorkA14 : '00:00'
+            hoursToUpdate.days[15].startWorkA = startWorkA15 ? startWorkA15 : '00:00'
+            hoursToUpdate.days[16].startWorkA = startWorkA16 ? startWorkA16 : '00:00'
+            hoursToUpdate.days[17].startWorkA = startWorkA17 ? startWorkA17 : '00:00'
+            hoursToUpdate.days[18].startWorkA = startWorkA18 ? startWorkA18 : '00:00'
+            hoursToUpdate.days[19].startWorkA = startWorkA19 ? startWorkA19 : '00:00'
+            hoursToUpdate.days[20].startWorkA = startWorkA20 ? startWorkA20 : '00:00'
+            hoursToUpdate.days[21].startWorkA = startWorkA21 ? startWorkA21 : '00:00'
+            hoursToUpdate.days[22].startWorkA = startWorkA22 ? startWorkA22 : '00:00'
+            hoursToUpdate.days[23].startWorkA = startWorkA23 ? startWorkA23 : '00:00'
+            hoursToUpdate.days[24].startWorkA = startWorkA24 ? startWorkA24 : '00:00'
+            hoursToUpdate.days[25].startWorkA = startWorkA25 ? startWorkA25 : '00:00'
+            hoursToUpdate.days[26].startWorkA = startWorkA26 ? startWorkA26 : '00:00'
+            hoursToUpdate.days[27].startWorkA = startWorkA27 ? startWorkA27 : '00:00'
+            hoursToUpdate.days[28].startWorkA = startWorkA28 ? startWorkA28 : '00:00'
+            hoursToUpdate.days[29].startWorkA = startWorkA29 ? startWorkA29 : '00:00'
+            hoursToUpdate.days[30].startWorkA = startWorkA30 ? startWorkA30 : '00:00'
+
+            hoursToUpdate.days[0].startWorkB = startWorkB0 ? startWorkB0 : '00:00'
+            hoursToUpdate.days[1].startWorkB = startWorkB1 ? startWorkB1 : '00:00'
+            hoursToUpdate.days[2].startWorkB = startWorkB2 ? startWorkB2 : '00:00'
+            hoursToUpdate.days[3].startWorkB = startWorkB3 ? startWorkB3 : '00:00'
+            hoursToUpdate.days[4].startWorkB = startWorkB4 ? startWorkB4 : '00:00'
+            hoursToUpdate.days[5].startWorkB = startWorkB5 ? startWorkB5 : '00:00'
+            hoursToUpdate.days[6].startWorkB = startWorkB6 ? startWorkB6 : '00:00'
+            hoursToUpdate.days[7].startWorkB = startWorkB7 ? startWorkB7 : '00:00'
+            hoursToUpdate.days[8].startWorkB = startWorkB8 ? startWorkB8 : '00:00'
+            hoursToUpdate.days[9].startWorkB = startWorkB9 ? startWorkB9 : '00:00'
+            hoursToUpdate.days[10].startWorkB = startWorkB10 ? startWorkB10 : '00:00'
+            hoursToUpdate.days[11].startWorkB = startWorkB11 ? startWorkB11 : '00:00'
+            hoursToUpdate.days[12].startWorkB = startWorkB12 ? startWorkB12 : '00:00'
+            hoursToUpdate.days[13].startWorkB = startWorkB13 ? startWorkB13 : '00:00'
+            hoursToUpdate.days[14].startWorkB = startWorkB14 ? startWorkB14 : '00:00'
+            hoursToUpdate.days[15].startWorkB = startWorkB15 ? startWorkB15 : '00:00'
+            hoursToUpdate.days[16].startWorkB = startWorkB16 ? startWorkB16 : '00:00'
+            hoursToUpdate.days[17].startWorkB = startWorkB17 ? startWorkB17 : '00:00'
+            hoursToUpdate.days[18].startWorkB = startWorkB18 ? startWorkB18 : '00:00'
+            hoursToUpdate.days[19].startWorkB = startWorkB19 ? startWorkB19 : '00:00'
+            hoursToUpdate.days[20].startWorkB = startWorkB20 ? startWorkB20 : '00:00'
+            hoursToUpdate.days[21].startWorkB = startWorkB21 ? startWorkB21 : '00:00'
+            hoursToUpdate.days[22].startWorkB = startWorkB22 ? startWorkB22 : '00:00'
+            hoursToUpdate.days[23].startWorkB = startWorkB23 ? startWorkB23 : '00:00'
+            hoursToUpdate.days[24].startWorkB = startWorkB24 ? startWorkB24 : '00:00'
+            hoursToUpdate.days[25].startWorkB = startWorkB25 ? startWorkB25 : '00:00'
+            hoursToUpdate.days[26].startWorkB = startWorkB26 ? startWorkB26 : '00:00'
+            hoursToUpdate.days[27].startWorkB = startWorkB27 ? startWorkB27 : '00:00'
+            hoursToUpdate.days[28].startWorkB = startWorkB28 ? startWorkB28 : '00:00'
+            hoursToUpdate.days[29].startWorkB = startWorkB29 ? startWorkB29 : '00:00'
+            hoursToUpdate.days[30].startWorkB = startWorkB30 ? startWorkB30 : '00:00'
             
-            // if endWork is not defined, leave default value time 00:00
-            hoursToUpdate.days[0].endWork = endWork0 ? endWork0 : '00:00'
-            hoursToUpdate.days[1].endWork = endWork1 ? endWork1 : '00:00'
-            hoursToUpdate.days[2].endWork = endWork2 ? endWork2 : '00:00'
-            hoursToUpdate.days[3].endWork = endWork3 ? endWork3 : '00:00'
-            hoursToUpdate.days[4].endWork = endWork4 ? endWork4 : '00:00'
-            hoursToUpdate.days[5].endWork = endWork5 ? endWork5 : '00:00'
-            hoursToUpdate.days[6].endWork = endWork6 ? endWork6 : '00:00'
-            hoursToUpdate.days[7].endWork = endWork7 ? endWork7 : '00:00'
-            hoursToUpdate.days[8].endWork = endWork8 ? endWork8 : '00:00'
-            hoursToUpdate.days[9].endWork = endWork9 ? endWork9 : '00:00'
-            hoursToUpdate.days[10].endWork = endWork10 ? endWork10 : '00:00'
-            hoursToUpdate.days[11].endWork = endWork11 ? endWork11 : '00:00'
-            hoursToUpdate.days[12].endWork = endWork12 ? endWork12 : '00:00'
-            hoursToUpdate.days[13].endWork = endWork13 ? endWork13 : '00:00'
-            hoursToUpdate.days[14].endWork = endWork14 ? endWork14 : '00:00'
-            hoursToUpdate.days[15].endWork = endWork15 ? endWork15 : '00:00'
-            hoursToUpdate.days[16].endWork = endWork16 ? endWork16 : '00:00'
-            hoursToUpdate.days[17].endWork = endWork17 ? endWork17 : '00:00'
-            hoursToUpdate.days[18].endWork = endWork18 ? endWork18 : '00:00'
-            hoursToUpdate.days[19].endWork = endWork19 ? endWork19 : '00:00'
-            hoursToUpdate.days[20].endWork = endWork20 ? endWork20 : '00:00'
-            hoursToUpdate.days[21].endWork = endWork21 ? endWork21 : '00:00'
-            hoursToUpdate.days[22].endWork = endWork22 ? endWork22 : '00:00'
-            hoursToUpdate.days[23].endWork = endWork23 ? endWork23 : '00:00'
-            hoursToUpdate.days[24].endWork = endWork24 ? endWork24 : '00:00'
-            hoursToUpdate.days[25].endWork = endWork25 ? endWork25 : '00:00'
-            hoursToUpdate.days[26].endWork = endWork26 ? endWork26 : '00:00'
-            hoursToUpdate.days[27].endWork = endWork27 ? endWork27 : '00:00'
-            hoursToUpdate.days[28].endWork = endWork28 ? endWork28 : '00:00'
-            hoursToUpdate.days[29].endWork = endWork29 ? endWork29 : '00:00'
-            hoursToUpdate.days[30].endWork = endWork30 ? endWork30 : '00:00'
+            // if endWorkA is not defined, leave default value time 00:00
+            hoursToUpdate.days[0].endWorkA = endWorkA0 ? endWorkA0 : '00:00'
+            hoursToUpdate.days[1].endWorkA = endWorkA1 ? endWorkA1 : '00:00'
+            hoursToUpdate.days[2].endWorkA = endWorkA2 ? endWorkA2 : '00:00'
+            hoursToUpdate.days[3].endWorkA = endWorkA3 ? endWorkA3 : '00:00'
+            hoursToUpdate.days[4].endWorkA = endWorkA4 ? endWorkA4 : '00:00'
+            hoursToUpdate.days[5].endWorkA = endWorkA5 ? endWorkA5 : '00:00'
+            hoursToUpdate.days[6].endWorkA = endWorkA6 ? endWorkA6 : '00:00'
+            hoursToUpdate.days[7].endWorkA = endWorkA7 ? endWorkA7 : '00:00'
+            hoursToUpdate.days[8].endWorkA = endWorkA8 ? endWorkA8 : '00:00'
+            hoursToUpdate.days[9].endWorkA = endWorkA9 ? endWorkA9 : '00:00'
+            hoursToUpdate.days[10].endWorkA = endWorkA10 ? endWorkA10 : '00:00'
+            hoursToUpdate.days[11].endWorkA = endWorkA11 ? endWorkA11 : '00:00'
+            hoursToUpdate.days[12].endWorkA = endWorkA12 ? endWorkA12 : '00:00'
+            hoursToUpdate.days[13].endWorkA = endWorkA13 ? endWorkA13 : '00:00'
+            hoursToUpdate.days[14].endWorkA = endWorkA14 ? endWorkA14 : '00:00'
+            hoursToUpdate.days[15].endWorkA = endWorkA15 ? endWorkA15 : '00:00'
+            hoursToUpdate.days[16].endWorkA = endWorkA16 ? endWorkA16 : '00:00'
+            hoursToUpdate.days[17].endWorkA = endWorkA17 ? endWorkA17 : '00:00'
+            hoursToUpdate.days[18].endWorkA = endWorkA18 ? endWorkA18 : '00:00'
+            hoursToUpdate.days[19].endWorkA = endWorkA19 ? endWorkA19 : '00:00'
+            hoursToUpdate.days[20].endWorkA = endWorkA20 ? endWorkA20 : '00:00'
+            hoursToUpdate.days[21].endWorkA = endWorkA21 ? endWorkA21 : '00:00'
+            hoursToUpdate.days[22].endWorkA = endWorkA22 ? endWorkA22 : '00:00'
+            hoursToUpdate.days[23].endWorkA = endWorkA23 ? endWorkA23 : '00:00'
+            hoursToUpdate.days[24].endWorkA = endWorkA24 ? endWorkA24 : '00:00'
+            hoursToUpdate.days[25].endWorkA = endWorkA25 ? endWorkA25 : '00:00'
+            hoursToUpdate.days[26].endWorkA = endWorkA26 ? endWorkA26 : '00:00'
+            hoursToUpdate.days[27].endWorkA = endWorkA27 ? endWorkA27 : '00:00'
+            hoursToUpdate.days[28].endWorkA = endWorkA28 ? endWorkA28 : '00:00'
+            hoursToUpdate.days[29].endWorkA = endWorkA29 ? endWorkA29 : '00:00'
+            hoursToUpdate.days[30].endWorkA = endWorkA30 ? endWorkA30 : '00:00'
+
+            hoursToUpdate.days[0].endWorkB = endWorkB0 ? endWorkB0 : '00:00'
+            hoursToUpdate.days[1].endWorkB = endWorkB1 ? endWorkB1 : '00:00'
+            hoursToUpdate.days[2].endWorkB = endWorkB2 ? endWorkB2 : '00:00'
+            hoursToUpdate.days[3].endWorkB = endWorkB3 ? endWorkB3 : '00:00'
+            hoursToUpdate.days[4].endWorkB = endWorkB4 ? endWorkB4 : '00:00'
+            hoursToUpdate.days[5].endWorkB = endWorkB5 ? endWorkB5 : '00:00'
+            hoursToUpdate.days[6].endWorkB = endWorkB6 ? endWorkB6 : '00:00'
+            hoursToUpdate.days[7].endWorkB = endWorkB7 ? endWorkB7 : '00:00'
+            hoursToUpdate.days[8].endWorkB = endWorkB8 ? endWorkB8 : '00:00'
+            hoursToUpdate.days[9].endWorkB = endWorkB9 ? endWorkB9 : '00:00'
+            hoursToUpdate.days[10].endWorkB = endWorkB10 ? endWorkB10 : '00:00'
+            hoursToUpdate.days[11].endWorkB = endWorkB11 ? endWorkB11 : '00:00'
+            hoursToUpdate.days[12].endWorkB = endWorkB12 ? endWorkB12 : '00:00'
+            hoursToUpdate.days[13].endWorkB = endWorkB13 ? endWorkB13 : '00:00'
+            hoursToUpdate.days[14].endWorkB = endWorkB14 ? endWorkB14 : '00:00'
+            hoursToUpdate.days[15].endWorkB = endWorkB15 ? endWorkB15 : '00:00'
+            hoursToUpdate.days[16].endWorkB = endWorkB16 ? endWorkB16 : '00:00'
+            hoursToUpdate.days[17].endWorkB = endWorkB17 ? endWorkB17 : '00:00'
+            hoursToUpdate.days[18].endWorkB = endWorkB18 ? endWorkB18 : '00:00'
+            hoursToUpdate.days[19].endWorkB = endWorkB19 ? endWorkB19 : '00:00'
+            hoursToUpdate.days[20].endWorkB = endWorkB20 ? endWorkB20 : '00:00'
+            hoursToUpdate.days[21].endWorkB = endWorkB21 ? endWorkB21 : '00:00'
+            hoursToUpdate.days[22].endWorkB = endWorkB22 ? endWorkB22 : '00:00'
+            hoursToUpdate.days[23].endWorkB = endWorkB23 ? endWorkB23 : '00:00'
+            hoursToUpdate.days[24].endWorkB = endWorkB24 ? endWorkB24 : '00:00'
+            hoursToUpdate.days[25].endWorkB = endWorkB25 ? endWorkB25 : '00:00'
+            hoursToUpdate.days[26].endWorkB = endWorkB26 ? endWorkB26 : '00:00'
+            hoursToUpdate.days[27].endWorkB = endWorkB27 ? endWorkB27 : '00:00'
+            hoursToUpdate.days[28].endWorkB = endWorkB28 ? endWorkB28 : '00:00'
+            hoursToUpdate.days[29].endWorkB = endWorkB29 ? endWorkB29 : '00:00'
+            hoursToUpdate.days[30].endWorkB = endWorkB30 ? endWorkB30 : '00:00'
             
             hoursToUpdate.days[0].jobDescription = jobDescription0
             hoursToUpdate.days[1].jobDescription = jobDescription1
@@ -1990,38 +3412,72 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             hoursToUpdate.days[29].jobDescription = jobDescription29
             hoursToUpdate.days[30].jobDescription = jobDescription30
 
+            const dayName = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+
+            hoursToUpdate.days[0].dayNumber = day0 ? `${day0} ${dayName[new Date(day0).getDay()]}` : ''
+            hoursToUpdate.days[1].dayNumber = day1 ? `${day1} ${dayName[new Date(day1).getDay()]}` : ''
+            hoursToUpdate.days[2].dayNumber = day2 ? `${day2} ${dayName[new Date(day2).getDay()]}` : ''
+            hoursToUpdate.days[3].dayNumber = day3 ? `${day3} ${dayName[new Date(day3).getDay()]}` : ''
+            hoursToUpdate.days[4].dayNumber = day4 ? `${day4} ${dayName[new Date(day4).getDay()]}` : ''
+            hoursToUpdate.days[5].dayNumber = day5 ? `${day5} ${dayName[new Date(day5).getDay()]}` : ''
+            hoursToUpdate.days[6].dayNumber = day6 ? `${day6} ${dayName[new Date(day6).getDay()]}` : ''
+            hoursToUpdate.days[7].dayNumber = day7 ? `${day7} ${dayName[new Date(day7).getDay()]}` : ''
+            hoursToUpdate.days[8].dayNumber = day8 ? `${day8} ${dayName[new Date(day8).getDay()]}` : ''
+            hoursToUpdate.days[9].dayNumber = day9 ? `${day9} ${dayName[new Date(day9).getDay()]}` : ''
+            hoursToUpdate.days[10].dayNumber = day10 ? `${day10} ${dayName[new Date(day10).getDay()]}` : ''
+            hoursToUpdate.days[11].dayNumber = day11 ? `${day11} ${dayName[new Date(day11).getDay()]}` : ''
+            hoursToUpdate.days[12].dayNumber = day12 ? `${day12} ${dayName[new Date(day12).getDay()]}` : ''
+            hoursToUpdate.days[13].dayNumber = day13 ? `${day13} ${dayName[new Date(day13).getDay()]}` : ''
+            hoursToUpdate.days[14].dayNumber = day14 ? `${day14} ${dayName[new Date(day14).getDay()]}` : ''
+            hoursToUpdate.days[15].dayNumber = day15 ? `${day15} ${dayName[new Date(day15).getDay()]}` : ''
+            hoursToUpdate.days[16].dayNumber = day16 ? `${day16} ${dayName[new Date(day16).getDay()]}` : ''
+            hoursToUpdate.days[17].dayNumber = day17 ? `${day17} ${dayName[new Date(day17).getDay()]}` : ''
+            hoursToUpdate.days[18].dayNumber = day18 ? `${day18} ${dayName[new Date(day18).getDay()]}` : ''
+            hoursToUpdate.days[19].dayNumber = day19 ? `${day19} ${dayName[new Date(day19).getDay()]}` : ''
+            hoursToUpdate.days[20].dayNumber = day20 ? `${day20} ${dayName[new Date(day20).getDay()]}` : ''
+            hoursToUpdate.days[21].dayNumber = day21 ? `${day21} ${dayName[new Date(day21).getDay()]}` : ''
+            hoursToUpdate.days[22].dayNumber = day22 ? `${day22} ${dayName[new Date(day22).getDay()]}` : ''
+            hoursToUpdate.days[23].dayNumber = day23 ? `${day23} ${dayName[new Date(day23).getDay()]}` : ''
+            hoursToUpdate.days[24].dayNumber = day24 ? `${day24} ${dayName[new Date(day24).getDay()]}` : ''
+            hoursToUpdate.days[25].dayNumber = day25 ? `${day25} ${dayName[new Date(day25).getDay()]}` : ''
+            hoursToUpdate.days[26].dayNumber = day26 ? `${day26} ${dayName[new Date(day26).getDay()]}` : ''
+            hoursToUpdate.days[27].dayNumber = day27 ? `${day27} ${dayName[new Date(day27).getDay()]}` : ''
+            hoursToUpdate.days[28].dayNumber = day28 ? `${day28} ${dayName[new Date(day28).getDay()]}` : ''
+            hoursToUpdate.days[29].dayNumber = day29 ? `${day29} ${dayName[new Date(day29).getDay()]}` : ''
+            hoursToUpdate.days[30].dayNumber = day30 ? `${day30} ${dayName[new Date(day30).getDay()]}` : ''
+
             // use default value time 00:00
-            hoursToUpdate.days[0].totalHours = calculate(timeToDecimal(hoursToUpdate.days[0].startWork), timeToDecimal(hoursToUpdate.days[0].endWork))
-            hoursToUpdate.days[1].totalHours = calculate(timeToDecimal(hoursToUpdate.days[1].startWork), timeToDecimal(hoursToUpdate.days[1].endWork))
-            hoursToUpdate.days[2].totalHours = calculate(timeToDecimal(hoursToUpdate.days[2].startWork), timeToDecimal(hoursToUpdate.days[2].endWork))
-            hoursToUpdate.days[3].totalHours = calculate(timeToDecimal(hoursToUpdate.days[3].startWork), timeToDecimal(hoursToUpdate.days[3].endWork))
-            hoursToUpdate.days[4].totalHours = calculate(timeToDecimal(hoursToUpdate.days[4].startWork), timeToDecimal(hoursToUpdate.days[4].endWork))
-            hoursToUpdate.days[5].totalHours = calculate(timeToDecimal(hoursToUpdate.days[5].startWork), timeToDecimal(hoursToUpdate.days[5].endWork))
-            hoursToUpdate.days[6].totalHours = calculate(timeToDecimal(hoursToUpdate.days[6].startWork), timeToDecimal(hoursToUpdate.days[6].endWork))
-            hoursToUpdate.days[7].totalHours = calculate(timeToDecimal(hoursToUpdate.days[7].startWork), timeToDecimal(hoursToUpdate.days[7].endWork))
-            hoursToUpdate.days[8].totalHours = calculate(timeToDecimal(hoursToUpdate.days[8].startWork), timeToDecimal(hoursToUpdate.days[8].endWork))
-            hoursToUpdate.days[9].totalHours = calculate(timeToDecimal(hoursToUpdate.days[9].startWork), timeToDecimal(hoursToUpdate.days[9].endWork))
-            hoursToUpdate.days[10].totalHours = calculate(timeToDecimal(hoursToUpdate.days[10].startWork), timeToDecimal(hoursToUpdate.days[10].endWork))
-            hoursToUpdate.days[11].totalHours = calculate(timeToDecimal(hoursToUpdate.days[11].startWork), timeToDecimal(hoursToUpdate.days[11].endWork))
-            hoursToUpdate.days[12].totalHours = calculate(timeToDecimal(hoursToUpdate.days[12].startWork), timeToDecimal(hoursToUpdate.days[12].endWork))
-            hoursToUpdate.days[13].totalHours = calculate(timeToDecimal(hoursToUpdate.days[13].startWork), timeToDecimal(hoursToUpdate.days[13].endWork))
-            hoursToUpdate.days[14].totalHours = calculate(timeToDecimal(hoursToUpdate.days[14].startWork), timeToDecimal(hoursToUpdate.days[14].endWork))
-            hoursToUpdate.days[15].totalHours = calculate(timeToDecimal(hoursToUpdate.days[15].startWork), timeToDecimal(hoursToUpdate.days[15].endWork))
-            hoursToUpdate.days[16].totalHours = calculate(timeToDecimal(hoursToUpdate.days[16].startWork), timeToDecimal(hoursToUpdate.days[16].endWork))
-            hoursToUpdate.days[17].totalHours = calculate(timeToDecimal(hoursToUpdate.days[17].startWork), timeToDecimal(hoursToUpdate.days[17].endWork))
-            hoursToUpdate.days[18].totalHours = calculate(timeToDecimal(hoursToUpdate.days[18].startWork), timeToDecimal(hoursToUpdate.days[18].endWork))
-            hoursToUpdate.days[19].totalHours = calculate(timeToDecimal(hoursToUpdate.days[19].startWork), timeToDecimal(hoursToUpdate.days[19].endWork))
-            hoursToUpdate.days[20].totalHours = calculate(timeToDecimal(hoursToUpdate.days[20].startWork), timeToDecimal(hoursToUpdate.days[20].endWork))
-            hoursToUpdate.days[21].totalHours = calculate(timeToDecimal(hoursToUpdate.days[21].startWork), timeToDecimal(hoursToUpdate.days[21].endWork))
-            hoursToUpdate.days[22].totalHours = calculate(timeToDecimal(hoursToUpdate.days[22].startWork), timeToDecimal(hoursToUpdate.days[22].endWork))
-            hoursToUpdate.days[23].totalHours = calculate(timeToDecimal(hoursToUpdate.days[23].startWork), timeToDecimal(hoursToUpdate.days[23].endWork))
-            hoursToUpdate.days[24].totalHours = calculate(timeToDecimal(hoursToUpdate.days[24].startWork), timeToDecimal(hoursToUpdate.days[24].endWork))
-            hoursToUpdate.days[25].totalHours = calculate(timeToDecimal(hoursToUpdate.days[25].startWork), timeToDecimal(hoursToUpdate.days[25].endWork))
-            hoursToUpdate.days[26].totalHours = calculate(timeToDecimal(hoursToUpdate.days[26].startWork), timeToDecimal(hoursToUpdate.days[26].endWork))
-            hoursToUpdate.days[27].totalHours = calculate(timeToDecimal(hoursToUpdate.days[27].startWork), timeToDecimal(hoursToUpdate.days[27].endWork))
-            hoursToUpdate.days[28].totalHours = calculate(timeToDecimal(hoursToUpdate.days[28].startWork), timeToDecimal(hoursToUpdate.days[28].endWork))
-            hoursToUpdate.days[29].totalHours = calculate(timeToDecimal(hoursToUpdate.days[29].startWork), timeToDecimal(hoursToUpdate.days[29].endWork))
-            hoursToUpdate.days[30].totalHours = calculate(timeToDecimal(hoursToUpdate.days[30].startWork), timeToDecimal(hoursToUpdate.days[30].endWork))
+            hoursToUpdate.days[0].totalHours = calculate(timeToDecimal(hoursToUpdate.days[0].startWorkA), timeToDecimal(hoursToUpdate.days[0].endWorkA), timeToDecimal(hoursToUpdate.days[0].startWorkB), timeToDecimal(hoursToUpdate.days[0].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[1].totalHours = calculate(timeToDecimal(hoursToUpdate.days[1].startWorkA), timeToDecimal(hoursToUpdate.days[1].endWorkA), timeToDecimal(hoursToUpdate.days[1].startWorkB), timeToDecimal(hoursToUpdate.days[1].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[2].totalHours = calculate(timeToDecimal(hoursToUpdate.days[2].startWorkA), timeToDecimal(hoursToUpdate.days[2].endWorkA), timeToDecimal(hoursToUpdate.days[2].startWorkB), timeToDecimal(hoursToUpdate.days[2].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[3].totalHours = calculate(timeToDecimal(hoursToUpdate.days[3].startWorkA), timeToDecimal(hoursToUpdate.days[3].endWorkA), timeToDecimal(hoursToUpdate.days[3].startWorkB), timeToDecimal(hoursToUpdate.days[3].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[4].totalHours = calculate(timeToDecimal(hoursToUpdate.days[4].startWorkA), timeToDecimal(hoursToUpdate.days[4].endWorkA), timeToDecimal(hoursToUpdate.days[4].startWorkB), timeToDecimal(hoursToUpdate.days[4].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[5].totalHours = calculate(timeToDecimal(hoursToUpdate.days[5].startWorkA), timeToDecimal(hoursToUpdate.days[5].endWorkA), timeToDecimal(hoursToUpdate.days[5].startWorkB), timeToDecimal(hoursToUpdate.days[5].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[6].totalHours = calculate(timeToDecimal(hoursToUpdate.days[6].startWorkA), timeToDecimal(hoursToUpdate.days[6].endWorkA), timeToDecimal(hoursToUpdate.days[6].startWorkB), timeToDecimal(hoursToUpdate.days[6].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[7].totalHours = calculate(timeToDecimal(hoursToUpdate.days[7].startWorkA), timeToDecimal(hoursToUpdate.days[7].endWorkA), timeToDecimal(hoursToUpdate.days[7].startWorkB), timeToDecimal(hoursToUpdate.days[7].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[8].totalHours = calculate(timeToDecimal(hoursToUpdate.days[8].startWorkA), timeToDecimal(hoursToUpdate.days[8].endWorkA), timeToDecimal(hoursToUpdate.days[8].startWorkB), timeToDecimal(hoursToUpdate.days[8].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[9].totalHours = calculate(timeToDecimal(hoursToUpdate.days[9].startWorkA), timeToDecimal(hoursToUpdate.days[9].endWorkA), timeToDecimal(hoursToUpdate.days[9].startWorkB), timeToDecimal(hoursToUpdate.days[9].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[10].totalHours = calculate(timeToDecimal(hoursToUpdate.days[10].startWorkA), timeToDecimal(hoursToUpdate.days[10].endWorkA), timeToDecimal(hoursToUpdate.days[10].startWorkB), timeToDecimal(hoursToUpdate.days[10].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[11].totalHours = calculate(timeToDecimal(hoursToUpdate.days[11].startWorkA), timeToDecimal(hoursToUpdate.days[11].endWorkA), timeToDecimal(hoursToUpdate.days[11].startWorkB), timeToDecimal(hoursToUpdate.days[11].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[12].totalHours = calculate(timeToDecimal(hoursToUpdate.days[12].startWorkA), timeToDecimal(hoursToUpdate.days[12].endWorkA), timeToDecimal(hoursToUpdate.days[12].startWorkB), timeToDecimal(hoursToUpdate.days[12].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[13].totalHours = calculate(timeToDecimal(hoursToUpdate.days[13].startWorkA), timeToDecimal(hoursToUpdate.days[13].endWorkA), timeToDecimal(hoursToUpdate.days[13].startWorkB), timeToDecimal(hoursToUpdate.days[13].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[14].totalHours = calculate(timeToDecimal(hoursToUpdate.days[14].startWorkA), timeToDecimal(hoursToUpdate.days[14].endWorkA), timeToDecimal(hoursToUpdate.days[14].startWorkB), timeToDecimal(hoursToUpdate.days[14].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[15].totalHours = calculate(timeToDecimal(hoursToUpdate.days[15].startWorkA), timeToDecimal(hoursToUpdate.days[15].endWorkA), timeToDecimal(hoursToUpdate.days[15].startWorkB), timeToDecimal(hoursToUpdate.days[15].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[16].totalHours = calculate(timeToDecimal(hoursToUpdate.days[16].startWorkA), timeToDecimal(hoursToUpdate.days[16].endWorkA), timeToDecimal(hoursToUpdate.days[16].startWorkB), timeToDecimal(hoursToUpdate.days[16].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[17].totalHours = calculate(timeToDecimal(hoursToUpdate.days[17].startWorkA), timeToDecimal(hoursToUpdate.days[17].endWorkA), timeToDecimal(hoursToUpdate.days[17].startWorkB), timeToDecimal(hoursToUpdate.days[17].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[18].totalHours = calculate(timeToDecimal(hoursToUpdate.days[18].startWorkA), timeToDecimal(hoursToUpdate.days[18].endWorkA), timeToDecimal(hoursToUpdate.days[18].startWorkB), timeToDecimal(hoursToUpdate.days[18].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[19].totalHours = calculate(timeToDecimal(hoursToUpdate.days[19].startWorkA), timeToDecimal(hoursToUpdate.days[19].endWorkA), timeToDecimal(hoursToUpdate.days[19].startWorkB), timeToDecimal(hoursToUpdate.days[19].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[20].totalHours = calculate(timeToDecimal(hoursToUpdate.days[20].startWorkA), timeToDecimal(hoursToUpdate.days[20].endWorkA), timeToDecimal(hoursToUpdate.days[20].startWorkB), timeToDecimal(hoursToUpdate.days[20].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[21].totalHours = calculate(timeToDecimal(hoursToUpdate.days[21].startWorkA), timeToDecimal(hoursToUpdate.days[21].endWorkA), timeToDecimal(hoursToUpdate.days[21].startWorkB), timeToDecimal(hoursToUpdate.days[21].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[22].totalHours = calculate(timeToDecimal(hoursToUpdate.days[22].startWorkA), timeToDecimal(hoursToUpdate.days[22].endWorkA), timeToDecimal(hoursToUpdate.days[22].startWorkB), timeToDecimal(hoursToUpdate.days[22].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[23].totalHours = calculate(timeToDecimal(hoursToUpdate.days[23].startWorkA), timeToDecimal(hoursToUpdate.days[23].endWorkA), timeToDecimal(hoursToUpdate.days[23].startWorkB), timeToDecimal(hoursToUpdate.days[23].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[24].totalHours = calculate(timeToDecimal(hoursToUpdate.days[24].startWorkA), timeToDecimal(hoursToUpdate.days[24].endWorkA), timeToDecimal(hoursToUpdate.days[24].startWorkB), timeToDecimal(hoursToUpdate.days[24].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[25].totalHours = calculate(timeToDecimal(hoursToUpdate.days[25].startWorkA), timeToDecimal(hoursToUpdate.days[25].endWorkA), timeToDecimal(hoursToUpdate.days[25].startWorkB), timeToDecimal(hoursToUpdate.days[25].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[26].totalHours = calculate(timeToDecimal(hoursToUpdate.days[26].startWorkA), timeToDecimal(hoursToUpdate.days[26].endWorkA), timeToDecimal(hoursToUpdate.days[26].startWorkB), timeToDecimal(hoursToUpdate.days[26].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[27].totalHours = calculate(timeToDecimal(hoursToUpdate.days[27].startWorkA), timeToDecimal(hoursToUpdate.days[27].endWorkA), timeToDecimal(hoursToUpdate.days[27].startWorkB), timeToDecimal(hoursToUpdate.days[27].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[28].totalHours = calculate(timeToDecimal(hoursToUpdate.days[28].startWorkA), timeToDecimal(hoursToUpdate.days[28].endWorkA), timeToDecimal(hoursToUpdate.days[28].startWorkB), timeToDecimal(hoursToUpdate.days[28].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[29].totalHours = calculate(timeToDecimal(hoursToUpdate.days[29].startWorkA), timeToDecimal(hoursToUpdate.days[29].endWorkA), timeToDecimal(hoursToUpdate.days[29].startWorkB), timeToDecimal(hoursToUpdate.days[29].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[30].totalHours = calculate(timeToDecimal(hoursToUpdate.days[30].startWorkA), timeToDecimal(hoursToUpdate.days[30].endWorkA), timeToDecimal(hoursToUpdate.days[30].startWorkB), timeToDecimal(hoursToUpdate.days[30].endWorkB), new Date(day0).getDay())
             
           
 
@@ -2032,9 +3488,9 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             const allSpecial = special.filter(value => value !== undefined ).map(x => x = Number(x)).reduce((a,b) => a+b)
             const allTotal = total.filter(value => value !== undefined ).map(x => x = Number(x)).reduce((a,b) => a+b)
 
-            let numallNormal = allNormal % 1 !== 0 ? parseFloat(allNormal).toFixed(1) : allNormal
-            let numallSpecial = allSpecial % 1 !== 0 ? parseFloat(allSpecial).toFixed(1) : allSpecial
-            let numallTotal = allTotal % 1 !== 0 ? parseFloat(allTotal).toFixed(1) : allTotal
+            let numallNormal = allNormal % 1 !== 0 ? parseFloat(allNormal).toFixed(2) : allNormal
+            let numallSpecial = allSpecial % 1 !== 0 ? parseFloat(allSpecial).toFixed(2) : allSpecial
+            let numallTotal = allTotal % 1 !== 0 ? parseFloat(allTotal).toFixed(2) : allTotal
 
             hoursToUpdate.monthHours = {
                 totalHours: numallTotal,
@@ -2064,6 +3520,22 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                 <br/>
                 <button className='screenBtn' onClick={() => toScreen('1')} >Back</button>
                 <br/>
+
+                {/* https://www.w3schools.com/react/react_forms.asp */}
+
+                {/* When the data is handled by the components, all the data is stored in the component state. */}
+
+                {/* You can control changes by adding event handlers in the onChange attribute. */}
+
+                {/* You can control the submit action by adding an event handler in the onSubmit attribute for the <form>: */}
+
+                {/* You can control the values of more than one input field by adding a name attribute to each element.
+
+                We will initialize our state with an empty object.
+
+                To access the fields in the event handler use the event.target.name and event.target.value syntax.
+
+                To update the state, use square brackets [bracket notation] around the property name. */}
                 
                 <form onSubmit={addTimeCard}>
                 <p>MONTH</p>
@@ -2075,45 +3547,100 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                 />
                     <div className='timecard'>
                         
-                            <div className='timeCardHeader'>
+                            {/* <div className='timeCardHeader'>
                                 <p className='left'>DATE</p>
                                 <p className='left'>JOB DESCRIPTION</p>
                                 <p className='left'>START</p>
-                                <p className='left'>FINISH</p>
+                                <p className='left'>FINISH</p> */}
                                 {/* <p className='left'>TOTAL HOURS/TIMER</p> */}
-                            </div>
+                            {/* </div> */}
 
-                            <div className='eachDay'>
-                                <p>{hours.days[0].dayNumber}</p>
+                            <div className='eachDay topeachday'>
+                                <p className='topDay'>{hours.days[0].dayNumber}</p>
 
-                                <input 
-                                    id='0'
-                                    type="text"
-                                    name="jobDescription0"
-                                    value={description.jobDescription0 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input 
-                                    id='0'
-                                    type="time"
-                                    name="startWork0"
-                                    value={start.startWork0 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input 
-                                    id='0'
-                                    type="time"
-                                    name="endWork0"
-                                    value={end.endWork0 || '00:00'}
-                                    onChange={handleChange}
-                                />
+                                <div>
+                                    <p>Date</p>
+                                    <input
+                                        id='0'
+                                        type="date"
+                                        label='Date'
+                                        name="day0"
+                                        value={day.day0 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
                                 
+                                <div>
+                                    <p>Job Description</p>
+                                    <input 
+                                        id='0'
+                                        type="text"
+                                        name="jobDescription0"
+                                        value={description.jobDescription0 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+
+                                {/* <div style={{backgroundColor: '#4caf50'}}> */}
+                                <div>
+                                    <p className='startA'>Start</p>
+                                    <input className='startA'
+                                        id='0'
+                                        type="time"
+                                        name="startWorkA0"
+                                        value={start.startWorkA0 || '00:00'}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+
+                                {/* <div style={{backgroundColor: '#4caf50'}}> */}
+                                <div>
+                                    <p className='endA'>End</p>
+                                    <input className='endA'
+                                        id='0'
+                                        type="time"
+                                        name="endWorkA0"
+                                        value={end.endWorkA0 || '00:00'}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+
+                                <div>
+                                    <p className='startB'>Start</p>
+                                    <input  className='startB'
+                                        id='0'
+                                        type="time"
+                                        name="startWorkB0"
+                                        value={start.startWorkB0 || '00:00'}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+
+                                <div>
+                                    <p className='endB'>End</p>
+                                    <input  className='endB'
+                                        id='0'
+                                        type="time"
+                                        name="endWorkB0"
+                                        value={end.endWorkB0 || '00:00'}
+                                        onChange={handleChange}
+                                />
+                                </div>
+
+                                {/* <p>{ start.startWorkA0 !== end.endWorkA0 &&
+                                    JSON.stringify(calculate(timeToDecimal(start.startWorkA0), timeToDecimal(end.endWorkA0))) }</p> */}
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[1].dayNumber}</p>
+                                <p>{hours.days[1].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='1'
+                                    type="date"
+                                    name="day1"
+                                    value={day.day1 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='1'
@@ -2123,25 +3650,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='1'
                                     type="time"
-                                    name="startWork1"
-                                    value={start.startWork1 || '00:00'}
+                                    name="startWorkA1"
+                                    value={start.startWorkA1 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='1'
                                     type="time"
-                                    name="endWork1"
-                                    value={end.endWork1 || '00:00'}
+                                    name="endWorkA1"
+                                    value={end.endWorkA1 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='1'
+                                    type="time"
+                                    name="startWorkB1"
+                                    value={start.startWorkB1 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='1'
+                                    type="time"
+                                    name="endWorkB1"
+                                    value={end.endWorkB1 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[2].dayNumber}</p>
+                                <p>{hours.days[2].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='2'
+                                    type="date"
+                                    name="day2"
+                                    value={day.day2 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='2'
@@ -2151,25 +3702,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='2'
                                     type="time"
-                                    name="startWork2"
-                                    value={start.startWork2 || '00:00'}
+                                    name="startWorkA2"
+                                    value={start.startWorkA2 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='2'
                                     type="time"
-                                    name="endWork2"
-                                    value={end.endWork2 || '00:00'}
+                                    name="endWorkA2"
+                                    value={end.endWorkA2 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='2'
+                                    type="time"
+                                    name="startWorkB2"
+                                    value={start.startWorkB2 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='2'
+                                    type="time"
+                                    name="endWorkB2"
+                                    value={end.endWorkB2 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[3].dayNumber}</p>
+                                <p>{hours.days[3].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='3'
+                                    type="date"
+                                    name="day3"
+                                    value={day.day3 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='3'
@@ -2179,25 +3754,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='3'
                                     type="time"
-                                    name="startWork3"
-                                    value={start.startWork3 || '00:00'}
+                                    name="startWorkA3"
+                                    value={start.startWorkA3 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='3'
                                     type="time"
-                                    name="endWork3"
-                                    value={end.endWork3 || '00:00'}
+                                    name="endWorkA3"
+                                    value={end.endWorkA3 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='3'
+                                    type="time"
+                                    name="startWorkB3"
+                                    value={start.startWorkB3 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='3'
+                                    type="time"
+                                    name="endWorkB3"
+                                    value={end.endWorkB3 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[4].dayNumber}</p>
+                                <p>{hours.days[4].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='4'
+                                    type="date"
+                                    name="day4"
+                                    value={day.day4 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='4'
@@ -2207,25 +3806,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='4'
                                     type="time"
-                                    name="startWork4"
-                                    value={start.startWork4 || '00:00'}
+                                    name="startWorkA4"
+                                    value={start.startWorkA4 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='4'
                                     type="time"
-                                    name="endWork4"
-                                    value={end.endWork4 || '00:00'}
+                                    name="endWorkA4"
+                                    value={end.endWorkA4 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='4'
+                                    type="time"
+                                    name="startWorkB4"
+                                    value={start.startWorkB4 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='4'
+                                    type="time"
+                                    name="endWorkB4"
+                                    value={end.endWorkB4 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[5].dayNumber}</p>
+                                <p>{hours.days[5].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='5'
+                                    type="date"
+                                    name="day5"
+                                    value={day.day5 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='5'
@@ -2235,25 +3858,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='5'
                                     type="time"
-                                    name="startWork5"
-                                    value={start.startWork5 || '00:00'}
+                                    name="startWorkA5"
+                                    value={start.startWorkA5 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='5'
                                     type="time"
-                                    name="endWork5"
-                                    value={end.endWork5 || '00:00'}
+                                    name="endWorkA5"
+                                    value={end.endWorkA5 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='5'
+                                    type="time"
+                                    name="startWorkB5"
+                                    value={start.startWorkB5 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='5'
+                                    type="time"
+                                    name="endWorkB5"
+                                    value={end.endWorkB5 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[6].dayNumber}</p>
+                                <p>{hours.days[6].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='6'
+                                    type="date"
+                                    name="day6"
+                                    value={day.day6 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='6'
@@ -2263,25 +3910,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='6'
                                     type="time"
-                                    name="startWork6"
-                                    value={start.startWork6 || '00:00'}
+                                    name="startWorkA6"
+                                    value={start.startWorkA6 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='6'
                                     type="time"
-                                    name="endWork6"
-                                    value={end.endWork6 || '00:00'}
+                                    name="endWorkA6"
+                                    value={end.endWorkA6 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='6'
+                                    type="time"
+                                    name="startWorkB6"
+                                    value={start.startWorkB6 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='6'
+                                    type="time"
+                                    name="endWorkB6"
+                                    value={end.endWorkB6 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[7].dayNumber}</p>
+                                <p>{hours.days[7].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='7'
+                                    type="date"
+                                    name="day7"
+                                    value={day.day7 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='7'
@@ -2291,25 +3962,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='7'
                                     type="time"
-                                    name="startWork7"
-                                    value={start.startWork7 || '00:00'}
+                                    name="startWorkA7"
+                                    value={start.startWorkA7 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='7'
                                     type="time"
-                                    name="endWork7"
-                                    value={end.endWork7 || '00:00'}
+                                    name="endWorkA7"
+                                    value={end.endWorkA7 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='7'
+                                    type="time"
+                                    name="startWorkB7"
+                                    value={start.startWorkB7 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='7'
+                                    type="time"
+                                    name="endWorkB7"
+                                    value={end.endWorkB7 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[8].dayNumber}</p>
+                                <p>{hours.days[8].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='8'
+                                    type="date"
+                                    name="day8"
+                                    value={day.day8 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='8'
@@ -2319,25 +4014,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='8'
                                     type="time"
-                                    name="startWork8"
-                                    value={start.startWork8 || '00:00'}
+                                    name="startWorkA8"
+                                    value={start.startWorkA8 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='8'
                                     type="time"
-                                    name="endWork8"
-                                    value={end.endWork8 || '00:00'}
+                                    name="endWorkA8"
+                                    value={end.endWorkA8 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='8'
+                                    type="time"
+                                    name="startWorkB8"
+                                    value={start.startWorkB8 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='8'
+                                    type="time"
+                                    name="endWorkB8"
+                                    value={end.endWorkB8 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[9].dayNumber}</p>
+                                <p>{hours.days[9].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='9'
+                                    type="date"
+                                    name="day9"
+                                    value={day.day9 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='9'
@@ -2347,25 +4066,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='9'
                                     type="time"
-                                    name="startWork9"
-                                    value={start.startWork9 || '00:00'}
+                                    name="startWorkA9"
+                                    value={start.startWorkA9 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='9'
                                     type="time"
-                                    name="endWork9"
-                                    value={end.endWork9 || '00:00'}
+                                    name="endWorkA9"
+                                    value={end.endWorkA9 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='9'
+                                    type="time"
+                                    name="startWorkB9"
+                                    value={start.startWorkB9 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='9'
+                                    type="time"
+                                    name="endWorkB9"
+                                    value={end.endWorkB9 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[10].dayNumber}</p>
+                                <p>{hours.days[10].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='10'
+                                    type="date"
+                                    name="day10"
+                                    value={day.day10 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='10'
@@ -2375,25 +4118,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='10'
                                     type="time"
-                                    name="startWork10"
-                                    value={start.startWork10 || '00:00'}
+                                    name="startWorkA10"
+                                    value={start.startWorkA10 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='10'
                                     type="time"
-                                    name="endWork10"
-                                    value={end.endWork10 || '00:00'}
+                                    name="endWorkA10"
+                                    value={end.endWorkA10 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='10'
+                                    type="time"
+                                    name="startWorkB10"
+                                    value={start.startWorkB10 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='10'
+                                    type="time"
+                                    name="endWorkB10"
+                                    value={end.endWorkB10 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[11].dayNumber}</p>
+                                <p>{hours.days[11].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='11'
+                                    type="date"
+                                    name="day11"
+                                    value={day.day11 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='11'
@@ -2403,25 +4170,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='11'
                                     type="time"
-                                    name="startWork11"
-                                    value={start.startWork11 || '00:00'}
+                                    name="startWorkA11"
+                                    value={start.startWorkA11 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='11'
                                     type="time"
-                                    name="endWork11"
-                                    value={end.endWork11 || '00:00'}
+                                    name="endWorkA11"
+                                    value={end.endWorkA11 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='11'
+                                    type="time"
+                                    name="startWorkB11"
+                                    value={start.startWorkB11 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='11'
+                                    type="time"
+                                    name="endWorkB11"
+                                    value={end.endWorkB11 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[12].dayNumber}</p>
+                                <p>{hours.days[12].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='12'
+                                    type="date"
+                                    name="day12"
+                                    value={day.day12 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='12'
@@ -2431,25 +4222,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='12'
                                     type="time"
-                                    name="startWork12"
-                                    value={start.startWork12 || '00:00'}
+                                    name="startWorkA12"
+                                    value={start.startWorkA12 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='12'
                                     type="time"
-                                    name="endWork12"
-                                    value={end.endWork12 || '00:00'}
+                                    name="endWorkA12"
+                                    value={end.endWorkA12 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='12'
+                                    type="time"
+                                    name="startWorkB12"
+                                    value={start.startWorkB12 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='12'
+                                    type="time"
+                                    name="endWorkB12"
+                                    value={end.endWorkB12 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[13].dayNumber}</p>
+                                <p>{hours.days[13].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='13'
+                                    type="date"
+                                    name="day13"
+                                    value={day.day13 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='13'
@@ -2459,25 +4274,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='13'
                                     type="time"
-                                    name="startWork13"
-                                    value={start.startWork13 || '00:00'}
+                                    name="startWorkA13"
+                                    value={start.startWorkA13 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='13'
                                     type="time"
-                                    name="endWork13"
-                                    value={end.endWork13 || '00:00'}
+                                    name="endWorkA13"
+                                    value={end.endWorkA13 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='13'
+                                    type="time"
+                                    name="startWorkB13"
+                                    value={start.startWorkB13 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='13'
+                                    type="time"
+                                    name="endWorkB13"
+                                    value={end.endWorkB13 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[14].dayNumber}</p>
+                                <p>{hours.days[14].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='14'
+                                    type="date"
+                                    name="day14"
+                                    value={day.day14 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='14'
@@ -2487,25 +4326,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='14'
                                     type="time"
-                                    name="startWork14"
-                                    value={start.startWork14 || '00:00'}
+                                    name="startWorkA14"
+                                    value={start.startWorkA14 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='14'
                                     type="time"
-                                    name="endWork14"
-                                    value={end.endWork14 || '00:00'}
+                                    name="endWorkA14"
+                                    value={end.endWorkA14 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='14'
+                                    type="time"
+                                    name="startWorkB14"
+                                    value={start.startWorkB14 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='14'
+                                    type="time"
+                                    name="endWorkB14"
+                                    value={end.endWorkB14 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[15].dayNumber}</p>
+                                <p>{hours.days[15].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='15'
+                                    type="date"
+                                    name="day15"
+                                    value={day.day15 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='15'
@@ -2515,25 +4378,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='15'
                                     type="time"
-                                    name="startWork15"
-                                    value={start.startWork15 || '00:00'}
+                                    name="startWorkA15"
+                                    value={start.startWorkA15 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='15'
                                     type="time"
-                                    name="endWork15"
-                                    value={end.endWork15 || '00:00'}
+                                    name="endWorkA15"
+                                    value={end.endWorkA15 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='15'
+                                    type="time"
+                                    name="startWorkB15"
+                                    value={start.startWorkB15 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='15'
+                                    type="time"
+                                    name="endWorkB15"
+                                    value={end.endWorkB15 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[16].dayNumber}</p>
+                                <p>{hours.days[16].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='16'
+                                    type="date"
+                                    name="day16"
+                                    value={day.day16 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='16'
@@ -2543,25 +4430,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='16'
                                     type="time"
-                                    name="startWork16"
-                                    value={start.startWork16 || '00:00'}
+                                    name="startWorkA16"
+                                    value={start.startWorkA16 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='16'
                                     type="time"
-                                    name="endWork16"
-                                    value={end.endWork16 || '00:00'}
+                                    name="endWorkA16"
+                                    value={end.endWorkA16 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='16'
+                                    type="time"
+                                    name="startWorkB16"
+                                    value={start.startWorkB16 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='16'
+                                    type="time"
+                                    name="endWorkB16"
+                                    value={end.endWorkB16 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[17].dayNumber}</p>
+                                <p>{hours.days[17].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='17'
+                                    type="date"
+                                    name="day17"
+                                    value={day.day17 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='17'
@@ -2571,25 +4482,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='17'
                                     type="time"
-                                    name="startWork17"
-                                    value={start.startWork17 || '00:00'}
+                                    name="startWorkA17"
+                                    value={start.startWorkA17 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='17'
                                     type="time"
-                                    name="endWork17"
-                                    value={end.endWork17 || '00:00'}
+                                    name="endWorkA17"
+                                    value={end.endWorkA17 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='17'
+                                    type="time"
+                                    name="startWorkB17"
+                                    value={start.startWorkB17 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='17'
+                                    type="time"
+                                    name="endWorkB17"
+                                    value={end.endWorkB17 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[18].dayNumber}</p>
+                                <p>{hours.days[18].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='18'
+                                    type="date"
+                                    name="day18"
+                                    value={day.day18 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='18'
@@ -2599,25 +4534,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='18'
                                     type="time"
-                                    name="startWork18"
-                                    value={start.startWork18 || '00:00'}
+                                    name="startWorkA18"
+                                    value={start.startWorkA18 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='18'
                                     type="time"
-                                    name="endWork18"
-                                    value={end.endWork18 || '00:00'}
+                                    name="endWorkA18"
+                                    value={end.endWorkA18 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='18'
+                                    type="time"
+                                    name="startWorkB18"
+                                    value={start.startWorkB18 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='18'
+                                    type="time"
+                                    name="endWorkB18"
+                                    value={end.endWorkB18 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[19].dayNumber}</p>
+                                <p>{hours.days[19].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='19'
+                                    type="date"
+                                    name="day19"
+                                    value={day.day19 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='19'
@@ -2627,25 +4586,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='19'
                                     type="time"
-                                    name="startWork19"
-                                    value={start.startWork19 || '00:00'}
+                                    name="startWorkA19"
+                                    value={start.startWorkA19 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='19'
                                     type="time"
-                                    name="endWork19"
-                                    value={end.endWork19 || '00:00'}
+                                    name="endWorkA19"
+                                    value={end.endWorkA19 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='19'
+                                    type="time"
+                                    name="startWorkB19"
+                                    value={start.startWorkB19 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='19'
+                                    type="time"
+                                    name="endWorkB19"
+                                    value={end.endWorkB19 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[20].dayNumber}</p>
+                                <p>{hours.days[20].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='20'
+                                    type="date"
+                                    name="day20"
+                                    value={day.day20 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='20'
@@ -2655,25 +4638,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='20'
                                     type="time"
-                                    name="startWork20"
-                                    value={start.startWork20 || '00:00'}
+                                    name="startWorkA20"
+                                    value={start.startWorkA20 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='20'
                                     type="time"
-                                    name="endWork20"
-                                    value={end.endWork20 || '00:00'}
+                                    name="endWorkA20"
+                                    value={end.endWorkA20 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='20'
+                                    type="time"
+                                    name="startWorkB20"
+                                    value={start.startWorkB20 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='20'
+                                    type="time"
+                                    name="endWorkB20"
+                                    value={end.endWorkB20 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[21].dayNumber}</p>
+                                <p>{hours.days[21].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='21'
+                                    type="date"
+                                    name="day21"
+                                    value={day.day21 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='21'
@@ -2683,25 +4690,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='21'
                                     type="time"
-                                    name="startWork21"
-                                    value={start.startWork21 || '00:00'}
+                                    name="startWorkA21"
+                                    value={start.startWorkA21 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='21'
                                     type="time"
-                                    name="endWork21"
-                                    value={end.endWork21 || '00:00'}
+                                    name="endWorkA21"
+                                    value={end.endWorkA21 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='21'
+                                    type="time"
+                                    name="startWorkB21"
+                                    value={start.startWorkB21 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='21'
+                                    type="time"
+                                    name="endWorkB21"
+                                    value={end.endWorkB21 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[22].dayNumber}</p>
+                                <p>{hours.days[22].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='22'
+                                    type="date"
+                                    name="day22"
+                                    value={day.day22 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='22'
@@ -2711,25 +4742,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='22'
                                     type="time"
-                                    name="startWork22"
-                                    value={start.startWork22 || '00:00'}
+                                    name="startWorkA22"
+                                    value={start.startWorkA22 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='22'
                                     type="time"
-                                    name="endWork22"
-                                    value={end.endWork22 || '00:00'}
+                                    name="endWorkA22"
+                                    value={end.endWorkA22 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='22'
+                                    type="time"
+                                    name="startWorkB22"
+                                    value={start.startWorkB22 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='22'
+                                    type="time"
+                                    name="endWorkB22"
+                                    value={end.endWorkB22 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[23].dayNumber}</p>
+                                <p>{hours.days[23].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='23'
+                                    type="date"
+                                    name="day23"
+                                    value={day.day23 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='23'
@@ -2739,25 +4794,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='23'
                                     type="time"
-                                    name="startWork23"
-                                    value={start.startWork23 || '00:00'}
+                                    name="startWorkA23"
+                                    value={start.startWorkA23 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='23'
                                     type="time"
-                                    name="endWork23"
-                                    value={end.endWork23 || '00:00'}
+                                    name="endWorkA23"
+                                    value={end.endWorkA23 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='23'
+                                    type="time"
+                                    name="startWorkB23"
+                                    value={start.startWorkB23 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='23'
+                                    type="time"
+                                    name="endWorkB23"
+                                    value={end.endWorkB23 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[24].dayNumber}</p>
+                                <p>{hours.days[24].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='24'
+                                    type="date"
+                                    name="day24"
+                                    value={day.day24 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='24'
@@ -2767,25 +4846,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='24'
                                     type="time"
-                                    name="startWork24"
-                                    value={start.startWork24 || '00:00'}
+                                    name="startWorkA24"
+                                    value={start.startWorkA24 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='24'
                                     type="time"
-                                    name="endWork24"
-                                    value={end.endWork24 || '00:00'}
+                                    name="endWorkA24"
+                                    value={end.endWorkA24 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='24'
+                                    type="time"
+                                    name="startWorkB24"
+                                    value={start.startWorkB24 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='24'
+                                    type="time"
+                                    name="endWorkB24"
+                                    value={end.endWorkB24 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[25].dayNumber}</p>
+                                <p>{hours.days[25].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='25'
+                                    type="date"
+                                    name="day25"
+                                    value={day.day25 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='25'
@@ -2795,25 +4898,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='25'
                                     type="time"
-                                    name="startWork25"
-                                    value={start.startWork25 || '00:00'}
+                                    name="startWorkA25"
+                                    value={start.startWorkA25 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='25'
                                     type="time"
-                                    name="endWork25"
-                                    value={end.endWork25 || '00:00'}
+                                    name="endWorkA25"
+                                    value={end.endWorkA25 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='25'
+                                    type="time"
+                                    name="startWorkB25"
+                                    value={start.startWorkB25 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='25'
+                                    type="time"
+                                    name="endWorkB25"
+                                    value={end.endWorkB25 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[26].dayNumber}</p>
+                                <p>{hours.days[26].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='26'
+                                    type="date"
+                                    name="day26"
+                                    value={day.day26 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='26'
@@ -2823,25 +4950,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='26'
                                     type="time"
-                                    name="startWork26"
-                                    value={start.startWork26 || '00:00'}
+                                    name="startWorkA26"
+                                    value={start.startWorkA26 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='26'
                                     type="time"
-                                    name="endWork26"
-                                    value={end.endWork26 || '00:00'}
+                                    name="endWorkA26"
+                                    value={end.endWorkA26 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='26'
+                                    type="time"
+                                    name="startWorkB26"
+                                    value={start.startWorkB26 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='26'
+                                    type="time"
+                                    name="endWorkB26"
+                                    value={end.endWorkB26 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[27].dayNumber}</p>
+                                <p>{hours.days[27].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='27'
+                                    type="date"
+                                    name="day27"
+                                    value={day.day27 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='27'
@@ -2851,25 +5002,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='27'
                                     type="time"
-                                    name="startWork27"
-                                    value={start.startWork27 || '00:00'}
+                                    name="startWorkA27"
+                                    value={start.startWorkA27 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='27'
                                     type="time"
-                                    name="endWork27"
-                                    value={end.endWork27 || '00:00'}
+                                    name="endWorkA27"
+                                    value={end.endWorkA27 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='27'
+                                    type="time"
+                                    name="startWorkB27"
+                                    value={start.startWorkB27 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='27'
+                                    type="time"
+                                    name="endWorkB27"
+                                    value={end.endWorkB27 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[28].dayNumber}</p>
+                                <p>{hours.days[28].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='28'
+                                    type="date"
+                                    name="day28"
+                                    value={day.day28 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='28'
@@ -2879,25 +5054,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='28'
                                     type="time"
-                                    name="startWork28"
-                                    value={start.startWork28 || '00:00'}
+                                    name="startWorkA28"
+                                    value={start.startWorkA28 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='28'
                                     type="time"
-                                    name="endWork28"
-                                    value={end.endWork28 || '00:00'}
+                                    name="endWorkA28"
+                                    value={end.endWorkA28 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='28'
+                                    type="time"
+                                    name="startWorkB28"
+                                    value={start.startWorkB28 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='28'
+                                    type="time"
+                                    name="endWorkB28"
+                                    value={end.endWorkB28 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[29].dayNumber}</p>
+                                <p>{hours.days[29].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='29'
+                                    type="date"
+                                    name="day29"
+                                    value={day.day29 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='29'
@@ -2907,25 +5106,49 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='29'
                                     type="time"
-                                    name="startWork29"
-                                    value={start.startWork29 || '00:00'}
+                                    name="startWorkA29"
+                                    value={start.startWorkA29 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='29'
                                     type="time"
-                                    name="endWork29"
-                                    value={end.endWork29 || '00:00'}
+                                    name="endWorkA29"
+                                    value={end.endWorkA29 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='29'
+                                    type="time"
+                                    name="startWorkB29"
+                                    value={start.startWorkB29 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='29'
+                                    type="time"
+                                    name="endWorkB29"
+                                    value={end.endWorkB29 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[30].dayNumber}</p>
+                                <p>{hours.days[30].dayNumber || '----------------------'}</p>
+
+                                <input 
+                                    id='30'
+                                    type="date"
+                                    name="day30"
+                                    value={day.day30 || ''}
+                                    onChange={handleChange}
+                                />
 
                                 <input 
                                     id='30'
@@ -2935,24 +5158,138 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='startA'
                                     id='30'
                                     type="time"
-                                    name="startWork30"
-                                    value={start.startWork30 || '00:00'}
+                                    name="startWorkA30"
+                                    value={start.startWorkA30 || '00:00'}
                                     onChange={handleChange}
                                 />
 
-                                <input 
+                                <input className='endA'
                                     id='30'
                                     type="time"
-                                    name="endWork30"
-                                    value={end.endWork30 || '00:00'}
+                                    name="endWorkA30"
+                                    value={end.endWorkA30 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='startB'
+                                    id='30'
+                                    type="time"
+                                    name="startWorkB30"
+                                    value={start.startWorkB30 || '00:00'}
+                                    onChange={handleChange}
+                                />
+
+                                <input className='endB'
+                                    id='30'
+                                    type="time"
+                                    name="endWorkB30"
+                                    value={end.endWorkB30 || '00:00'}
                                     onChange={handleChange}
                                 />
                             </div>
+
+                            
+
+                            {/* {inputs.days.map( */}
+                            {/* {days.map(
+                                day =>
+                                <div key={day.dayNumber} className='eachDay'>
+                                    <p className='dateright'>{ day.dayNumber}</p>
+                            
+                                    <input className='jobright'
+                                        id={day.dayNumber}
+                                        type="text"
+                                        name="jobDescription"
+                                        value={inputs.jobDescription || ''}
+                                        onChange={handleChange}
+                                    />
+                                    <input className='startright'
+                                        id={day.dayNumber}
+                                        type="time"
+                                        name="startWorkA"
+                                        value={inputs.startWorkA || ''}
+                                        onChange={handleChange}
+                                    />
+                                    <input className='finishright'
+                                        id={day.dayNumber}
+                                        type="time"
+                                        name="endWorkA"
+                                        value={inputs.endWorkA || ''}
+                                        onChange={handleChange}
+                                    />                            
+
+                                    <p className='totalright'>{ inputs.startTime !== inputs.finishTime &&
+                                    JSON.stringify(calculate(timeToDecimal(inputs.startTime), timeToDecimal(inputs.finishTime))) }</p>
+                            
+                                </div>
+                            ) } */}
+                        
+                        {/* this form format works
+                        // ----------------------- */}
+                            {/* <p className='dateright'>21</p>
+                            
+                            <input className='jobright'
+                                type="text"
+                                name="jobDescription"
+                                value={inputs.jobDescription || ''}
+                                onChange={handleChange}
+                            />
+                            <input className='startright'
+                                type="time"
+                                name="startTime"
+                                value={inputs.startTime || ''}
+                                onChange={handleChange}
+                            />
+                            <input className='finishright'
+                                type="time"
+                                name="finishTime"
+                                value={inputs.finishTime || ''}
+                                onChange={handleChange}
+                            />
+                            
+                            
+                            <p className='totalright'>{ inputs.startTime !== inputs.finishTime &&
+                            JSON.stringify(calculate(timeToDecimal(inputs.startTime), timeToDecimal(inputs.finishTime))) }</p> */}
+                        
                     </div>
-                    
+                    {/* <div className='timecard'>
+                        
+                            
+                            <p className='left22'>DATO / DATE</p>
+                            <p className='left22'>JOB DESCRIPTION</p>
+                            <p className='left22'>START: TIME</p>
+                            <p className='left22'>FINISH: TIME</p>
+                            <p className='left22'>TOTAL HOURS/TIMER</p>
+                        
+                        
+                            <p className='dateright'>22</p>
+                            
+                            <input className='jobright'
+                                type="text"
+                                name="jobDescription22"
+                                value={inputs.jobDescription22 || ''}
+                                onChange={handleChange}
+                            />
+                            <input className='startright'
+                                type="time"
+                                name="startTime22"
+                                value={inputs.startTime22 || ''}
+                                onChange={handleChange}
+                            />
+                            <input className='finishright'
+                                type="time"
+                                name="finishTime22"
+                                value={inputs.finishTime22 || ''}
+                                onChange={handleChange}
+                            />
+                                                        
+                            <p className='totalright'>{ inputs.startTime22 !== inputs.finishTime22 &&
+                            JSON.stringify(calculate(timeToDecimal(inputs.startTime22), timeToDecimal(inputs.finishTime22))) }</p>
+                        
+                    </div> */}
                     <button className='uploadBtn screenBtn' type="submit">Upload</button>
                 </form>
             </div>
