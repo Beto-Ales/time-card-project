@@ -70,15 +70,16 @@ const ScreenThree = ({ hours, worker }) => {
       <button className='screenBtn' onClick={() => toScreen('2')} >Back</button>
       
       <div className='userTable userTableHeader'>
-          <span className='headerTitle'>DATE</span>
-          <span className='headerTitle'>JOB DESCRIPTION</span>
+          <span className='headerTitle date-column'>DATE</span>
+          <span className='headerTitle'>HOLIDAY</span>
+          <span className='headerTitle jobdescription'>JOB DESCRIPTION</span>
           <span className='headerTitle startA'>START</span>
           <span className='headerTitle endA'>FINISH</span>
           <span className='headerTitle startB'>START</span>
           <span className='headerTitle endB'>FINISH</span>
-          <span className='headerTitle'>TOTAL</span>
-          <span className='headerTitle'>NORMAL</span>
-          <span className='headerTitle'>SPECIAL</span>
+          <span className='headerTitle hours-min-width'>TOTAL</span>
+          <span className='headerTitle hours-min-width'>NORMAL</span>
+          <span className='headerTitle hours-min-width'>SPECIAL</span>
           {/* <p className='left'>TOTAL HOURS/TIMER</p> */}
       </div>
       
@@ -90,15 +91,16 @@ const ScreenThree = ({ hours, worker }) => {
             <li key={day.dayNumber}>
               {/* <p>Day: {day.dayNumber} Job description: {day.jobDescription} Start: {day.startWorkA}, End: {day.endWorkA} Total Hours: {day.totalHours && day.totalHours.total} Normal rate: {day.totalHours && day.totalHours.normal} Special rate: {day.totalHours && day.totalHours.special}</p> */}
               <div className='userTable'>
-                <span className='userSpan'>{day.dayNumber}</span>
-                <span className='userSpan'>{day.jobDescription}</span>
+                <span className='userSpan date-column'>{day.dayNumber}</span>
+                <span className='userSpan'>{day.holiday ? '✔' : ''}</span>
+                <span className='userSpan jobdescription'>{day.jobDescription}</span>
                 <span className='userSpan startA'>{day.startWorkA}</span>
                 <span className='userSpan endA'>{day.endWorkA}</span>
                 <span className='userSpan startB'>{day.startWorkB}</span>
                 <span className='userSpan endB'>{day.endWorkB}</span>
-                <span className='userSpan'>{day.totalHours && day.totalHours.total}</span>
-                <span className='userSpan'>{day.totalHours && day.totalHours.normal}</span>
-                <span className='userSpan'>{day.totalHours && day.totalHours.special}</span>
+                <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.total}</span>
+                <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.normal}</span>
+                <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.special}</span>
               </div>
               {/* <p>Total Hours: {hours.totalHours}</p> */}
             </li>

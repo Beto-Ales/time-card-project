@@ -28,6 +28,7 @@ const hourSchema = new mongoose.Schema({
             type: String,
             // required: true
         },
+        holiday: Boolean,
         jobDescription: String,
         startWorkA: {
             type: String,

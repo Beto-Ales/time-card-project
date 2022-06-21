@@ -63,16 +63,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
         )
     }
         
-    const ScreenTwo = ({ hours }) => {
-
-        // const normal = hours.days.map(day => day.totalHours && day.totalHours.normal)
-        // const special = hours.days.map(day => day.totalHours && day.totalHours.special)
-        // const total = hours.days.map(day => day.totalHours && day.totalHours.total)
-        // const allNormal = normal.filter(value => value !== undefined ).reduce((a,b) => a+b)
-        // const allSpecial = special.filter(value => value !== undefined ).reduce((a,b) => a+b)
-        // const allTotal = total.filter(value => value !== undefined ).reduce((a,b) => a+b)        
-        // console.log('allNormal', allNormal)
-
+    const ScreenTwo = ({ hours }) => {        
   
 
   return (
@@ -82,15 +73,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
         <button className='screenBtn' onClick={() => toScreen('4')} >Edit</button>
       
       <div className='userTable userTableHeader'>
-          <span className='headerTitle'>DATE</span>
-          <span className='headerTitle'>JOB DESCRIPTION</span>
+          <span className='headerTitle date-column'>DATE</span>
+          <span className='headerTitle'>HOLIDAY</span>
+          <span className='headerTitle jobdescription'>JOB DESCRIPTION</span>
           <span className='headerTitle startA'>START</span>
           <span className='headerTitle endA'>FINISH</span>
           <span className='headerTitle startB'>START</span>
           <span className='headerTitle endB'>FINISH</span>
-          <span className='headerTitle'>TOTAL</span>
-          <span className='headerTitle'>NORMAL</span>
-          <span className='headerTitle'>SPECIAL</span>
+          <span className='headerTitle hours-min-width'>TOTAL</span>
+          <span className='headerTitle hours-min-width'>NORMAL</span>
+          <span className='headerTitle hours-min-width'>SPECIAL</span>
           {/* <p className='left'>TOTAL HOURS/TIMER</p> */}
       </div>
       
@@ -102,15 +94,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             <li key={day.dayNumber}>
               {/* <p>Day: {day.dayNumber} Job description: {day.jobDescription} Start: {day.startWorkA}, End: {day.endWorkA} Total Hours: {day.totalHours && day.totalHours.total} Normal rate: {day.totalHours && day.totalHours.normal} Special rate: {day.totalHours && day.totalHours.special}</p> */}
               <div className='userTable'>
-                <span className='userSpan'>{day.dayNumber}</span>
-                <span className='userSpan'>{day.jobDescription}</span>
+                <span className='userSpan date-column'>{day.dayNumber}</span>
+                <span className='userSpan'>{day.holiday ? '✔' : ''}</span>
+                <span className='userSpan jobdescription'>{day.jobDescription}</span>
                 <span className='userSpan startA'>{day.startWorkA}</span>
                 <span className='userSpan endA'>{day.endWorkA}</span>
                 <span className='userSpan startB'>{day.startWorkB}</span>
                 <span className='userSpan endB'>{day.endWorkB}</span>
-                <span className='userSpan'>{day.totalHours && day.totalHours.total}</span>
-                <span className='userSpan'>{day.totalHours && day.totalHours.normal}</span>
-                <span className='userSpan'>{day.totalHours && day.totalHours.special}</span>
+                <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.total}</span>
+                <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.normal}</span>
+                <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.special}</span>
               </div>
               {/* <p>Total Hours: {hours.totalHours}</p> */}
             </li>
@@ -164,6 +157,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
         const [end, setEnd] = useState({})
         const [description, setDescription] = useState({})
         const [day, setDay] = useState({})
+        const [checked, setChecked] = useState({})
         
         const timeToDecimal = (t) => {
             var arr = t.split(':')
@@ -173,7 +167,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
         }
 
         
-        const calculate = (startTimeA, endTimeA, startTimeB, endTimeB, isWeekend) => {
+        const calculate = (startTimeA, endTimeA, startTimeB, endTimeB, isWeekend, holiday) => {
             let startA = startTimeA
             let endA = endTimeA
             let startB = startTimeB
@@ -232,7 +226,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             special = special % 1 !== 0 ? special.toFixed(2) : special
             total = total % 1 !== 0 ? total.toFixed(2) : total
 
-            if (isWeekend === 0 || isWeekend === 6) {
+            if (isWeekend === 0 || isWeekend === 6 || holiday) {
                 special = total
                 normal = 0
             }
@@ -267,6 +261,9 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             setDay(values => ({...values,
                 [name]: value,
             }))
+
+            setChecked(values => ({...values,
+                [name]: event.target.checked,}))
         }
 
         const addTimeCard = async (event) => {
@@ -489,6 +486,72 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                 day29,
                 day30,
             } = day
+
+            const {
+                holiday0,
+                holiday1,
+                holiday2,
+                holiday3,
+                holiday4,
+                holiday5,
+                holiday6,
+                holiday7,
+                holiday8,
+                holiday9,
+                holiday10,
+                holiday11,
+                holiday12,
+                holiday13,
+                holiday14,
+                holiday15,
+                holiday16,
+                holiday17,
+                holiday18,
+                holiday19,
+                holiday20,
+                holiday21,
+                holiday22,
+                holiday23,
+                holiday24,
+                holiday25,
+                holiday26,
+                holiday27,
+                holiday28,
+                holiday29,
+                holiday30,
+            } = checked
+
+            hours.days[0].holiday = holiday0 ? holiday0 : false
+            hours.days[1].holiday = holiday1 ? holiday1 : false
+            hours.days[2].holiday = holiday2 ? holiday2 : false
+            hours.days[3].holiday = holiday3 ? holiday3 : false
+            hours.days[4].holiday = holiday4 ? holiday4 : false
+            hours.days[5].holiday = holiday5 ? holiday5 : false
+            hours.days[6].holiday = holiday6 ? holiday6 : false
+            hours.days[7].holiday = holiday7 ? holiday7 : false
+            hours.days[8].holiday = holiday8 ? holiday8 : false
+            hours.days[9].holiday = holiday9 ? holiday9 : false
+            hours.days[10].holiday = holiday10 ? holiday10 : false
+            hours.days[11].holiday = holiday11 ? holiday11 : false
+            hours.days[12].holiday = holiday12 ? holiday12 : false
+            hours.days[13].holiday = holiday13 ? holiday13 : false
+            hours.days[14].holiday = holiday14 ? holiday14 : false
+            hours.days[15].holiday = holiday15 ? holiday15 : false
+            hours.days[16].holiday = holiday16 ? holiday16 : false
+            hours.days[17].holiday = holiday17 ? holiday17 : false
+            hours.days[18].holiday = holiday18 ? holiday18 : false
+            hours.days[19].holiday = holiday19 ? holiday19 : false
+            hours.days[20].holiday = holiday20 ? holiday20 : false
+            hours.days[21].holiday = holiday21 ? holiday21 : false
+            hours.days[22].holiday = holiday22 ? holiday22 : false
+            hours.days[23].holiday = holiday23 ? holiday23 : false
+            hours.days[24].holiday = holiday24 ? holiday24 : false
+            hours.days[25].holiday = holiday25 ? holiday25 : false
+            hours.days[26].holiday = holiday26 ? holiday26 : false
+            hours.days[27].holiday = holiday27 ? holiday27 : false
+            hours.days[28].holiday = holiday28 ? holiday28 : false
+            hours.days[29].holiday = holiday29 ? holiday29 : false
+            hours.days[30].holiday = holiday30 ? holiday30 : false
             
             // if startWorkA is not defined, leave default value time 00:00
             hours.days[0].startWorkA = startWorkA0 ? startWorkA0 : '00:00'
@@ -688,107 +751,43 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             hours.days[29].dayNumber = day29 ? `${day29} ${dayName[new Date(day29).getDay()]}` : ''
             hours.days[30].dayNumber = day30 ? `${day30} ${dayName[new Date(day30).getDay()]}` : ''
 
-            // hours.days[0].totalHours = JSON.stringify(calculate(timeToDecimal(startWorkA0), timeToDecimal(endWorkA0)))
-
-            // hours.days[0].totalHours = startWorkA0 && endWorkA0 && calculate(timeToDecimal(startWorkA0), timeToDecimal(endWorkA0))            
-            // hours.days[1].totalHours = startWorkA1 && endWorkA1 && calculate(timeToDecimal(startWorkA1), timeToDecimal(endWorkA1))
-            // hours.days[2].totalHours = startWorkA2 && endWorkA2 && calculate(timeToDecimal(startWorkA2), timeToDecimal(endWorkA2))
-            // hours.days[3].totalHours = startWorkA3 && endWorkA3 && calculate(timeToDecimal(startWorkA3), timeToDecimal(endWorkA3))
-            // hours.days[4].totalHours = startWorkA4 && endWorkA4 && calculate(timeToDecimal(startWorkA4), timeToDecimal(endWorkA4))
-            // hours.days[5].totalHours = startWorkA5 && endWorkA5 && calculate(timeToDecimal(startWorkA5), timeToDecimal(endWorkA5))
-            // hours.days[6].totalHours = startWorkA6 && endWorkA6 && calculate(timeToDecimal(startWorkA6), timeToDecimal(endWorkA6))
-            // hours.days[7].totalHours = startWorkA7 && endWorkA7 && calculate(timeToDecimal(startWorkA7), timeToDecimal(endWorkA7))
-            // hours.days[8].totalHours = startWorkA8 && endWorkA8 && calculate(timeToDecimal(startWorkA8), timeToDecimal(endWorkA8))
-            // hours.days[9].totalHours = startWorkA9 && endWorkA9 && calculate(timeToDecimal(startWorkA9), timeToDecimal(endWorkA9))
-            // hours.days[10].totalHours = startWorkA10 && endWorkA10 && calculate(timeToDecimal(startWorkA10), timeToDecimal(endWorkA10))
-            // hours.days[11].totalHours = startWorkA11 && endWorkA11 && calculate(timeToDecimal(startWorkA11), timeToDecimal(endWorkA11))
-            // hours.days[12].totalHours = startWorkA12 && endWorkA12 && calculate(timeToDecimal(startWorkA12), timeToDecimal(endWorkA12))
-            // hours.days[13].totalHours = startWorkA13 && endWorkA13 && calculate(timeToDecimal(startWorkA13), timeToDecimal(endWorkA13))
-            // hours.days[14].totalHours = startWorkA14 && endWorkA14 && calculate(timeToDecimal(startWorkA14), timeToDecimal(endWorkA14))
-            // hours.days[15].totalHours = startWorkA15 && endWorkA15 && calculate(timeToDecimal(startWorkA15), timeToDecimal(endWorkA15))
-            // hours.days[16].totalHours = startWorkA16 && endWorkA16 && calculate(timeToDecimal(startWorkA16), timeToDecimal(endWorkA16))
-            // hours.days[17].totalHours = startWorkA17 && endWorkA17 && calculate(timeToDecimal(startWorkA17), timeToDecimal(endWorkA17))
-            // hours.days[18].totalHours = startWorkA18 && endWorkA18 && calculate(timeToDecimal(startWorkA18), timeToDecimal(endWorkA18))
-            // hours.days[19].totalHours = startWorkA19 && endWorkA19 && calculate(timeToDecimal(startWorkA19), timeToDecimal(endWorkA19))
-            // hours.days[20].totalHours = startWorkA20 && endWorkA20 && calculate(timeToDecimal(startWorkA20), timeToDecimal(endWorkA20))
-            // hours.days[21].totalHours = startWorkA21 && endWorkA21 && calculate(timeToDecimal(startWorkA21), timeToDecimal(endWorkA21))
-            // hours.days[22].totalHours = startWorkA22 && endWorkA22 && calculate(timeToDecimal(startWorkA22), timeToDecimal(endWorkA22))
-            // hours.days[23].totalHours = startWorkA23 && endWorkA23 && calculate(timeToDecimal(startWorkA23), timeToDecimal(endWorkA23))
-            // hours.days[24].totalHours = startWorkA24 && endWorkA24 && calculate(timeToDecimal(startWorkA24), timeToDecimal(endWorkA24))
-            // hours.days[25].totalHours = startWorkA25 && endWorkA25 && calculate(timeToDecimal(startWorkA25), timeToDecimal(endWorkA25))
-            // hours.days[26].totalHours = startWorkA26 && endWorkA26 && calculate(timeToDecimal(startWorkA26), timeToDecimal(endWorkA26))
-            // hours.days[27].totalHours = startWorkA27 && endWorkA27 && calculate(timeToDecimal(startWorkA27), timeToDecimal(endWorkA27))
-            // hours.days[28].totalHours = startWorkA28 && endWorkA28 && calculate(timeToDecimal(startWorkA28), timeToDecimal(endWorkA28))
-            // hours.days[29].totalHours = startWorkA29 && endWorkA29 && calculate(timeToDecimal(startWorkA29), timeToDecimal(endWorkA29))
-            // hours.days[30].totalHours = startWorkA30 && endWorkA30 && calculate(timeToDecimal(startWorkA30), timeToDecimal(endWorkA30))
+            
 
             // use default value time 00:00
             // simulate
             // --------
-            hours.days[0].totalHours = calculate(timeToDecimal(hours.days[0].startWorkA), timeToDecimal(hours.days[0].endWorkA), timeToDecimal(hours.days[0].startWorkB), timeToDecimal(hours.days[0].endWorkB), new Date(day0).getDay())
-            hours.days[1].totalHours = calculate(timeToDecimal(hours.days[1].startWorkA), timeToDecimal(hours.days[1].endWorkA), timeToDecimal(hours.days[1].startWorkB), timeToDecimal(hours.days[1].endWorkB), new Date(day1).getDay())
-            hours.days[2].totalHours = calculate(timeToDecimal(hours.days[2].startWorkA), timeToDecimal(hours.days[2].endWorkA), timeToDecimal(hours.days[2].startWorkB), timeToDecimal(hours.days[2].endWorkB), new Date(day2).getDay())
-            hours.days[3].totalHours = calculate(timeToDecimal(hours.days[3].startWorkA), timeToDecimal(hours.days[3].endWorkA), timeToDecimal(hours.days[3].startWorkB), timeToDecimal(hours.days[3].endWorkB), new Date(day3).getDay())
-            hours.days[4].totalHours = calculate(timeToDecimal(hours.days[4].startWorkA), timeToDecimal(hours.days[4].endWorkA), timeToDecimal(hours.days[4].startWorkB), timeToDecimal(hours.days[4].endWorkB), new Date(day4).getDay())
-            hours.days[5].totalHours = calculate(timeToDecimal(hours.days[5].startWorkA), timeToDecimal(hours.days[5].endWorkA), timeToDecimal(hours.days[5].startWorkB), timeToDecimal(hours.days[5].endWorkB), new Date(day5).getDay())
-            hours.days[6].totalHours = calculate(timeToDecimal(hours.days[6].startWorkA), timeToDecimal(hours.days[6].endWorkA), timeToDecimal(hours.days[6].startWorkB), timeToDecimal(hours.days[6].endWorkB), new Date(day6).getDay())
-            hours.days[7].totalHours = calculate(timeToDecimal(hours.days[7].startWorkA), timeToDecimal(hours.days[7].endWorkA), timeToDecimal(hours.days[7].startWorkB), timeToDecimal(hours.days[7].endWorkB), new Date(day7).getDay())
-            hours.days[8].totalHours = calculate(timeToDecimal(hours.days[8].startWorkA), timeToDecimal(hours.days[8].endWorkA), timeToDecimal(hours.days[8].startWorkB), timeToDecimal(hours.days[8].endWorkB), new Date(day8).getDay())
-            hours.days[9].totalHours = calculate(timeToDecimal(hours.days[9].startWorkA), timeToDecimal(hours.days[9].endWorkA), timeToDecimal(hours.days[9].startWorkB), timeToDecimal(hours.days[9].endWorkB), new Date(day9).getDay())
-            hours.days[10].totalHours = calculate(timeToDecimal(hours.days[10].startWorkA), timeToDecimal(hours.days[10].endWorkA), timeToDecimal(hours.days[10].startWorkB), timeToDecimal(hours.days[10].endWorkB), new Date(day10).getDay())
-            hours.days[11].totalHours = calculate(timeToDecimal(hours.days[11].startWorkA), timeToDecimal(hours.days[11].endWorkA), timeToDecimal(hours.days[11].startWorkB), timeToDecimal(hours.days[11].endWorkB), new Date(day11).getDay())
-            hours.days[12].totalHours = calculate(timeToDecimal(hours.days[12].startWorkA), timeToDecimal(hours.days[12].endWorkA), timeToDecimal(hours.days[12].startWorkB), timeToDecimal(hours.days[12].endWorkB), new Date(day12).getDay())
-            hours.days[13].totalHours = calculate(timeToDecimal(hours.days[13].startWorkA), timeToDecimal(hours.days[13].endWorkA), timeToDecimal(hours.days[13].startWorkB), timeToDecimal(hours.days[13].endWorkB), new Date(day13).getDay())
-            hours.days[14].totalHours = calculate(timeToDecimal(hours.days[14].startWorkA), timeToDecimal(hours.days[14].endWorkA), timeToDecimal(hours.days[14].startWorkB), timeToDecimal(hours.days[14].endWorkB), new Date(day14).getDay())
-            hours.days[15].totalHours = calculate(timeToDecimal(hours.days[15].startWorkA), timeToDecimal(hours.days[15].endWorkA), timeToDecimal(hours.days[15].startWorkB), timeToDecimal(hours.days[15].endWorkB), new Date(day15).getDay())
-            hours.days[16].totalHours = calculate(timeToDecimal(hours.days[16].startWorkA), timeToDecimal(hours.days[16].endWorkA), timeToDecimal(hours.days[16].startWorkB), timeToDecimal(hours.days[16].endWorkB), new Date(day16).getDay())
-            hours.days[17].totalHours = calculate(timeToDecimal(hours.days[17].startWorkA), timeToDecimal(hours.days[17].endWorkA), timeToDecimal(hours.days[17].startWorkB), timeToDecimal(hours.days[17].endWorkB), new Date(day17).getDay())
-            hours.days[18].totalHours = calculate(timeToDecimal(hours.days[18].startWorkA), timeToDecimal(hours.days[18].endWorkA), timeToDecimal(hours.days[18].startWorkB), timeToDecimal(hours.days[18].endWorkB), new Date(day18).getDay())
-            hours.days[19].totalHours = calculate(timeToDecimal(hours.days[19].startWorkA), timeToDecimal(hours.days[19].endWorkA), timeToDecimal(hours.days[19].startWorkB), timeToDecimal(hours.days[19].endWorkB), new Date(day19).getDay())
-            hours.days[20].totalHours = calculate(timeToDecimal(hours.days[20].startWorkA), timeToDecimal(hours.days[20].endWorkA), timeToDecimal(hours.days[20].startWorkB), timeToDecimal(hours.days[20].endWorkB), new Date(day20).getDay())
-            hours.days[21].totalHours = calculate(timeToDecimal(hours.days[21].startWorkA), timeToDecimal(hours.days[21].endWorkA), timeToDecimal(hours.days[21].startWorkB), timeToDecimal(hours.days[21].endWorkB), new Date(day21).getDay())
-            hours.days[22].totalHours = calculate(timeToDecimal(hours.days[22].startWorkA), timeToDecimal(hours.days[22].endWorkA), timeToDecimal(hours.days[22].startWorkB), timeToDecimal(hours.days[22].endWorkB), new Date(day22).getDay())
-            hours.days[23].totalHours = calculate(timeToDecimal(hours.days[23].startWorkA), timeToDecimal(hours.days[23].endWorkA), timeToDecimal(hours.days[23].startWorkB), timeToDecimal(hours.days[23].endWorkB), new Date(day23).getDay())
-            hours.days[24].totalHours = calculate(timeToDecimal(hours.days[24].startWorkA), timeToDecimal(hours.days[24].endWorkA), timeToDecimal(hours.days[24].startWorkB), timeToDecimal(hours.days[24].endWorkB), new Date(day24).getDay())
-            hours.days[25].totalHours = calculate(timeToDecimal(hours.days[25].startWorkA), timeToDecimal(hours.days[25].endWorkA), timeToDecimal(hours.days[25].startWorkB), timeToDecimal(hours.days[25].endWorkB), new Date(day25).getDay())
-            hours.days[26].totalHours = calculate(timeToDecimal(hours.days[26].startWorkA), timeToDecimal(hours.days[26].endWorkA), timeToDecimal(hours.days[26].startWorkB), timeToDecimal(hours.days[26].endWorkB), new Date(day26).getDay())
-            hours.days[27].totalHours = calculate(timeToDecimal(hours.days[27].startWorkA), timeToDecimal(hours.days[27].endWorkA), timeToDecimal(hours.days[27].startWorkB), timeToDecimal(hours.days[27].endWorkB), new Date(day27).getDay())
-            hours.days[28].totalHours = calculate(timeToDecimal(hours.days[28].startWorkA), timeToDecimal(hours.days[28].endWorkA), timeToDecimal(hours.days[28].startWorkB), timeToDecimal(hours.days[28].endWorkB), new Date(day28).getDay())
-            hours.days[29].totalHours = calculate(timeToDecimal(hours.days[29].startWorkA), timeToDecimal(hours.days[29].endWorkA), timeToDecimal(hours.days[29].startWorkB), timeToDecimal(hours.days[29].endWorkB), new Date(day29).getDay())
-            hours.days[30].totalHours = calculate(timeToDecimal(hours.days[30].startWorkA), timeToDecimal(hours.days[30].endWorkA), timeToDecimal(hours.days[30].startWorkB), timeToDecimal(hours.days[30].endWorkB), new Date(day30).getDay())
-            // hours.days[0].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day0).getDay())
-            // hours.days[1].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day1).getDay())
-            // hours.days[2].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day2).getDay())
-            // hours.days[3].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day3).getDay())
-            // hours.days[4].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day4).getDay())
-            // hours.days[5].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day5).getDay())
-            // hours.days[6].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day6).getDay())
-            // hours.days[7].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day7).getDay())
-            // hours.days[8].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day8).getDay())
-            // hours.days[9].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day9).getDay())
-            // hours.days[10].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day10).getDay())
-            // hours.days[11].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day11).getDay())
-            // hours.days[12].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day12).getDay())
-            // hours.days[13].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day13).getDay())
-            // hours.days[14].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day14).getDay())
-            // hours.days[15].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day15).getDay())
-            // hours.days[16].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day16).getDay())
-            // hours.days[17].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day17).getDay())
-            // hours.days[18].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day18).getDay())
-            // hours.days[19].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day19).getDay())
-            // hours.days[20].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day20).getDay())
-            // hours.days[21].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day21).getDay())
-            // hours.days[22].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day22).getDay())
-            // hours.days[23].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day23).getDay())
-            // hours.days[24].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day24).getDay())
-            // hours.days[25].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day25).getDay())
-            // hours.days[26].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day26).getDay())
-            // hours.days[27].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day27).getDay())
-            // hours.days[28].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day28).getDay())
-            // hours.days[29].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day29).getDay())
-            // hours.days[30].totalHours = calculate(timeToDecimal('11:00'), timeToDecimal('12:00'), timeToDecimal('18:00'), timeToDecimal('19:00'),  new Date(day30).getDay())
-            // simulate
-            // --------
+            hours.days[0].totalHours = calculate(timeToDecimal(hours.days[0].startWorkA), timeToDecimal(hours.days[0].endWorkA), timeToDecimal(hours.days[0].startWorkB), timeToDecimal(hours.days[0].endWorkB), new Date(day0).getDay(), holiday0)
+            hours.days[1].totalHours = calculate(timeToDecimal(hours.days[1].startWorkA), timeToDecimal(hours.days[1].endWorkA), timeToDecimal(hours.days[1].startWorkB), timeToDecimal(hours.days[1].endWorkB), new Date(day1).getDay(), holiday1)
+            hours.days[2].totalHours = calculate(timeToDecimal(hours.days[2].startWorkA), timeToDecimal(hours.days[2].endWorkA), timeToDecimal(hours.days[2].startWorkB), timeToDecimal(hours.days[2].endWorkB), new Date(day2).getDay(), holiday2)
+            hours.days[3].totalHours = calculate(timeToDecimal(hours.days[3].startWorkA), timeToDecimal(hours.days[3].endWorkA), timeToDecimal(hours.days[3].startWorkB), timeToDecimal(hours.days[3].endWorkB), new Date(day3).getDay(), holiday3)
+            hours.days[4].totalHours = calculate(timeToDecimal(hours.days[4].startWorkA), timeToDecimal(hours.days[4].endWorkA), timeToDecimal(hours.days[4].startWorkB), timeToDecimal(hours.days[4].endWorkB), new Date(day4).getDay(), holiday4)
+            hours.days[5].totalHours = calculate(timeToDecimal(hours.days[5].startWorkA), timeToDecimal(hours.days[5].endWorkA), timeToDecimal(hours.days[5].startWorkB), timeToDecimal(hours.days[5].endWorkB), new Date(day5).getDay(), holiday5)
+            hours.days[6].totalHours = calculate(timeToDecimal(hours.days[6].startWorkA), timeToDecimal(hours.days[6].endWorkA), timeToDecimal(hours.days[6].startWorkB), timeToDecimal(hours.days[6].endWorkB), new Date(day6).getDay(), holiday6)
+            hours.days[7].totalHours = calculate(timeToDecimal(hours.days[7].startWorkA), timeToDecimal(hours.days[7].endWorkA), timeToDecimal(hours.days[7].startWorkB), timeToDecimal(hours.days[7].endWorkB), new Date(day7).getDay(), holiday7)
+            hours.days[8].totalHours = calculate(timeToDecimal(hours.days[8].startWorkA), timeToDecimal(hours.days[8].endWorkA), timeToDecimal(hours.days[8].startWorkB), timeToDecimal(hours.days[8].endWorkB), new Date(day8).getDay(), holiday8)
+            hours.days[9].totalHours = calculate(timeToDecimal(hours.days[9].startWorkA), timeToDecimal(hours.days[9].endWorkA), timeToDecimal(hours.days[9].startWorkB), timeToDecimal(hours.days[9].endWorkB), new Date(day9).getDay(), holiday9)
+            hours.days[10].totalHours = calculate(timeToDecimal(hours.days[10].startWorkA), timeToDecimal(hours.days[10].endWorkA), timeToDecimal(hours.days[10].startWorkB), timeToDecimal(hours.days[10].endWorkB), new Date(day10).getDay(), holiday10)
+            hours.days[11].totalHours = calculate(timeToDecimal(hours.days[11].startWorkA), timeToDecimal(hours.days[11].endWorkA), timeToDecimal(hours.days[11].startWorkB), timeToDecimal(hours.days[11].endWorkB), new Date(day11).getDay(), holiday11)
+            hours.days[12].totalHours = calculate(timeToDecimal(hours.days[12].startWorkA), timeToDecimal(hours.days[12].endWorkA), timeToDecimal(hours.days[12].startWorkB), timeToDecimal(hours.days[12].endWorkB), new Date(day12).getDay(), holiday12)
+            hours.days[13].totalHours = calculate(timeToDecimal(hours.days[13].startWorkA), timeToDecimal(hours.days[13].endWorkA), timeToDecimal(hours.days[13].startWorkB), timeToDecimal(hours.days[13].endWorkB), new Date(day13).getDay(), holiday13)
+            hours.days[14].totalHours = calculate(timeToDecimal(hours.days[14].startWorkA), timeToDecimal(hours.days[14].endWorkA), timeToDecimal(hours.days[14].startWorkB), timeToDecimal(hours.days[14].endWorkB), new Date(day14).getDay(), holiday14)
+            hours.days[15].totalHours = calculate(timeToDecimal(hours.days[15].startWorkA), timeToDecimal(hours.days[15].endWorkA), timeToDecimal(hours.days[15].startWorkB), timeToDecimal(hours.days[15].endWorkB), new Date(day15).getDay(), holiday15)
+            hours.days[16].totalHours = calculate(timeToDecimal(hours.days[16].startWorkA), timeToDecimal(hours.days[16].endWorkA), timeToDecimal(hours.days[16].startWorkB), timeToDecimal(hours.days[16].endWorkB), new Date(day16).getDay(), holiday16)
+            hours.days[17].totalHours = calculate(timeToDecimal(hours.days[17].startWorkA), timeToDecimal(hours.days[17].endWorkA), timeToDecimal(hours.days[17].startWorkB), timeToDecimal(hours.days[17].endWorkB), new Date(day17).getDay(), holiday17)
+            hours.days[18].totalHours = calculate(timeToDecimal(hours.days[18].startWorkA), timeToDecimal(hours.days[18].endWorkA), timeToDecimal(hours.days[18].startWorkB), timeToDecimal(hours.days[18].endWorkB), new Date(day18).getDay(), holiday18)
+            hours.days[19].totalHours = calculate(timeToDecimal(hours.days[19].startWorkA), timeToDecimal(hours.days[19].endWorkA), timeToDecimal(hours.days[19].startWorkB), timeToDecimal(hours.days[19].endWorkB), new Date(day19).getDay(), holiday19)
+            hours.days[20].totalHours = calculate(timeToDecimal(hours.days[20].startWorkA), timeToDecimal(hours.days[20].endWorkA), timeToDecimal(hours.days[20].startWorkB), timeToDecimal(hours.days[20].endWorkB), new Date(day20).getDay(), holiday20)
+            hours.days[21].totalHours = calculate(timeToDecimal(hours.days[21].startWorkA), timeToDecimal(hours.days[21].endWorkA), timeToDecimal(hours.days[21].startWorkB), timeToDecimal(hours.days[21].endWorkB), new Date(day21).getDay(), holiday21)
+            hours.days[22].totalHours = calculate(timeToDecimal(hours.days[22].startWorkA), timeToDecimal(hours.days[22].endWorkA), timeToDecimal(hours.days[22].startWorkB), timeToDecimal(hours.days[22].endWorkB), new Date(day22).getDay(), holiday22)
+            hours.days[23].totalHours = calculate(timeToDecimal(hours.days[23].startWorkA), timeToDecimal(hours.days[23].endWorkA), timeToDecimal(hours.days[23].startWorkB), timeToDecimal(hours.days[23].endWorkB), new Date(day23).getDay(), holiday23)
+            hours.days[24].totalHours = calculate(timeToDecimal(hours.days[24].startWorkA), timeToDecimal(hours.days[24].endWorkA), timeToDecimal(hours.days[24].startWorkB), timeToDecimal(hours.days[24].endWorkB), new Date(day24).getDay(), holiday24)
+            hours.days[25].totalHours = calculate(timeToDecimal(hours.days[25].startWorkA), timeToDecimal(hours.days[25].endWorkA), timeToDecimal(hours.days[25].startWorkB), timeToDecimal(hours.days[25].endWorkB), new Date(day25).getDay(), holiday25)
+            hours.days[26].totalHours = calculate(timeToDecimal(hours.days[26].startWorkA), timeToDecimal(hours.days[26].endWorkA), timeToDecimal(hours.days[26].startWorkB), timeToDecimal(hours.days[26].endWorkB), new Date(day26).getDay(), holiday26)
+            hours.days[27].totalHours = calculate(timeToDecimal(hours.days[27].startWorkA), timeToDecimal(hours.days[27].endWorkA), timeToDecimal(hours.days[27].startWorkB), timeToDecimal(hours.days[27].endWorkB), new Date(day27).getDay(), holiday27)
+            hours.days[28].totalHours = calculate(timeToDecimal(hours.days[28].startWorkA), timeToDecimal(hours.days[28].endWorkA), timeToDecimal(hours.days[28].startWorkB), timeToDecimal(hours.days[28].endWorkB), new Date(day28).getDay(), holiday28)
+            hours.days[29].totalHours = calculate(timeToDecimal(hours.days[29].startWorkA), timeToDecimal(hours.days[29].endWorkA), timeToDecimal(hours.days[29].startWorkB), timeToDecimal(hours.days[29].endWorkB), new Date(day29).getDay(), holiday29)
+            hours.days[30].totalHours = calculate(timeToDecimal(hours.days[30].startWorkA), timeToDecimal(hours.days[30].endWorkA), timeToDecimal(hours.days[30].startWorkB), timeToDecimal(hours.days[30].endWorkB), new Date(day30).getDay(), holiday30)
+            
                         
 
             const normal = hours.days.map(day => day.totalHours && day.totalHours.normal)
@@ -815,6 +814,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             await hoursService
               .create(hours)
             console.log('hours created')
+            console.log('checked', checked)
               setErrorMessage('Time card created')
               setTimeout(() => {
                 setErrorMessage(null)
@@ -863,7 +863,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             {/* </div> */}
 
                             <div className='eachDay topeachday'>
-                                <p className='topDay'>{days[0].dayNumber}</p>
+                                <p className='topDay day'>{days[0].dayNumber}</p>
 
                                 <div>
                                     <p>Date</p>
@@ -873,6 +873,17 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                         label='Date'
                                         name="day0"
                                         value={day.day0 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+
+                                <div>
+                                    <p>Holiday</p>
+                                    <input className='holiday'
+                                        id='0'
+                                        type="checkbox"
+                                        name="holiday0"
+                                        value={inputs.holiday0 || ''}
                                         onChange={handleChange}
                                     />
                                 </div>
@@ -939,7 +950,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[1].dayNumber}</p>
+                                <p className='day'>{days[1].dayNumber}</p>
 
                                 <input 
                                     id='1'
@@ -948,6 +959,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day1 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='1'
+                                        type="checkbox"
+                                        name="holiday1"
+                                        value={inputs.holiday1 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='1'
@@ -991,7 +1012,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[2].dayNumber}</p>
+                                <p className='day'>{days[2].dayNumber}</p>
 
                                 <input 
                                     id='2'
@@ -1000,6 +1021,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day2 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='2'
+                                        type="checkbox"
+                                        name="holiday2"
+                                        value={inputs.holiday2 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='2'
@@ -1043,7 +1074,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[3].dayNumber}</p>
+                                <p className='day'>{days[3].dayNumber}</p>
 
                                 <input 
                                     id='3'
@@ -1052,6 +1083,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day3 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='3'
+                                        type="checkbox"
+                                        name="holiday3"
+                                        value={inputs.holiday3 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='3'
@@ -1095,7 +1136,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[4].dayNumber}</p>
+                                <p className='day'>{days[4].dayNumber}</p>
 
                                 <input 
                                     id='4'
@@ -1104,6 +1145,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day4 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='4'
+                                        type="checkbox"
+                                        name="holiday4"
+                                        value={inputs.holiday4 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='4'
@@ -1147,7 +1198,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[5].dayNumber}</p>
+                                <p className='day'>{days[5].dayNumber}</p>
 
                                 <input 
                                     id='5'
@@ -1156,6 +1207,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day5 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='5'
+                                        type="checkbox"
+                                        name="holiday5"
+                                        value={inputs.holiday5 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='5'
@@ -1199,7 +1260,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[6].dayNumber}</p>
+                                <p className='day'>{days[6].dayNumber}</p>
 
                                 <input 
                                     id='6'
@@ -1208,6 +1269,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day6 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='6'
+                                        type="checkbox"
+                                        name="holiday6"
+                                        value={inputs.holiday6 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='6'
@@ -1251,7 +1322,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[7].dayNumber}</p>
+                                <p className='day'>{days[7].dayNumber}</p>
 
                                 <input 
                                     id='7'
@@ -1260,6 +1331,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day7 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='7'
+                                        type="checkbox"
+                                        name="holiday7"
+                                        value={inputs.holiday7 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='7'
@@ -1303,7 +1384,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[8].dayNumber}</p>
+                                <p className='day'>{days[8].dayNumber}</p>
 
                                 <input 
                                     id='8'
@@ -1312,6 +1393,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day8 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='8'
+                                        type="checkbox"
+                                        name="holiday8"
+                                        value={inputs.holiday8 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='8'
@@ -1355,7 +1446,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[9].dayNumber}</p>
+                                <p className='day'>{days[9].dayNumber}</p>
 
                                 <input 
                                     id='9'
@@ -1364,6 +1455,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day9 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='9'
+                                        type="checkbox"
+                                        name="holiday9"
+                                        value={inputs.holiday9 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='9'
@@ -1407,7 +1508,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[10].dayNumber}</p>
+                                <p className='day'>{days[10].dayNumber}</p>
 
                                 <input 
                                     id='10'
@@ -1416,6 +1517,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day10 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='10'
+                                        type="checkbox"
+                                        name="holiday10"
+                                        value={inputs.holiday10 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='10'
@@ -1459,7 +1570,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[11].dayNumber}</p>
+                                <p className='day'>{days[11].dayNumber}</p>
 
                                 <input 
                                     id='11'
@@ -1468,6 +1579,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day11 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='11'
+                                        type="checkbox"
+                                        name="holiday11"
+                                        value={inputs.holiday11 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='11'
@@ -1511,7 +1632,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[12].dayNumber}</p>
+                                <p className='day'>{days[12].dayNumber}</p>
 
                                 <input 
                                     id='12'
@@ -1520,6 +1641,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day12 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='12'
+                                        type="checkbox"
+                                        name="holiday12"
+                                        value={inputs.holiday12 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='12'
@@ -1563,7 +1694,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[13].dayNumber}</p>
+                                <p className='day'>{days[13].dayNumber}</p>
 
                                 <input 
                                     id='13'
@@ -1572,6 +1703,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day13 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='13'
+                                        type="checkbox"
+                                        name="holiday13"
+                                        value={inputs.holiday13 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='13'
@@ -1615,7 +1756,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[14].dayNumber}</p>
+                                <p className='day'>{days[14].dayNumber}</p>
 
                                 <input 
                                     id='14'
@@ -1624,6 +1765,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day14 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='14'
+                                        type="checkbox"
+                                        name="holiday14"
+                                        value={inputs.holiday14 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='14'
@@ -1667,7 +1818,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[15].dayNumber}</p>
+                                <p className='day'>{days[15].dayNumber}</p>
 
                                 <input 
                                     id='15'
@@ -1676,6 +1827,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day15 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='15'
+                                        type="checkbox"
+                                        name="holiday15"
+                                        value={inputs.holiday15 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='15'
@@ -1719,7 +1880,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[16].dayNumber}</p>
+                                <p className='day'>{days[16].dayNumber}</p>
 
                                 <input 
                                     id='16'
@@ -1728,6 +1889,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day16 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='16'
+                                        type="checkbox"
+                                        name="holiday16"
+                                        value={inputs.holiday16 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='16'
@@ -1771,7 +1942,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[17].dayNumber}</p>
+                                <p className='day'>{days[17].dayNumber}</p>
 
                                 <input 
                                     id='17'
@@ -1780,6 +1951,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day17 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='17'
+                                        type="checkbox"
+                                        name="holiday17"
+                                        value={inputs.holiday17 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='17'
@@ -1823,7 +2004,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[18].dayNumber}</p>
+                                <p className='day'>{days[18].dayNumber}</p>
 
                                 <input 
                                     id='18'
@@ -1832,6 +2013,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day18 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='18'
+                                        type="checkbox"
+                                        name="holiday18"
+                                        value={inputs.holiday18 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='18'
@@ -1875,7 +2066,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[19].dayNumber}</p>
+                                <p className='day'>{days[19].dayNumber}</p>
 
                                 <input 
                                     id='19'
@@ -1884,6 +2075,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day19 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='19'
+                                        type="checkbox"
+                                        name="holiday19"
+                                        value={inputs.holiday19 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='19'
@@ -1927,7 +2128,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[20].dayNumber}</p>
+                                <p className='day'>{days[20].dayNumber}</p>
 
                                 <input 
                                     id='20'
@@ -1936,6 +2137,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day20 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='20'
+                                        type="checkbox"
+                                        name="holiday20"
+                                        value={inputs.holiday20 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='20'
@@ -1979,7 +2190,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[21].dayNumber}</p>
+                                <p className='day'>{days[21].dayNumber}</p>
 
                                 <input 
                                     id='21'
@@ -1988,6 +2199,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day21 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='21'
+                                        type="checkbox"
+                                        name="holiday21"
+                                        value={inputs.holiday21 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='21'
@@ -2031,7 +2252,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[22].dayNumber}</p>
+                                <p className='day'>{days[22].dayNumber}</p>
 
                                 <input 
                                     id='22'
@@ -2040,6 +2261,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day22 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='22'
+                                        type="checkbox"
+                                        name="holiday22"
+                                        value={inputs.holiday22 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='22'
@@ -2083,7 +2314,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[23].dayNumber}</p>
+                                <p className='day'>{days[23].dayNumber}</p>
 
                                 <input 
                                     id='23'
@@ -2092,6 +2323,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day23 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='23'
+                                        type="checkbox"
+                                        name="holiday23"
+                                        value={inputs.holiday23 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='23'
@@ -2135,7 +2376,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[24].dayNumber}</p>
+                                <p className='day'>{days[24].dayNumber}</p>
 
                                 <input 
                                     id='24'
@@ -2144,6 +2385,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day24 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='24'
+                                        type="checkbox"
+                                        name="holiday24"
+                                        value={inputs.holiday24 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='24'
@@ -2187,7 +2438,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[25].dayNumber}</p>
+                                <p className='day'>{days[25].dayNumber}</p>
 
                                 <input 
                                     id='25'
@@ -2196,6 +2447,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day25 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='25'
+                                        type="checkbox"
+                                        name="holiday25"
+                                        value={inputs.holiday25 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='25'
@@ -2239,7 +2500,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[26].dayNumber}</p>
+                                <p className='day'>{days[26].dayNumber}</p>
 
                                 <input 
                                     id='26'
@@ -2248,6 +2509,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day26 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='26'
+                                        type="checkbox"
+                                        name="holiday26"
+                                        value={inputs.holiday26 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='26'
@@ -2291,7 +2562,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[27].dayNumber}</p>
+                                <p className='day'>{days[27].dayNumber}</p>
 
                                 <input 
                                     id='27'
@@ -2300,6 +2571,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day27 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='27'
+                                        type="checkbox"
+                                        name="holiday27"
+                                        value={inputs.holiday27 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='27'
@@ -2343,7 +2624,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[28].dayNumber}</p>
+                                <p className='day'>{days[28].dayNumber}</p>
 
                                 <input 
                                     id='28'
@@ -2352,6 +2633,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day28 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='28'
+                                        type="checkbox"
+                                        name="holiday28"
+                                        value={inputs.holiday28 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='28'
@@ -2395,7 +2686,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[29].dayNumber}</p>
+                                <p className='day'>{days[29].dayNumber}</p>
 
                                 <input 
                                     id='29'
@@ -2404,6 +2695,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day29 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='29'
+                                        type="checkbox"
+                                        name="holiday29"
+                                        value={inputs.holiday29 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='29'
@@ -2447,7 +2748,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{days[30].dayNumber}</p>
+                                <p className='day'>{days[30].dayNumber}</p>
 
                                 <input 
                                     id='30'
@@ -2456,6 +2757,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day30 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='30'
+                                        type="checkbox"
+                                        name="holiday30"
+                                        value={inputs.holiday30 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='30'
@@ -2855,6 +3166,40 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
         })
         // const [days, setDays] = useState([])    // days is not defined
         // setDays(hoursToUpdate.days) // days is not defined
+
+        const [checked, setChecked] = useState({
+            holiday0: hoursToUpdate.days[0].holiday || false,
+            holiday1: hoursToUpdate.days[1].holiday || false,
+            holiday2: hoursToUpdate.days[2].holiday || false,
+            holiday3: hoursToUpdate.days[3].holiday || false,
+            holiday4: hoursToUpdate.days[4].holiday || false,
+            holiday5: hoursToUpdate.days[5].holiday || false,
+            holiday6: hoursToUpdate.days[6].holiday || false,
+            holiday7: hoursToUpdate.days[7].holiday || false,
+            holiday8: hoursToUpdate.days[8].holiday || false,
+            holiday9: hoursToUpdate.days[9].holiday || false,
+            holiday10: hoursToUpdate.days[10].holiday || false,
+            holiday11: hoursToUpdate.days[11].holiday || false,
+            holiday12: hoursToUpdate.days[12].holiday || false,
+            holiday13: hoursToUpdate.days[13].holiday || false,
+            holiday14: hoursToUpdate.days[14].holiday || false,
+            holiday15: hoursToUpdate.days[15].holiday || false,
+            holiday16: hoursToUpdate.days[16].holiday || false,
+            holiday17: hoursToUpdate.days[17].holiday || false,
+            holiday18: hoursToUpdate.days[18].holiday || false,
+            holiday19: hoursToUpdate.days[19].holiday || false,
+            holiday20: hoursToUpdate.days[20].holiday || false,
+            holiday21: hoursToUpdate.days[21].holiday || false,
+            holiday22: hoursToUpdate.days[22].holiday || false,
+            holiday23: hoursToUpdate.days[23].holiday || false,
+            holiday24: hoursToUpdate.days[24].holiday || false,
+            holiday25: hoursToUpdate.days[25].holiday || false,
+            holiday26: hoursToUpdate.days[26].holiday || false,
+            holiday27: hoursToUpdate.days[27].holiday || false,
+            holiday28: hoursToUpdate.days[28].holiday || false,
+            holiday29: hoursToUpdate.days[29].holiday || false,
+            holiday30: hoursToUpdate.days[30].holiday || false,
+        })
         
         const timeToDecimal = (t) => {
             var arr = t.split(':')
@@ -2863,7 +3208,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             return parseFloat(parseInt(arr[0], 10) + '.' + (dec<10?'0':'') + dec)
         }
 
-        const calculate = (startTimeA, endTimeA, startTimeB, endTimeB, isWeekend) => {
+        const calculate = (startTimeA, endTimeA, startTimeB, endTimeB, isWeekend, holiday) => {
             let startA = startTimeA
             let endA = endTimeA
             let startB = startTimeB
@@ -2922,7 +3267,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             special = special % 1 !== 0 ? special.toFixed(2) : special
             total = total % 1 !== 0 ? total.toFixed(2) : total
 
-            if (isWeekend === 0 || isWeekend === 6) {
+            if (isWeekend === 0 || isWeekend === 6 || holiday) {
                 special = total
                 normal = 0
             }
@@ -3008,9 +3353,11 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
         //         startWorkA30: hoursToUpdate.days[30].startWorkA,
         //     }))
 
-            console.log(start)
+            
 
         const handleChange = (event) => {
+
+            console.log(hoursToUpdate.days)
 
             const name = event.target.name
             const value = event.target.value
@@ -3033,6 +3380,9 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             setDay(values => ({...values,
                 [name]: value,
             }))
+
+            setChecked(values => ({...values,
+                [name]: event.target.checked,}))
         }
 
         // update
@@ -3249,6 +3599,72 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                 day29,
                 day30,
             } = day
+
+            const {
+                holiday0,
+                holiday1,
+                holiday2,
+                holiday3,
+                holiday4,
+                holiday5,
+                holiday6,
+                holiday7,
+                holiday8,
+                holiday9,
+                holiday10,
+                holiday11,
+                holiday12,
+                holiday13,
+                holiday14,
+                holiday15,
+                holiday16,
+                holiday17,
+                holiday18,
+                holiday19,
+                holiday20,
+                holiday21,
+                holiday22,
+                holiday23,
+                holiday24,
+                holiday25,
+                holiday26,
+                holiday27,
+                holiday28,
+                holiday29,
+                holiday30,
+            } = checked
+
+            hoursToUpdate.days[0].holiday = holiday0 ? holiday0 : false
+            hoursToUpdate.days[1].holiday = holiday1 ? holiday1 : false
+            hoursToUpdate.days[2].holiday = holiday2 ? holiday2 : false
+            hoursToUpdate.days[3].holiday = holiday3 ? holiday3 : false
+            hoursToUpdate.days[4].holiday = holiday4 ? holiday4 : false
+            hoursToUpdate.days[5].holiday = holiday5 ? holiday5 : false
+            hoursToUpdate.days[6].holiday = holiday6 ? holiday6 : false
+            hoursToUpdate.days[7].holiday = holiday7 ? holiday7 : false
+            hoursToUpdate.days[8].holiday = holiday8 ? holiday8 : false
+            hoursToUpdate.days[9].holiday = holiday9 ? holiday9 : false
+            hoursToUpdate.days[10].holiday = holiday10 ? holiday10 : false
+            hoursToUpdate.days[11].holiday = holiday11 ? holiday11 : false
+            hoursToUpdate.days[12].holiday = holiday12 ? holiday12 : false
+            hoursToUpdate.days[13].holiday = holiday13 ? holiday13 : false
+            hoursToUpdate.days[14].holiday = holiday14 ? holiday14 : false
+            hoursToUpdate.days[15].holiday = holiday15 ? holiday15 : false
+            hoursToUpdate.days[16].holiday = holiday16 ? holiday16 : false
+            hoursToUpdate.days[17].holiday = holiday17 ? holiday17 : false
+            hoursToUpdate.days[18].holiday = holiday18 ? holiday18 : false
+            hoursToUpdate.days[19].holiday = holiday19 ? holiday19 : false
+            hoursToUpdate.days[20].holiday = holiday20 ? holiday20 : false
+            hoursToUpdate.days[21].holiday = holiday21 ? holiday21 : false
+            hoursToUpdate.days[22].holiday = holiday22 ? holiday22 : false
+            hoursToUpdate.days[23].holiday = holiday23 ? holiday23 : false
+            hoursToUpdate.days[24].holiday = holiday24 ? holiday24 : false
+            hoursToUpdate.days[25].holiday = holiday25 ? holiday25 : false
+            hoursToUpdate.days[26].holiday = holiday26 ? holiday26 : false
+            hoursToUpdate.days[27].holiday = holiday27 ? holiday27 : false
+            hoursToUpdate.days[28].holiday = holiday28 ? holiday28 : false
+            hoursToUpdate.days[29].holiday = holiday29 ? holiday29 : false
+            hoursToUpdate.days[30].holiday = holiday30 ? holiday30 : false
             
             // if startWorkA is not defined, leave default value time 00:00
             hoursToUpdate.days[0].startWorkA = startWorkA0 ? startWorkA0 : '00:00'
@@ -3447,37 +3863,37 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             hoursToUpdate.days[30].dayNumber = day30 ? `${day30} ${dayName[new Date(day30).getDay()]}` : ''
 
             // use default value time 00:00
-            hoursToUpdate.days[0].totalHours = calculate(timeToDecimal(hoursToUpdate.days[0].startWorkA), timeToDecimal(hoursToUpdate.days[0].endWorkA), timeToDecimal(hoursToUpdate.days[0].startWorkB), timeToDecimal(hoursToUpdate.days[0].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[1].totalHours = calculate(timeToDecimal(hoursToUpdate.days[1].startWorkA), timeToDecimal(hoursToUpdate.days[1].endWorkA), timeToDecimal(hoursToUpdate.days[1].startWorkB), timeToDecimal(hoursToUpdate.days[1].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[2].totalHours = calculate(timeToDecimal(hoursToUpdate.days[2].startWorkA), timeToDecimal(hoursToUpdate.days[2].endWorkA), timeToDecimal(hoursToUpdate.days[2].startWorkB), timeToDecimal(hoursToUpdate.days[2].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[3].totalHours = calculate(timeToDecimal(hoursToUpdate.days[3].startWorkA), timeToDecimal(hoursToUpdate.days[3].endWorkA), timeToDecimal(hoursToUpdate.days[3].startWorkB), timeToDecimal(hoursToUpdate.days[3].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[4].totalHours = calculate(timeToDecimal(hoursToUpdate.days[4].startWorkA), timeToDecimal(hoursToUpdate.days[4].endWorkA), timeToDecimal(hoursToUpdate.days[4].startWorkB), timeToDecimal(hoursToUpdate.days[4].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[5].totalHours = calculate(timeToDecimal(hoursToUpdate.days[5].startWorkA), timeToDecimal(hoursToUpdate.days[5].endWorkA), timeToDecimal(hoursToUpdate.days[5].startWorkB), timeToDecimal(hoursToUpdate.days[5].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[6].totalHours = calculate(timeToDecimal(hoursToUpdate.days[6].startWorkA), timeToDecimal(hoursToUpdate.days[6].endWorkA), timeToDecimal(hoursToUpdate.days[6].startWorkB), timeToDecimal(hoursToUpdate.days[6].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[7].totalHours = calculate(timeToDecimal(hoursToUpdate.days[7].startWorkA), timeToDecimal(hoursToUpdate.days[7].endWorkA), timeToDecimal(hoursToUpdate.days[7].startWorkB), timeToDecimal(hoursToUpdate.days[7].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[8].totalHours = calculate(timeToDecimal(hoursToUpdate.days[8].startWorkA), timeToDecimal(hoursToUpdate.days[8].endWorkA), timeToDecimal(hoursToUpdate.days[8].startWorkB), timeToDecimal(hoursToUpdate.days[8].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[9].totalHours = calculate(timeToDecimal(hoursToUpdate.days[9].startWorkA), timeToDecimal(hoursToUpdate.days[9].endWorkA), timeToDecimal(hoursToUpdate.days[9].startWorkB), timeToDecimal(hoursToUpdate.days[9].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[10].totalHours = calculate(timeToDecimal(hoursToUpdate.days[10].startWorkA), timeToDecimal(hoursToUpdate.days[10].endWorkA), timeToDecimal(hoursToUpdate.days[10].startWorkB), timeToDecimal(hoursToUpdate.days[10].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[11].totalHours = calculate(timeToDecimal(hoursToUpdate.days[11].startWorkA), timeToDecimal(hoursToUpdate.days[11].endWorkA), timeToDecimal(hoursToUpdate.days[11].startWorkB), timeToDecimal(hoursToUpdate.days[11].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[12].totalHours = calculate(timeToDecimal(hoursToUpdate.days[12].startWorkA), timeToDecimal(hoursToUpdate.days[12].endWorkA), timeToDecimal(hoursToUpdate.days[12].startWorkB), timeToDecimal(hoursToUpdate.days[12].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[13].totalHours = calculate(timeToDecimal(hoursToUpdate.days[13].startWorkA), timeToDecimal(hoursToUpdate.days[13].endWorkA), timeToDecimal(hoursToUpdate.days[13].startWorkB), timeToDecimal(hoursToUpdate.days[13].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[14].totalHours = calculate(timeToDecimal(hoursToUpdate.days[14].startWorkA), timeToDecimal(hoursToUpdate.days[14].endWorkA), timeToDecimal(hoursToUpdate.days[14].startWorkB), timeToDecimal(hoursToUpdate.days[14].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[15].totalHours = calculate(timeToDecimal(hoursToUpdate.days[15].startWorkA), timeToDecimal(hoursToUpdate.days[15].endWorkA), timeToDecimal(hoursToUpdate.days[15].startWorkB), timeToDecimal(hoursToUpdate.days[15].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[16].totalHours = calculate(timeToDecimal(hoursToUpdate.days[16].startWorkA), timeToDecimal(hoursToUpdate.days[16].endWorkA), timeToDecimal(hoursToUpdate.days[16].startWorkB), timeToDecimal(hoursToUpdate.days[16].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[17].totalHours = calculate(timeToDecimal(hoursToUpdate.days[17].startWorkA), timeToDecimal(hoursToUpdate.days[17].endWorkA), timeToDecimal(hoursToUpdate.days[17].startWorkB), timeToDecimal(hoursToUpdate.days[17].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[18].totalHours = calculate(timeToDecimal(hoursToUpdate.days[18].startWorkA), timeToDecimal(hoursToUpdate.days[18].endWorkA), timeToDecimal(hoursToUpdate.days[18].startWorkB), timeToDecimal(hoursToUpdate.days[18].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[19].totalHours = calculate(timeToDecimal(hoursToUpdate.days[19].startWorkA), timeToDecimal(hoursToUpdate.days[19].endWorkA), timeToDecimal(hoursToUpdate.days[19].startWorkB), timeToDecimal(hoursToUpdate.days[19].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[20].totalHours = calculate(timeToDecimal(hoursToUpdate.days[20].startWorkA), timeToDecimal(hoursToUpdate.days[20].endWorkA), timeToDecimal(hoursToUpdate.days[20].startWorkB), timeToDecimal(hoursToUpdate.days[20].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[21].totalHours = calculate(timeToDecimal(hoursToUpdate.days[21].startWorkA), timeToDecimal(hoursToUpdate.days[21].endWorkA), timeToDecimal(hoursToUpdate.days[21].startWorkB), timeToDecimal(hoursToUpdate.days[21].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[22].totalHours = calculate(timeToDecimal(hoursToUpdate.days[22].startWorkA), timeToDecimal(hoursToUpdate.days[22].endWorkA), timeToDecimal(hoursToUpdate.days[22].startWorkB), timeToDecimal(hoursToUpdate.days[22].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[23].totalHours = calculate(timeToDecimal(hoursToUpdate.days[23].startWorkA), timeToDecimal(hoursToUpdate.days[23].endWorkA), timeToDecimal(hoursToUpdate.days[23].startWorkB), timeToDecimal(hoursToUpdate.days[23].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[24].totalHours = calculate(timeToDecimal(hoursToUpdate.days[24].startWorkA), timeToDecimal(hoursToUpdate.days[24].endWorkA), timeToDecimal(hoursToUpdate.days[24].startWorkB), timeToDecimal(hoursToUpdate.days[24].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[25].totalHours = calculate(timeToDecimal(hoursToUpdate.days[25].startWorkA), timeToDecimal(hoursToUpdate.days[25].endWorkA), timeToDecimal(hoursToUpdate.days[25].startWorkB), timeToDecimal(hoursToUpdate.days[25].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[26].totalHours = calculate(timeToDecimal(hoursToUpdate.days[26].startWorkA), timeToDecimal(hoursToUpdate.days[26].endWorkA), timeToDecimal(hoursToUpdate.days[26].startWorkB), timeToDecimal(hoursToUpdate.days[26].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[27].totalHours = calculate(timeToDecimal(hoursToUpdate.days[27].startWorkA), timeToDecimal(hoursToUpdate.days[27].endWorkA), timeToDecimal(hoursToUpdate.days[27].startWorkB), timeToDecimal(hoursToUpdate.days[27].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[28].totalHours = calculate(timeToDecimal(hoursToUpdate.days[28].startWorkA), timeToDecimal(hoursToUpdate.days[28].endWorkA), timeToDecimal(hoursToUpdate.days[28].startWorkB), timeToDecimal(hoursToUpdate.days[28].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[29].totalHours = calculate(timeToDecimal(hoursToUpdate.days[29].startWorkA), timeToDecimal(hoursToUpdate.days[29].endWorkA), timeToDecimal(hoursToUpdate.days[29].startWorkB), timeToDecimal(hoursToUpdate.days[29].endWorkB), new Date(day0).getDay())
-            hoursToUpdate.days[30].totalHours = calculate(timeToDecimal(hoursToUpdate.days[30].startWorkA), timeToDecimal(hoursToUpdate.days[30].endWorkA), timeToDecimal(hoursToUpdate.days[30].startWorkB), timeToDecimal(hoursToUpdate.days[30].endWorkB), new Date(day0).getDay())
+            hoursToUpdate.days[0].totalHours = calculate(timeToDecimal(hoursToUpdate.days[0].startWorkA), timeToDecimal(hoursToUpdate.days[0].endWorkA), timeToDecimal(hoursToUpdate.days[0].startWorkB), timeToDecimal(hoursToUpdate.days[0].endWorkB), new Date(day0).getDay(), holiday0)
+            hoursToUpdate.days[1].totalHours = calculate(timeToDecimal(hoursToUpdate.days[1].startWorkA), timeToDecimal(hoursToUpdate.days[1].endWorkA), timeToDecimal(hoursToUpdate.days[1].startWorkB), timeToDecimal(hoursToUpdate.days[1].endWorkB), new Date(day0).getDay(), holiday1)
+            hoursToUpdate.days[2].totalHours = calculate(timeToDecimal(hoursToUpdate.days[2].startWorkA), timeToDecimal(hoursToUpdate.days[2].endWorkA), timeToDecimal(hoursToUpdate.days[2].startWorkB), timeToDecimal(hoursToUpdate.days[2].endWorkB), new Date(day0).getDay(), holiday2)
+            hoursToUpdate.days[3].totalHours = calculate(timeToDecimal(hoursToUpdate.days[3].startWorkA), timeToDecimal(hoursToUpdate.days[3].endWorkA), timeToDecimal(hoursToUpdate.days[3].startWorkB), timeToDecimal(hoursToUpdate.days[3].endWorkB), new Date(day0).getDay(), holiday3)
+            hoursToUpdate.days[4].totalHours = calculate(timeToDecimal(hoursToUpdate.days[4].startWorkA), timeToDecimal(hoursToUpdate.days[4].endWorkA), timeToDecimal(hoursToUpdate.days[4].startWorkB), timeToDecimal(hoursToUpdate.days[4].endWorkB), new Date(day0).getDay(), holiday4)
+            hoursToUpdate.days[5].totalHours = calculate(timeToDecimal(hoursToUpdate.days[5].startWorkA), timeToDecimal(hoursToUpdate.days[5].endWorkA), timeToDecimal(hoursToUpdate.days[5].startWorkB), timeToDecimal(hoursToUpdate.days[5].endWorkB), new Date(day0).getDay(), holiday5)
+            hoursToUpdate.days[6].totalHours = calculate(timeToDecimal(hoursToUpdate.days[6].startWorkA), timeToDecimal(hoursToUpdate.days[6].endWorkA), timeToDecimal(hoursToUpdate.days[6].startWorkB), timeToDecimal(hoursToUpdate.days[6].endWorkB), new Date(day0).getDay(), holiday6)
+            hoursToUpdate.days[7].totalHours = calculate(timeToDecimal(hoursToUpdate.days[7].startWorkA), timeToDecimal(hoursToUpdate.days[7].endWorkA), timeToDecimal(hoursToUpdate.days[7].startWorkB), timeToDecimal(hoursToUpdate.days[7].endWorkB), new Date(day0).getDay(), holiday7)
+            hoursToUpdate.days[8].totalHours = calculate(timeToDecimal(hoursToUpdate.days[8].startWorkA), timeToDecimal(hoursToUpdate.days[8].endWorkA), timeToDecimal(hoursToUpdate.days[8].startWorkB), timeToDecimal(hoursToUpdate.days[8].endWorkB), new Date(day0).getDay(), holiday8)
+            hoursToUpdate.days[9].totalHours = calculate(timeToDecimal(hoursToUpdate.days[9].startWorkA), timeToDecimal(hoursToUpdate.days[9].endWorkA), timeToDecimal(hoursToUpdate.days[9].startWorkB), timeToDecimal(hoursToUpdate.days[9].endWorkB), new Date(day0).getDay(), holiday9)
+            hoursToUpdate.days[10].totalHours = calculate(timeToDecimal(hoursToUpdate.days[10].startWorkA), timeToDecimal(hoursToUpdate.days[10].endWorkA), timeToDecimal(hoursToUpdate.days[10].startWorkB), timeToDecimal(hoursToUpdate.days[10].endWorkB), new Date(day0).getDay(), holiday10)
+            hoursToUpdate.days[11].totalHours = calculate(timeToDecimal(hoursToUpdate.days[11].startWorkA), timeToDecimal(hoursToUpdate.days[11].endWorkA), timeToDecimal(hoursToUpdate.days[11].startWorkB), timeToDecimal(hoursToUpdate.days[11].endWorkB), new Date(day0).getDay(), holiday11)
+            hoursToUpdate.days[12].totalHours = calculate(timeToDecimal(hoursToUpdate.days[12].startWorkA), timeToDecimal(hoursToUpdate.days[12].endWorkA), timeToDecimal(hoursToUpdate.days[12].startWorkB), timeToDecimal(hoursToUpdate.days[12].endWorkB), new Date(day0).getDay(), holiday12)
+            hoursToUpdate.days[13].totalHours = calculate(timeToDecimal(hoursToUpdate.days[13].startWorkA), timeToDecimal(hoursToUpdate.days[13].endWorkA), timeToDecimal(hoursToUpdate.days[13].startWorkB), timeToDecimal(hoursToUpdate.days[13].endWorkB), new Date(day0).getDay(), holiday13)
+            hoursToUpdate.days[14].totalHours = calculate(timeToDecimal(hoursToUpdate.days[14].startWorkA), timeToDecimal(hoursToUpdate.days[14].endWorkA), timeToDecimal(hoursToUpdate.days[14].startWorkB), timeToDecimal(hoursToUpdate.days[14].endWorkB), new Date(day0).getDay(), holiday14)
+            hoursToUpdate.days[15].totalHours = calculate(timeToDecimal(hoursToUpdate.days[15].startWorkA), timeToDecimal(hoursToUpdate.days[15].endWorkA), timeToDecimal(hoursToUpdate.days[15].startWorkB), timeToDecimal(hoursToUpdate.days[15].endWorkB), new Date(day0).getDay(), holiday15)
+            hoursToUpdate.days[16].totalHours = calculate(timeToDecimal(hoursToUpdate.days[16].startWorkA), timeToDecimal(hoursToUpdate.days[16].endWorkA), timeToDecimal(hoursToUpdate.days[16].startWorkB), timeToDecimal(hoursToUpdate.days[16].endWorkB), new Date(day0).getDay(), holiday16)
+            hoursToUpdate.days[17].totalHours = calculate(timeToDecimal(hoursToUpdate.days[17].startWorkA), timeToDecimal(hoursToUpdate.days[17].endWorkA), timeToDecimal(hoursToUpdate.days[17].startWorkB), timeToDecimal(hoursToUpdate.days[17].endWorkB), new Date(day0).getDay(), holiday17)
+            hoursToUpdate.days[18].totalHours = calculate(timeToDecimal(hoursToUpdate.days[18].startWorkA), timeToDecimal(hoursToUpdate.days[18].endWorkA), timeToDecimal(hoursToUpdate.days[18].startWorkB), timeToDecimal(hoursToUpdate.days[18].endWorkB), new Date(day0).getDay(), holiday18)
+            hoursToUpdate.days[19].totalHours = calculate(timeToDecimal(hoursToUpdate.days[19].startWorkA), timeToDecimal(hoursToUpdate.days[19].endWorkA), timeToDecimal(hoursToUpdate.days[19].startWorkB), timeToDecimal(hoursToUpdate.days[19].endWorkB), new Date(day0).getDay(), holiday19)
+            hoursToUpdate.days[20].totalHours = calculate(timeToDecimal(hoursToUpdate.days[20].startWorkA), timeToDecimal(hoursToUpdate.days[20].endWorkA), timeToDecimal(hoursToUpdate.days[20].startWorkB), timeToDecimal(hoursToUpdate.days[20].endWorkB), new Date(day0).getDay(), holiday20)
+            hoursToUpdate.days[21].totalHours = calculate(timeToDecimal(hoursToUpdate.days[21].startWorkA), timeToDecimal(hoursToUpdate.days[21].endWorkA), timeToDecimal(hoursToUpdate.days[21].startWorkB), timeToDecimal(hoursToUpdate.days[21].endWorkB), new Date(day0).getDay(), holiday21)
+            hoursToUpdate.days[22].totalHours = calculate(timeToDecimal(hoursToUpdate.days[22].startWorkA), timeToDecimal(hoursToUpdate.days[22].endWorkA), timeToDecimal(hoursToUpdate.days[22].startWorkB), timeToDecimal(hoursToUpdate.days[22].endWorkB), new Date(day0).getDay(), holiday22)
+            hoursToUpdate.days[23].totalHours = calculate(timeToDecimal(hoursToUpdate.days[23].startWorkA), timeToDecimal(hoursToUpdate.days[23].endWorkA), timeToDecimal(hoursToUpdate.days[23].startWorkB), timeToDecimal(hoursToUpdate.days[23].endWorkB), new Date(day0).getDay(), holiday23)
+            hoursToUpdate.days[24].totalHours = calculate(timeToDecimal(hoursToUpdate.days[24].startWorkA), timeToDecimal(hoursToUpdate.days[24].endWorkA), timeToDecimal(hoursToUpdate.days[24].startWorkB), timeToDecimal(hoursToUpdate.days[24].endWorkB), new Date(day0).getDay(), holiday24)
+            hoursToUpdate.days[25].totalHours = calculate(timeToDecimal(hoursToUpdate.days[25].startWorkA), timeToDecimal(hoursToUpdate.days[25].endWorkA), timeToDecimal(hoursToUpdate.days[25].startWorkB), timeToDecimal(hoursToUpdate.days[25].endWorkB), new Date(day0).getDay(), holiday25)
+            hoursToUpdate.days[26].totalHours = calculate(timeToDecimal(hoursToUpdate.days[26].startWorkA), timeToDecimal(hoursToUpdate.days[26].endWorkA), timeToDecimal(hoursToUpdate.days[26].startWorkB), timeToDecimal(hoursToUpdate.days[26].endWorkB), new Date(day0).getDay(), holiday26)
+            hoursToUpdate.days[27].totalHours = calculate(timeToDecimal(hoursToUpdate.days[27].startWorkA), timeToDecimal(hoursToUpdate.days[27].endWorkA), timeToDecimal(hoursToUpdate.days[27].startWorkB), timeToDecimal(hoursToUpdate.days[27].endWorkB), new Date(day0).getDay(), holiday27)
+            hoursToUpdate.days[28].totalHours = calculate(timeToDecimal(hoursToUpdate.days[28].startWorkA), timeToDecimal(hoursToUpdate.days[28].endWorkA), timeToDecimal(hoursToUpdate.days[28].startWorkB), timeToDecimal(hoursToUpdate.days[28].endWorkB), new Date(day0).getDay(), holiday28)
+            hoursToUpdate.days[29].totalHours = calculate(timeToDecimal(hoursToUpdate.days[29].startWorkA), timeToDecimal(hoursToUpdate.days[29].endWorkA), timeToDecimal(hoursToUpdate.days[29].startWorkB), timeToDecimal(hoursToUpdate.days[29].endWorkB), new Date(day0).getDay(), holiday29)
+            hoursToUpdate.days[30].totalHours = calculate(timeToDecimal(hoursToUpdate.days[30].startWorkA), timeToDecimal(hoursToUpdate.days[30].endWorkA), timeToDecimal(hoursToUpdate.days[30].startWorkB), timeToDecimal(hoursToUpdate.days[30].endWorkB), new Date(day0).getDay(), holiday30)
             
           
 
@@ -3498,12 +3914,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                 specialRate: numallSpecial,
             }
 
-            console.log('normal', normal, 'allNormal', allNormal, 'numallNormal', numallNormal, 'hoursToUpdate.monthHours.normalRate', hoursToUpdate.monthHours.normalRate);
+            // console.log('normal', normal, 'allNormal', allNormal, 'numallNormal', numallNormal, 'hoursToUpdate.monthHours.normalRate', hoursToUpdate.monthHours.normalRate);
             
 
             
 
             hoursToUpdate.month = inputs.month
+
+            console.log('checked', checked)
+
+            console.log(hoursToUpdate)
             
             await hoursService
               .update(hours.id, hoursToUpdate)
@@ -3556,7 +3976,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             {/* </div> */}
 
                             <div className='eachDay topeachday'>
-                                <p className='topDay'>{hours.days[0].dayNumber}</p>
+                                <p className='topDay date'>{hours.days[0].dayNumber}</p>
 
                                 <div>
                                     <p>Date</p>
@@ -3566,6 +3986,17 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                         label='Date'
                                         name="day0"
                                         value={day.day0 || ''}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+
+                                <div>
+                                    <p>Holiday</p>
+                                    <input className='holiday'
+                                        id='0'
+                                        type="checkbox"
+                                        name="holiday0"
+                                        checked={checked.holiday0}
                                         onChange={handleChange}
                                     />
                                 </div>
@@ -3632,7 +4063,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[1].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[1].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='1'
@@ -3641,6 +4072,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day1 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='1'
+                                        type="checkbox"
+                                        name="holiday1"
+                                        checked={checked.holiday1 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='1'
@@ -3684,7 +4125,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[2].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[2].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='2'
@@ -3693,6 +4134,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day2 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='2'
+                                        type="checkbox"
+                                        name="holiday2"
+                                        checked={checked.holiday2 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='2'
@@ -3736,7 +4187,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[3].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[3].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='3'
@@ -3745,6 +4196,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day3 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='3'
+                                        type="checkbox"
+                                        name="holiday3"
+                                        checked={checked.holiday3 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='3'
@@ -3788,7 +4249,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[4].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[4].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='4'
@@ -3797,6 +4258,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day4 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='4'
+                                        type="checkbox"
+                                        name="holiday4"
+                                        checked={checked.holiday4 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='4'
@@ -3840,7 +4311,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[5].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[5].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='5'
@@ -3849,6 +4320,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day5 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='5'
+                                        type="checkbox"
+                                        name="holiday5"
+                                        checked={checked.holiday5 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='5'
@@ -3892,7 +4373,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[6].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[6].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='6'
@@ -3901,6 +4382,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day6 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='6'
+                                        type="checkbox"
+                                        name="holiday6"
+                                        checked={checked.holiday6 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='6'
@@ -3944,7 +4435,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[7].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[7].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='7'
@@ -3953,6 +4444,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day7 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='7'
+                                        type="checkbox"
+                                        name="holiday7"
+                                        checked={checked.holiday7 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='7'
@@ -3996,7 +4497,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[8].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[8].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='8'
@@ -4005,6 +4506,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day8 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='8'
+                                        type="checkbox"
+                                        name="holiday8"
+                                        checked={checked.holiday8 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='8'
@@ -4048,7 +4559,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[9].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[9].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='9'
@@ -4057,6 +4568,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day9 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='9'
+                                        type="checkbox"
+                                        name="holiday9"
+                                        checked={checked.holiday9 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='9'
@@ -4100,7 +4621,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[10].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[10].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='10'
@@ -4109,6 +4630,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day10 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='10'
+                                        type="checkbox"
+                                        name="holiday10"
+                                        checked={checked.holiday10 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='10'
@@ -4152,7 +4683,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[11].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[11].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='11'
@@ -4161,6 +4692,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day11 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='11'
+                                        type="checkbox"
+                                        name="holiday11"
+                                        checked={checked.holiday11 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='11'
@@ -4204,7 +4745,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[12].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[12].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='12'
@@ -4213,6 +4754,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day12 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='12'
+                                        type="checkbox"
+                                        name="holiday12"
+                                        checked={checked.holiday12 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='12'
@@ -4256,7 +4807,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[13].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[13].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='13'
@@ -4265,6 +4816,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day13 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='13'
+                                        type="checkbox"
+                                        name="holiday13"
+                                        checked={checked.holiday13 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='13'
@@ -4308,7 +4869,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[14].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[14].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='14'
@@ -4317,6 +4878,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day14 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='14'
+                                        type="checkbox"
+                                        name="holiday14"
+                                        checked={checked.holiday14 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='14'
@@ -4360,7 +4931,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[15].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[15].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='15'
@@ -4369,6 +4940,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day15 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='15'
+                                        type="checkbox"
+                                        name="holiday15"
+                                        checked={checked.holiday15 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='15'
@@ -4412,7 +4993,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[16].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[16].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='16'
@@ -4421,6 +5002,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day16 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='16'
+                                        type="checkbox"
+                                        name="holiday16"
+                                        checked={checked.holiday16 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='16'
@@ -4464,7 +5055,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[17].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[17].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='17'
@@ -4473,6 +5064,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day17 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='17'
+                                        type="checkbox"
+                                        name="holiday17"
+                                        checked={checked.holiday17 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='17'
@@ -4516,7 +5117,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[18].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[18].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='18'
@@ -4525,6 +5126,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day18 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='18'
+                                        type="checkbox"
+                                        name="holiday18"
+                                        checked={checked.holiday18 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='18'
@@ -4568,7 +5179,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[19].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[19].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='19'
@@ -4577,6 +5188,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day19 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='19'
+                                        type="checkbox"
+                                        name="holiday19"
+                                        checked={checked.holiday19 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='19'
@@ -4620,7 +5241,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[20].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[20].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='20'
@@ -4629,6 +5250,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day20 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='20'
+                                        type="checkbox"
+                                        name="holiday20"
+                                        checked={checked.holiday20 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='20'
@@ -4672,7 +5303,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[21].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[21].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='21'
@@ -4681,6 +5312,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day21 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='21'
+                                        type="checkbox"
+                                        name="holiday21"
+                                        checked={checked.holiday21 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='21'
@@ -4724,7 +5365,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[22].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[22].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='22'
@@ -4733,6 +5374,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day22 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='22'
+                                        type="checkbox"
+                                        name="holiday22"
+                                        checked={checked.holiday22 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='22'
@@ -4776,7 +5427,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[23].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[23].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='23'
@@ -4785,6 +5436,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day23 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='23'
+                                        type="checkbox"
+                                        name="holiday23"
+                                        checked={checked.holiday23 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='23'
@@ -4828,7 +5489,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[24].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[24].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='24'
@@ -4837,6 +5498,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day24 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='24'
+                                        type="checkbox"
+                                        name="holiday24"
+                                        checked={checked.holiday24 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='24'
@@ -4880,7 +5551,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[25].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[25].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='25'
@@ -4889,6 +5560,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day25 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='25'
+                                        type="checkbox"
+                                        name="holiday25"
+                                        checked={checked.holiday25 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='25'
@@ -4932,7 +5613,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[26].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[26].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='26'
@@ -4941,6 +5622,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day26 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='26'
+                                        type="checkbox"
+                                        name="holiday26"
+                                        checked={checked.holiday26 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='26'
@@ -4984,7 +5675,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[27].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[27].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='27'
@@ -4993,6 +5684,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day27 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='27'
+                                        type="checkbox"
+                                        name="holiday27"
+                                        checked={checked.holiday27 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='27'
@@ -5036,7 +5737,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[28].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[28].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='28'
@@ -5045,6 +5746,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day28 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='28'
+                                        type="checkbox"
+                                        name="holiday28"
+                                        checked={checked.holiday28 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='28'
@@ -5088,7 +5799,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[29].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[29].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='29'
@@ -5097,6 +5808,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day29 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='29'
+                                        type="checkbox"
+                                        name="holiday29"
+                                        checked={checked.holiday29 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='29'
@@ -5140,7 +5861,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             </div>
 
                             <div className='eachDay'>
-                                <p>{hours.days[30].dayNumber || '----------------------'}</p>
+                                <p className='date'>{hours.days[30].dayNumber || '----------------------'}</p>
 
                                 <input 
                                     id='30'
@@ -5149,6 +5870,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     value={day.day30 || ''}
                                     onChange={handleChange}
                                 />
+
+                                <div>                                    
+                                    <input className='holiday'
+                                        id='30'
+                                        type="checkbox"
+                                        name="holiday30"
+                                        checked={checked.holiday30 || false}
+                                        onChange={handleChange}
+                                    />
+                                </div>
 
                                 <input 
                                     id='30'

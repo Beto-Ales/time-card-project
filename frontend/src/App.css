@@ -55,9 +55,11 @@
   padding: 0 1em;
 }
 
+/* screen two */
+/* ---------- */
 .userTable{
   display: grid;
-  grid-template-columns: repeat(9, 1fr);
+  grid-template-columns: repeat(10, 1fr);
   margin: 2em 0;
 }
 
@@ -78,10 +80,30 @@
   border: solid 0.01em;
   font-weight: bolder;
 }
-/* 
-li span{
-  margin: 0 2em;
-} */
+
+.jobdescription{
+  width: 10em;
+}
+
+.date-column{
+  width: 11em;
+}
+
+.hours-min-width{
+  min-width: 5em;
+}
+/* ---------- */
+/* screen two */
+
+/* update screen */
+.date{
+  width: 11em;
+}
+
+/* create */
+.day{
+  width: 1em;
+}
 
 .eachDay {
   display: flex;
@@ -100,14 +122,23 @@ li span{
   bottom: -1.75em;
 }
 
+/* checkbox holiday */
+.holiday{
+  margin: 0 2em;
+  width: 1.8em;
+  height: 1.8em;
+}
+
 .startA, .endA{
   color: #00ae9d;
   /* color: #086048; */
+  min-width: 5em;
 }
 
 .startB, .endB{
   color: #ff3d00;
   /* color: #563fc4; */
+  min-width: 5em;
 }
 
 .eachDay p {
