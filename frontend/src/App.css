@@ -131,14 +131,18 @@
 
 .startA, .endA{
   color: #00ae9d;
-  /* color: #086048; */
+  /* color: #086048; */  
+}
+
+.userTable .startA, .userTable .endA, .userTable .startB,
+.userTable .endB, .userTable .holiday-column, .freeWidth .startB,
+.freeWidth .endB, .freeWidth .holiday-column{
   min-width: 5em;
 }
 
 .startB, .endB{
   color: #ff3d00;
-  /* color: #563fc4; */
-  min-width: 5em;
+  /* color: #563fc4; */  
 }
 
 .eachDay p {

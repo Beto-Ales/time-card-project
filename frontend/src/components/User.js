@@ -71,7 +71,7 @@ const ScreenThree = ({ hours, worker }) => {
       
       <div className='userTable userTableHeader'>
           <span className='headerTitle date-column'>DATE</span>
-          <span className='headerTitle'>HOLIDAY</span>
+          <span className='headerTitle holiday-column'>HOLIDAY</span>
           <span className='headerTitle jobdescription'>JOB DESCRIPTION</span>
           <span className='headerTitle startA'>START</span>
           <span className='headerTitle endA'>FINISH</span>
@@ -92,7 +92,7 @@ const ScreenThree = ({ hours, worker }) => {
               {/* <p>Day: {day.dayNumber} Job description: {day.jobDescription} Start: {day.startWorkA}, End: {day.endWorkA} Total Hours: {day.totalHours && day.totalHours.total} Normal rate: {day.totalHours && day.totalHours.normal} Special rate: {day.totalHours && day.totalHours.special}</p> */}
               <div className='userTable'>
                 <span className='userSpan date-column'>{day.dayNumber}</span>
-                <span className='userSpan'>{day.holiday ? '✔' : ''}</span>
+                <span className='userSpan holiday-column'>{day.holiday ? '✔' : ''}</span>
                 <span className='userSpan jobdescription'>{day.jobDescription}</span>
                 <span className='userSpan startA'>{day.startWorkA}</span>
                 <span className='userSpan endA'>{day.endWorkA}</span>
