@@ -63,7 +63,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
         )
     }
         
-    const ScreenTwo = ({ hours }) => {        
+    const ScreenTwo = ({ hours }) => {
   
 
   return (
@@ -82,7 +82,8 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
           <span className='headerTitle endB'>FINISH</span>
           <span className='headerTitle hours-min-width'>TOTAL</span>
           <span className='headerTitle hours-min-width'>NORMAL</span>
-          <span className='headerTitle hours-min-width'>SPECIAL</span>
+          <span className='headerTitle hours-min-width'>LATE HOURS</span>
+          <span className='headerTitle hours-min-width'>HOLIDAY HOURS</span>
           {/* <p className='left'>TOTAL HOURS/TIMER</p> */}
       </div>
       
@@ -92,7 +93,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
           hours &&
           hours.days.map(day => 
             <li key={day.dayNumber}>
-              {/* <p>Day: {day.dayNumber} Job description: {day.jobDescription} Start: {day.startWorkA}, End: {day.endWorkA} Total Hours: {day.totalHours && day.totalHours.total} Normal rate: {day.totalHours && day.totalHours.normal} Special rate: {day.totalHours && day.totalHours.special}</p> */}
+              {/* <p>Day: {day.dayNumber} Job description: {day.jobDescription} Start: {day.startWorkA}, End: {day.endWorkA} Total Hours: {day.totalHours && day.totalHours.total} Normal rate: {day.totalHours && day.totalHours.normal} lateHours rate: {day.totalHours && day.totalHours.lateHours}</p> */}
               <div className='userTable'>
                 <span className='userSpan date-column'>{day.dayNumber}</span>
                 <span className='userSpan holiday-column'>{day.holiday ? '✔' : ''}</span>
@@ -103,15 +104,16 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                 <span className='userSpan endB'>{day.endWorkB}</span>
                 <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.total}</span>
                 <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.normal}</span>
-                <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.special}</span>
+                <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.lateHours}</span>
+                <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.holidayHours}</span>
               </div>
               {/* <p>Total Hours: {hours.totalHours}</p> */}
             </li>
           )
         }
       </ul>      
-      {/* <h3>Month total Hours: <span className='totalHoursStyle'>{allTotal}</span>, Normal rate: <span className='totalHoursStyle'>{allNormal}</span>, Special rate: <span className='totalHoursStyle'>{allSpecial}</span></h3> */}
-      <h3>Month total Hours: <span className='totalHoursStyle'>{hours.monthHours.totalHours}</span>, Normal rate: <span className='totalHoursStyle'>{hours.monthHours.normalRate}</span>, Special rate: <span className='totalHoursStyle'>{hours.monthHours.specialRate}</span></h3>
+      {/* <h3>Month total Hours: <span className='totalHoursStyle'>{allTotal}</span>, Normal rate: <span className='totalHoursStyle'>{allNormal}</span>, lateHours rate: <span className='totalHoursStyle'>{alllateHours}</span></h3> */}
+      <h3>Month total Hours: <span className='totalHoursStyle'>{hours.monthHours.totalHours}</span>, Normal rate: <span className='totalHoursStyle'>{hours.monthHours.normalRate}</span>, Late hours rate: <span className='totalHoursStyle'>{hours.monthHours.lateHoursRate}</span>, Holiday hours rate: <span className='totalHoursStyle'>{hours.monthHours.holidayHoursRate}</span></h3>
     </div>
   )
 
@@ -173,13 +175,13 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             let startB = startTimeB
             let endB = endTimeB
 
-            // let startA = startTimeA ? startTimeA : 0
-            // let endA = endTimeA ? endTimeA : 0
-            // let startB = startTimeB ? startTimeB : 0
-            // let endB = endTimeB ? endTimeB : 0
-
             let normal = 0
-            let special = 0
+            let lateHours = 0
+            let holidayHours = 0
+
+            // let normalRate = 0
+            // let lateHoursRate = 0
+            // let holidayRate = 0
 
             
 
@@ -203,37 +205,82 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             }
             
             let total = endA - startA + endB - startB
-            
-            if (endA > 18) {
-                special += endA - 18
-                normal += 18 - startA
-            }
-            
-            if (endB > 18) {
-                special += endB - 18
-                normal += 18 - startB
-            }
 
-            if (endA < 18) {
-                normal += endA - startA
-            }
+            // monday to friday
+            // ----------------
 
-            if (endB < 18) {
-                normal += endB - startB
+            // isWeekend !== 6 (saturday) || isWeekend !== 0 (sunday)
+            
+            if (isWeekend !== 6) {     
+                
+                if (startA >= 18) {
+                    lateHours = endA - startA + endB - startB
+                    normal = 0
+                } else if (endA >= 18) {
+                    lateHours = endA - 18 + endB - startB
+                    normal = 18 - startA
+                } else if (startB >= 18) {
+                    lateHours = endB - startB
+                    normal = endA - startA
+                } else if (endB >= 18) {
+                    lateHours = endB - 18
+                    normal = 18 - startB + endA - startA
+                } else {
+                    lateHours = 0
+                    normal = endA - startA + endB - startB
+                }
+
             }
+            // ----------------
+            // monday to friday
+
+
+
+            // saturday
+            // --------
+
+            // isWeekend === 6 (saturday)
+
+            if (isWeekend === 6) {
+
+                if (startA >= 14) {
+                    lateHours = endA - startA + endB - startB
+                    normal = 0
+                } else if (endA >= 14) {
+                    lateHours = endA - 14 + endB - startB
+                    normal = 14 - startA
+                } else if (startB >= 14) {
+                    lateHours = endB - startB
+                    normal = endA - startA
+                } else if (endB >= 14) {
+                    lateHours = endB - 14
+                    normal = 14 - startB + endA - startA
+                } else {
+                    lateHours = 0
+                    normal = endA - startA + endB - startB
+                }
+
+            }
+            // --------
+            // saturday
+            
+            
 
             normal = normal % 1 !== 0 ? normal.toFixed(2) : normal
-            special = special % 1 !== 0 ? special.toFixed(2) : special
+            lateHours = lateHours % 1 !== 0 ? lateHours.toFixed(2) : lateHours
             total = total % 1 !== 0 ? total.toFixed(2) : total
 
-            if (isWeekend === 0 || isWeekend === 6 || holiday) {
-                special = total
+            // isWeekend === 0 (sunday) or holiday (checkbox)
+            if (isWeekend === 0 || holiday) {
+                holidayHours = total
+                lateHours = 0
                 normal = 0
             }
 
             return {                
                 normal: normal,
-                special: special,
+                lateHours: lateHours,
+                holidayHours: holidayHours,
                 total: total
             }
         }
@@ -791,20 +838,24 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                         
 
             const normal = hours.days.map(day => day.totalHours && day.totalHours.normal)
-            const special = hours.days.map(day => day.totalHours && day.totalHours.special)
+            const lateHours = hours.days.map(day => day.totalHours && day.totalHours.lateHours)
+            const holidayHours = hours.days.map(day => day.totalHours && day.totalHours.holidayHours)
             const total = hours.days.map(day => day.totalHours && day.totalHours.total)
             const allNormal = normal.filter(value => value !== undefined ).map(x => x = Number(x)).reduce((a,b) => a+b)
-            const allSpecial = special.filter(value => value !== undefined ).map(x => x = Number(x)).reduce((a,b) => a+b)
+            const allLateHours = lateHours.filter(value => value !== undefined ).map(x => x = Number(x)).reduce((a,b) => a+b)
+            const allHolidayHours = holidayHours.filter(value => value !== undefined ).map(x => x = Number(x)).reduce((a,b) => a+b)
             const allTotal = total.filter(value => value !== undefined ).map(x => x = Number(x)).reduce((a,b) => a+b)
 
             let numallNormal = allNormal % 1 !== 0 ? parseFloat(allNormal).toFixed(2) : allNormal
-            let numallSpecial = allSpecial % 1 !== 0 ? parseFloat(allSpecial).toFixed(2) : allSpecial
+            let numallLateHours = allLateHours % 1 !== 0 ? parseFloat(allLateHours).toFixed(2) : allLateHours
+            let numallHolidayHours = allHolidayHours % 1 !== 0 ? parseFloat(allHolidayHours).toFixed(2) : allHolidayHours
             let numallTotal = allTotal % 1 !== 0 ? parseFloat(allTotal).toFixed(2) : allTotal
 
             hours.monthHours = {
                 totalHours: numallTotal,
                 normalRate: numallNormal,
-                specialRate: numallSpecial,
+                lateHoursRate: numallLateHours,
+                holidayHoursRate: numallHolidayHours,
             }
 
             hours.month = inputs.month
@@ -812,7 +863,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             console.log(hours)
             
             await hoursService
-            //   .create(hours)            
+              .create(hours)
             console.log('hours created')
             console.log('checked', checked)
               setErrorMessage('Time card created')
@@ -1255,13 +1306,13 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             let startB = startTimeB
             let endB = endTimeB
 
-            // let startA = startTimeA ? startTimeA : 0
-            // let endA = endTimeA ? endTimeA : 0
-            // let startB = startTimeB ? startTimeB : 0
-            // let endB = endTimeB ? endTimeB : 0
-
             let normal = 0
-            let special = 0
+            let lateHours = 0
+            let holidayHours = 0
+
+            // let normalRate = 0
+            // let lateHoursRate = 0
+            // let holidayRate = 0
 
             
 
@@ -1285,120 +1336,87 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             }
             
             let total = endA - startA + endB - startB
-            
-            if (endA > 18) {
-                special += endA - 18
-                normal += 18 - startA
-            }
-            
-            if (endB > 18) {
-                special += endB - 18
-                normal += 18 - startB
-            }
 
-            if (endA < 18) {
-                normal += endA - startA
-            }
+            // monday to friday
+            // ----------------
 
-            if (endB < 18) {
-                normal += endB - startB
+            // isWeekend !== 6 (saturday) || isWeekend !== 0 (sunday)
+            
+            if (isWeekend !== 6) {     
+                
+                if (startA >= 18) {
+                    lateHours = endA - startA + endB - startB
+                    normal = 0
+                } else if (endA >= 18) {
+                    lateHours = endA - 18 + endB - startB
+                    normal = 18 - startA
+                } else if (startB >= 18) {
+                    lateHours = endB - startB
+                    normal = endA - startA
+                } else if (endB >= 18) {
+                    lateHours = endB - 18
+                    normal = 18 - startB + endA - startA
+                } else {
+                    lateHours = 0
+                    normal = endA - startA + endB - startB
+                }
+
             }
+            // ----------------
+            // monday to friday
+
+
+
+            // saturday
+            // --------
+
+            // isWeekend === 6 (saturday)
+
+            if (isWeekend === 6) {
+
+                if (startA >= 14) {
+                    lateHours = endA - startA + endB - startB
+                    normal = 0
+                } else if (endA >= 14) {
+                    lateHours = endA - 14 + endB - startB
+                    normal = 14 - startA
+                } else if (startB >= 14) {
+                    lateHours = endB - startB
+                    normal = endA - startA
+                } else if (endB >= 14) {
+                    lateHours = endB - 14
+                    normal = 14 - startB + endA - startA
+                } else {
+                    lateHours = 0
+                    normal = endA - startA + endB - startB
+                }
+
+            }
+            // --------
+            // saturday
+            
+            
 
             normal = normal % 1 !== 0 ? normal.toFixed(2) : normal
-            special = special % 1 !== 0 ? special.toFixed(2) : special
+            lateHours = lateHours % 1 !== 0 ? lateHours.toFixed(2) : lateHours
             total = total % 1 !== 0 ? total.toFixed(2) : total
 
-            if (isWeekend === 0 || isWeekend === 6 || holiday) {
-                special = total
+            // isWeekend === 0 (sunday) or holiday (checkbox)
+            if (isWeekend === 0 || holiday) {
+                holidayHours = total
+                lateHours = 0
                 normal = 0
             }
 
             return {                
                 normal: normal,
-                special: special,
+                lateHours: lateHours,
+                holidayHours: holidayHours,
                 total: total
             }
         }
 
-        // works but need to be updated
-        // const calculate = (startTime, endTime) => {
-        //     let start = startTime
-        //     let end = endTime
-        //     let normal = 0
-        //     let special = 0
-
-        //     if (end < 4) {
-        //         end += 24
-        //     }
-
-        //     // check if it works
-        //     if(startTime === endTime) {
-        //         start = 0
-        //         end = 0
-        //     }
-            
-        //     let total = end - start
-            
-        //     if (end > 18) {
-        //         special = end - 18
-        //         normal = 18 - start
-        //     }else {
-        //         normal = total
-        //     }
-
-        //     normal = normal % 1 !== 0 ? normal.toFixed(2) : normal
-        //     special = special % 1 !== 0 ? special.toFixed(2) : special
-        //     total = total % 1 !== 0 ? total.toFixed(2) : total
-
-        //     return {                
-        //         normal: normal,
-        //         special: special,
-        //         total: total
-        //     }
-        // }
-
-        // set the inputs with the time card details from state hoursToUpdate
-        // doesn't work becouse every time set is called it rerender the component
-        // use state default in declaration intead
-        // setStart(values => ({...values,
-        //         startWorkA0: hoursToUpdate.days[0].startWorkA,
-        //         startWorkA1: hoursToUpdate.days[1].startWorkA,
-        //         startWorkA2: hoursToUpdate.days[2].startWorkA,
-        //         startWorkA3: hoursToUpdate.days[3].startWorkA,
-        //         startWorkA4: hoursToUpdate.days[4].startWorkA,
-        //         startWorkA5: hoursToUpdate.days[5].startWorkA,
-        //         startWorkA6: hoursToUpdate.days[6].startWorkA,
-        //         startWorkA7: hoursToUpdate.days[7].startWorkA,
-        //         startWorkA8: hoursToUpdate.days[8].startWorkA,
-        //         startWorkA9: hoursToUpdate.days[9].startWorkA,
-        //         startWorkA10: hoursToUpdate.days[10].startWorkA,
-        //         startWorkA11: hoursToUpdate.days[11].startWorkA,
-        //         startWorkA12: hoursToUpdate.days[12].startWorkA,
-        //         startWorkA13: hoursToUpdate.days[13].startWorkA,
-        //         startWorkA14: hoursToUpdate.days[14].startWorkA,
-        //         startWorkA15: hoursToUpdate.days[15].startWorkA,
-        //         startWorkA16: hoursToUpdate.days[16].startWorkA,
-        //         startWorkA17: hoursToUpdate.days[17].startWorkA,
-        //         startWorkA18: hoursToUpdate.days[18].startWorkA,
-        //         startWorkA19: hoursToUpdate.days[19].startWorkA,
-        //         startWorkA20: hoursToUpdate.days[20].startWorkA,
-        //         startWorkA21: hoursToUpdate.days[21].startWorkA,
-        //         startWorkA22: hoursToUpdate.days[22].startWorkA,
-        //         startWorkA23: hoursToUpdate.days[23].startWorkA,
-        //         startWorkA24: hoursToUpdate.days[24].startWorkA,
-        //         startWorkA25: hoursToUpdate.days[25].startWorkA,
-        //         startWorkA26: hoursToUpdate.days[26].startWorkA,
-        //         startWorkA27: hoursToUpdate.days[27].startWorkA,
-        //         startWorkA28: hoursToUpdate.days[28].startWorkA,
-        //         startWorkA29: hoursToUpdate.days[29].startWorkA,
-        //         startWorkA30: hoursToUpdate.days[30].startWorkA,
-        //     }))
-
-            
-
         const handleChange = (event) => {
-
-            console.log(hoursToUpdate.days)
 
             const name = event.target.name
             const value = event.target.value
@@ -1939,20 +1957,24 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
           
 
             const normal = hoursToUpdate.days.map(day => day.totalHours && day.totalHours.normal)
-            const special = hoursToUpdate.days.map(day => day.totalHours && day.totalHours.special)
+            const lateHours = hoursToUpdate.days.map(day => day.totalHours && day.totalHours.lateHours)
+            const holidayHours = hoursToUpdate.days.map(day => day.totalHours && day.totalHours.holidayHours)
             const total = hoursToUpdate.days.map(day => day.totalHours && day.totalHours.total)
             const allNormal = normal.filter(value => value !== undefined ).map(x => x = Number(x)).reduce((a,b) => a+b)
-            const allSpecial = special.filter(value => value !== undefined ).map(x => x = Number(x)).reduce((a,b) => a+b)
+            const allLateHours = lateHours.filter(value => value !== undefined ).map(x => x = Number(x)).reduce((a,b) => a+b)
+            const allHolidayHours = holidayHours.filter(value => value !== undefined ).map(x => x = Number(x)).reduce((a,b) => a+b)
             const allTotal = total.filter(value => value !== undefined ).map(x => x = Number(x)).reduce((a,b) => a+b)
 
             let numallNormal = allNormal % 1 !== 0 ? parseFloat(allNormal).toFixed(2) : allNormal
-            let numallSpecial = allSpecial % 1 !== 0 ? parseFloat(allSpecial).toFixed(2) : allSpecial
+            let numallLateHours = allLateHours % 1 !== 0 ? parseFloat(allLateHours).toFixed(2) : allLateHours
+            let numallHolidayHours = allHolidayHours % 1 !== 0 ? parseFloat(allHolidayHours).toFixed(2) : allHolidayHours
             let numallTotal = allTotal % 1 !== 0 ? parseFloat(allTotal).toFixed(2) : allTotal
 
             hoursToUpdate.monthHours = {
                 totalHours: numallTotal,
                 normalRate: numallNormal,
-                specialRate: numallSpecial,
+                lateHoursRate: numallLateHours,
+                holidayHoursRate: numallHolidayHours,
             }
 
             // console.log('normal', normal, 'allNormal', allNormal, 'numallNormal', numallNormal, 'hoursToUpdate.monthHours.normalRate', hoursToUpdate.monthHours.normalRate);

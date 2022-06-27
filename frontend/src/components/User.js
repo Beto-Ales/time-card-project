@@ -51,15 +51,15 @@ const ScreenTwo = ({ worker }) => {
     </div>
   )
 }
-const ScreenThree = ({ hours, worker }) => {  
+const ScreenThree = ({ hours, worker }) => {
   // done when creating timecard line 531
   // const normal = hours.days.map(day => day.totalHours && day.totalHours.normal)
-  // const special = hours.days.map(day => day.totalHours && day.totalHours.special)
+  // const lateHours = hours.days.map(day => day.totalHours && day.totalHours.lateHours)
   // const total = hours.days.map(day => day.totalHours && day.totalHours.total)
   // const allNormal = normal.filter(value => value !== undefined ).reduce((a,b) => a+b)
-  // const allSpecial = special.filter(value => value !== undefined ).reduce((a,b) => a+b)
+  // const alllateHours = lateHours.filter(value => value !== undefined ).reduce((a,b) => a+b)
   // const allTotal = total.filter(value => value !== undefined ).reduce((a,b) => a+b)
-  // // console.log('normal', normal, 'special', special, 'total', total)
+  // // console.log('normal', normal, 'lateHours', lateHours, 'total', total)
   // console.log('allNormal', allNormal)
   console.log(worker);
 
@@ -79,7 +79,8 @@ const ScreenThree = ({ hours, worker }) => {
           <span className='headerTitle endB'>FINISH</span>
           <span className='headerTitle hours-min-width'>TOTAL</span>
           <span className='headerTitle hours-min-width'>NORMAL</span>
-          <span className='headerTitle hours-min-width'>SPECIAL</span>
+          <span className='headerTitle hours-min-width'>LATE HOURS</span>
+          <span className='headerTitle hours-min-width'>HOLIDAY HOURS</span>
           {/* <p className='left'>TOTAL HOURS/TIMER</p> */}
       </div>
       
@@ -89,7 +90,7 @@ const ScreenThree = ({ hours, worker }) => {
           hours &&
           hours.days.map(day => 
             <li key={day.dayNumber}>
-              {/* <p>Day: {day.dayNumber} Job description: {day.jobDescription} Start: {day.startWorkA}, End: {day.endWorkA} Total Hours: {day.totalHours && day.totalHours.total} Normal rate: {day.totalHours && day.totalHours.normal} Special rate: {day.totalHours && day.totalHours.special}</p> */}
+              {/* <p>Day: {day.dayNumber} Job description: {day.jobDescription} Start: {day.startWorkA}, End: {day.endWorkA} Total Hours: {day.totalHours && day.totalHours.total} Normal rate: {day.totalHours && day.totalHours.normal} lateHours rate: {day.totalHours && day.totalHours.lateHours}</p> */}
               <div className='userTable'>
                 <span className='userSpan date-column'>{day.dayNumber}</span>
                 <span className='userSpan holiday-column'>{day.holiday ? '✔' : ''}</span>
@@ -100,15 +101,16 @@ const ScreenThree = ({ hours, worker }) => {
                 <span className='userSpan endB'>{day.endWorkB}</span>
                 <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.total}</span>
                 <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.normal}</span>
-                <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.special}</span>
+                <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.lateHours}</span>
+                <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.holidayHours}</span>
               </div>
               {/* <p>Total Hours: {hours.totalHours}</p> */}
             </li>
           )
         }
       </ul>      
-      {/* <h3>Month total Hours: <span className='totalHoursStyle'>{allTotal}</span>, Normal rate: <span className='totalHoursStyle'>{allNormal}</span>, Special rate: <span className='totalHoursStyle'>{allSpecial}</span></h3> */}
-      <h3>Month total Hours: <span className='totalHoursStyle'>{hours.monthHours.totalHours}</span>, Normal rate: <span className='totalHoursStyle'>{hours.monthHours.normalRate}</span>, Special rate: <span className='totalHoursStyle'>{hours.monthHours.specialRate}</span></h3>
+      {/* <h3>Month total Hours: <span className='totalHoursStyle'>{allTotal}</span>, Normal rate: <span className='totalHoursStyle'>{allNormal}</span>, lateHours rate: <span className='totalHoursStyle'>{alllateHours}</span></h3> */}
+      <h3>Month total Hours: <span className='totalHoursStyle'>{hours.monthHours.totalHours}</span>, Normal rate: <span className='totalHoursStyle'>{hours.monthHours.normalRate}</span>, Late hours rate: <span className='totalHoursStyle'>{hours.monthHours.lateHoursRate}</span>, Holiday hours rate: <span className='totalHoursStyle'>{hours.monthHours.holidayHoursRate}</span></h3>
     </div>
   )
 }
