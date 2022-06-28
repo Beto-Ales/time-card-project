@@ -1,8 +1,7 @@
 import React from 'react'
 import {useState} from 'react'
 
-const User = ({ user, employees }) => {
-  console.log('render component')
+const User = ({ user, employees }) => {  
   const [screen, setScreen] = useState('1')
   const [worker, setWorker] = useState(null)
   const [hours, setHours] = useState(null)
@@ -34,15 +33,14 @@ const User = ({ user, employees }) => {
 }
 
 const ScreenTwo = ({ worker }) => {
-  console.log('worker', worker)
   return (
     <div>
       <h1>{worker.username[0].toUpperCase() + worker.username.slice(1).toLowerCase()}</h1>
       <button className='screenBtn' onClick={() => toScreen('1')} >Back</button>
       <ul>
         {worker &&
-        worker.hours.map(hours => 
-          <li key={hours.id}>
+        worker.hours.map((hours, index) => 
+          <li key={index}>
             <button onClick={() => handleGetHours(hours)}>Period: {hours.month}</button>
             <br/>
           </li>
@@ -61,7 +59,7 @@ const ScreenThree = ({ hours, worker }) => {
   // const allTotal = total.filter(value => value !== undefined ).reduce((a,b) => a+b)
   // // console.log('normal', normal, 'lateHours', lateHours, 'total', total)
   // console.log('allNormal', allNormal)
-  console.log(worker);
+  
 
   return (
     <div>
@@ -80,7 +78,7 @@ const ScreenThree = ({ hours, worker }) => {
           <span className='headerTitle hours-min-width'>TOTAL</span>
           <span className='headerTitle hours-min-width'>NORMAL</span>
           <span className='headerTitle hours-min-width'>LATE HOURS</span>
-          <span className='headerTitle hours-min-width'>HOLIDAY HOURS</span>
+          <span className='headerTitle hours-min-width'>HOLYDAY HOURS</span>
           {/* <p className='left'>TOTAL HOURS/TIMER</p> */}
       </div>
       
@@ -88,8 +86,8 @@ const ScreenThree = ({ hours, worker }) => {
       <ul className='freeWidth'>
         {
           hours &&
-          hours.days.map(day => 
-            <li key={day.dayNumber}>
+          hours.days.map((day, index) => 
+            <li key={index}>
               {/* <p>Day: {day.dayNumber} Job description: {day.jobDescription} Start: {day.startWorkA}, End: {day.endWorkA} Total Hours: {day.totalHours && day.totalHours.total} Normal rate: {day.totalHours && day.totalHours.normal} lateHours rate: {day.totalHours && day.totalHours.lateHours}</p> */}
               <div className='userTable'>
                 <span className='userSpan date-column'>{day.dayNumber}</span>
@@ -110,7 +108,7 @@ const ScreenThree = ({ hours, worker }) => {
         }
       </ul>      
       {/* <h3>Month total Hours: <span className='totalHoursStyle'>{allTotal}</span>, Normal rate: <span className='totalHoursStyle'>{allNormal}</span>, lateHours rate: <span className='totalHoursStyle'>{alllateHours}</span></h3> */}
-      <h3>Month total Hours: <span className='totalHoursStyle'>{hours.monthHours.totalHours}</span>, Normal rate: <span className='totalHoursStyle'>{hours.monthHours.normalRate}</span>, Late hours rate: <span className='totalHoursStyle'>{hours.monthHours.lateHoursRate}</span>, Holiday hours rate: <span className='totalHoursStyle'>{hours.monthHours.holidayHoursRate}</span></h3>
+      <h3>Month total Hours: <span className='totalHoursStyle'>{hours.monthHours.totalHours}</span>, Normal rate: <span className='totalHoursStyle'>{hours.monthHours.normalRate}</span>, Late hours rate: <span className='totalHoursStyle'>{hours.monthHours.lateHoursRate}</span>, Holyday hours rate: <span className='totalHoursStyle'>{hours.monthHours.holidayHoursRate}</span></h3>
     </div>
   )
 }
@@ -118,7 +116,6 @@ const ScreenThree = ({ hours, worker }) => {
 const handleGetEmployee = (employee) => {
   setWorker(employee)
   toScreen('2')
-  console.log('see that user', employee)
 }
 const handleGetHours = (hours) => {
   setHours(hours)

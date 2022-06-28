@@ -74,7 +74,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
       
       <div className='userTable userTableHeader'>
           <span className='headerTitle date-column'>DATE</span>
-          <span className='headerTitle holiday-column'>HOLIDAY</span>
+          <span className='headerTitle holiday-column'>HOLYDAY</span>
           <span className='headerTitle jobdescription'>JOB DESCRIPTION</span>
           <span className='headerTitle startA'>START</span>
           <span className='headerTitle endA'>FINISH</span>
@@ -83,7 +83,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
           <span className='headerTitle hours-min-width'>TOTAL</span>
           <span className='headerTitle hours-min-width'>NORMAL</span>
           <span className='headerTitle hours-min-width'>LATE HOURS</span>
-          <span className='headerTitle hours-min-width'>HOLIDAY HOURS</span>
+          <span className='headerTitle hours-min-width'>HOLYDAY HOURS</span>
           {/* <p className='left'>TOTAL HOURS/TIMER</p> */}
       </div>
       
@@ -91,8 +91,8 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
       <ul className='freeWidth'>
         {
           hours &&
-          hours.days.map(day => 
-            <li key={day.dayNumber}>
+          hours.days.map((day, index) =>
+            <li key={index}>
               {/* <p>Day: {day.dayNumber} Job description: {day.jobDescription} Start: {day.startWorkA}, End: {day.endWorkA} Total Hours: {day.totalHours && day.totalHours.total} Normal rate: {day.totalHours && day.totalHours.normal} lateHours rate: {day.totalHours && day.totalHours.lateHours}</p> */}
               <div className='userTable'>
                 <span className='userSpan date-column'>{day.dayNumber}</span>
@@ -107,13 +107,13 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                 <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.lateHours}</span>
                 <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.holidayHours}</span>
               </div>
-              {/* <p>Total Hours: {hours.totalHours}</p> */}
+              
             </li>
           )
         }
       </ul>      
-      {/* <h3>Month total Hours: <span className='totalHoursStyle'>{allTotal}</span>, Normal rate: <span className='totalHoursStyle'>{allNormal}</span>, lateHours rate: <span className='totalHoursStyle'>{alllateHours}</span></h3> */}
-      <h3>Month total Hours: <span className='totalHoursStyle'>{hours.monthHours.totalHours}</span>, Normal rate: <span className='totalHoursStyle'>{hours.monthHours.normalRate}</span>, Late hours rate: <span className='totalHoursStyle'>{hours.monthHours.lateHoursRate}</span>, Holiday hours rate: <span className='totalHoursStyle'>{hours.monthHours.holidayHoursRate}</span></h3>
+      
+      <h3>Month total Hours: <span className='totalHoursStyle'>{hours.monthHours.totalHours}</span>, Normal rate: <span className='totalHoursStyle'>{hours.monthHours.normalRate}</span>, Late hours rate: <span className='totalHoursStyle'>{hours.monthHours.lateHoursRate}</span>, Holyday hours rate: <span className='totalHoursStyle'>{hours.monthHours.holidayHoursRate}</span></h3>
     </div>
   )
 
@@ -316,8 +316,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
         const addTimeCard = async (event) => {
             event.preventDefault()
             const {month} = inputs
-            if (!month) {
-                // return console.log('Month is a required field')
+            if (!month) {                
                 setErrorMessage('Month is a required field')
                 setTimeout(() => {
                 setErrorMessage(null)
@@ -859,13 +858,9 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             }
 
             hours.month = inputs.month
-
-            console.log(hours)
             
             await hoursService
-              .create(hours)
-            console.log('hours created')
-            console.log('checked', checked)
+              .create(hours)                        
               setErrorMessage('Time card created')
               setTimeout(() => {
                 setErrorMessage(null)
@@ -878,22 +873,6 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                 <br/>
                 <button className='screenBtn' onClick={() => toScreen('1')} >Back</button>
                 <br/>
-
-                {/* https://www.w3schools.com/react/react_forms.asp */}
-
-                {/* When the data is handled by the components, all the data is stored in the component state. */}
-
-                {/* You can control changes by adding event handlers in the onChange attribute. */}
-
-                {/* You can control the submit action by adding an event handler in the onSubmit attribute for the <form>: */}
-
-                {/* You can control the values of more than one input field by adding a name attribute to each element.
-
-                We will initialize our state with an empty object.
-
-                To access the fields in the event handler use the event.target.name and event.target.value syntax.
-
-                To update the state, use square brackets [bracket notation] around the property name. */}
                 
                 <form onSubmit={addTimeCard}>
                     <p>MONTH</p>
@@ -902,6 +881,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                         name="month"
                         value={inputs.month || ''}
                         onChange={handleChange}
+                        // placeholder="Month"
                     />
 
                     <div className='timecard'>
@@ -914,20 +894,21 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                                 <p className={index === 0 ? 'topDay day' : 'day'}>{eachDay.dayNumber}</p>
 
                                                 <div>
-                                                    {index === 0 && <p>Date</p>}
+                                                    {index === 0 && <p className='mobileHide'>Date</p>}
 
                                                     <input
                                                         id={index}
                                                         type="date"
                                                         label='Date'
                                                         name={`day${index}`}
-                                                        value={day[`day${index}`] || ''}  // value doesn't work
+                                                        value={day[`day${index}`] || ''}
                                                         onChange={handleChange}
+                                                        // placeholder="Date"
                                                     />                                                    
                                                 </div>
 
                                                 <div>
-                                                    {index === 0 && <p>Holiday</p>}
+                                                    {index === 0 && <p className='mobileHide'>Holyday</p>}
 
                                                     <input className='holiday'
                                                         id={index}
@@ -939,7 +920,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                                 </div>
 
                                                 <div>
-                                                    {index === 0 && <p>Job Description</p>}
+                                                    {index === 0 && <p className='mobileHide'>Job Description</p>}
 
                                                     <input 
                                                         id={index}
@@ -947,11 +928,12 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                                         name={`jobDescription${index}`}
                                                         value={description[`jobDescription${index}`] || ''}
                                                         onChange={handleChange}
+                                                        // placeholder="Job description"
                                                     />
                                                 </div>
                                                 
                                                 <div>
-                                                    {index === 0 && <p className='startA'>Start</p>}
+                                                    {index === 0 && <p className='startA mobileHide'>Start</p>}
 
                                                     <input className='startA'
                                                         id={index}
@@ -963,7 +945,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                                 </div>
                                                 
                                                 <div>
-                                                    {index === 0 && <p className='endA'>End</p>}
+                                                    {index === 0 && <p className='endA mobileHide'>End</p>}
 
                                                     <input className='endA'
                                                         id={index}
@@ -975,7 +957,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                                 </div>
 
                                                 <div>
-                                                    {index === 0 && <p className='startB'>Start</p>}
+                                                    {index === 0 && <p className='startB mobileHide'>Start</p>}
 
                                                     <input  className='startB'
                                                         id={index}
@@ -987,7 +969,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                                 </div>
 
                                                 <div>
-                                                    {index === 0 && <p className='endB'>End</p>}
+                                                    {index === 0 && <p className='endB mobileHide'>End</p>}
 
                                                     <input  className='endB'
                                                         id={index}
@@ -1976,22 +1958,14 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                 lateHoursRate: numallLateHours,
                 holidayHoursRate: numallHolidayHours,
             }
-
-            // console.log('normal', normal, 'allNormal', allNormal, 'numallNormal', numallNormal, 'hoursToUpdate.monthHours.normalRate', hoursToUpdate.monthHours.normalRate);
-            
-
             
 
             hoursToUpdate.month = inputs.month
-
-            console.log('checked', checked)
-
-            console.log(hoursToUpdate)
+            
             
             await hoursService
               .update(hours.id, hoursToUpdate)
-            // console.log(inputs)
-              setErrorMessage('Time card created')
+              setErrorMessage('Time card updated')
               setTimeout(() => {
                 setErrorMessage(null)
               }, 5000)
@@ -1999,2092 +1973,142 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
         return (
             <div>
-                <h1>TIMESEDDEL / TIME CARD</h1>
+                <h1>TIME CARD</h1>
                 <br/>
                 <button className='screenBtn' onClick={() => toScreen('1')} >Back</button>
                 <br/>
-
-                {/* https://www.w3schools.com/react/react_forms.asp */}
-
-                {/* When the data is handled by the components, all the data is stored in the component state. */}
-
-                {/* You can control changes by adding event handlers in the onChange attribute. */}
-
-                {/* You can control the submit action by adding an event handler in the onSubmit attribute for the <form>: */}
-
-                {/* You can control the values of more than one input field by adding a name attribute to each element.
-
-                We will initialize our state with an empty object.
-
-                To access the fields in the event handler use the event.target.name and event.target.value syntax.
-
-                To update the state, use square brackets [bracket notation] around the property name. */}
                 
                 <form onSubmit={addTimeCard}>
-                <p>MONTH</p>
-                <input
-                    type="text"
-                    name="month"
-                    value={inputs.month || ''}
-                    onChange={handleChange}
-                />
+
+                    <p>MONTH</p>
+
+                    <input
+                        type="text"
+                        name="month"
+                        value={inputs.month || ''}
+                        onChange={handleChange}
+                    />
+
                     <div className='timecard'>
-                        
-                            {/* <div className='timeCardHeader'>
-                                <p className='left'>DATE</p>
-                                <p className='left'>JOB DESCRIPTION</p>
-                                <p className='left'>START</p>
-                                <p className='left'>FINISH</p> */}
-                                {/* <p className='left'>TOTAL HOURS/TIMER</p> */}
-                            {/* </div> */}
 
-                            <div className='eachDay topeachday'>
-                                <p className='topDay date'>{hours.days[0].dayNumber || '----------------------'}</p>
+                        {hours.days.map((eachDay, index) => {
 
-                                <div>
-                                    <p>Date</p>
-                                    <input
-                                        id='0'
-                                        type="date"
-                                        label='Date'
-                                        name="day0"
-                                        value={day.day0 || ''}
-                                        onChange={handleChange}
+                            return(
+
+                                <div className={index === 0 ? 'eachDay topeachday' : 'eachDay'} key={index}>
+
+                                    <p className={index === 0 ? 'topDay date' : 'date'}>{eachDay.dayNumber || '----------------------'}</p>
+                                    
+                                    <div>
+
+                                        {index === 0 && <p className='mobileHide'>Date</p>}
+
+                                        <input
+                                                    id={index}
+                                                    type="date"
+                                                    label='Date'
+                                                    name={`day${index}`}
+                                                    value={day[`day${index}`] || ''}
+                                                    onChange={handleChange}
+                                                    // placeholder="Date"
+                                        />
+
+                                    </div>
+
+                                    <div>
+
+                                        {index === 0 && <p className='mobileHide'>Holyday</p>}
+
+                                        <input className='holiday'
+                                            id={index}
+                                            type="checkbox"
+                                            name={`holiday${index}`}
+                                            checked={checked[`holiday${index}`] || ''}
+                                            onChange={handleChange}
+                                        />
+
+                                    </div>
+
+                                    <div>
+
+                                        {index === 0 && <p className='mobileHide'>Job Description</p>}
+
+                                        <input 
+                                            id={index}
+                                            type="text"
+                                            name={`jobDescription${index}`}
+                                            value={description[`jobDescription${index}`] || ''}
+                                            onChange={handleChange}
+                                            // placeholder="Job description"
+                                        />
+
+                                    </div>
+
+                                    <div>
+
+                                        {index === 0 && <p className='startA mobileHide'>Start</p>}
+
+                                        <input className='startA'
+                                            id={index}
+                                            type="time"
+                                            name={`startWorkA${index}`}
+                                            value={start[`startWorkA${index}`] || '00:00'}
+                                            onChange={handleChange}
+                                        />
+
+                                    </div>
+
+                                    <div>
+
+                                        {index === 0 && <p className='endA mobileHide'>End</p>}
+
+                                        <input className='endA'
+                                            id={index}
+                                            type="time"
+                                            name={`endWorkA${index}`}
+                                            value={end[`endWorkA${index}`] || '00:00'}
+                                            onChange={handleChange}
+                                        />
+
+                                    </div>
+
+                                    <div>
+
+                                        {index === 0 && <p className='startB mobileHide'>Start</p>}
+
+                                        <input  className='startB'
+                                            id={index}
+                                            type="time"
+                                            name={`startWorkB${index}`}
+                                            value={start[`startWorkB${index}`] || '00:00'}
+                                            onChange={handleChange}
+                                        />
+
+                                    </div>
+
+                                    <div>
+
+                                        {index === 0 && <p className='endB mobileHide'>End</p>}
+
+                                        <input  className='endB'
+                                            id={index}
+                                            type="time"
+                                            name={`endWorkB${index}`}
+                                            value={end[`endWorkB${index}`] || '00:00'}
+                                            onChange={handleChange}
                                     />
+
+                                    </div>
+
                                 </div>
 
-                                <div>
-                                    <p>Holiday</p>
-                                    <input className='holiday'
-                                        id='0'
-                                        type="checkbox"
-                                        name="holiday0"
-                                        checked={checked.holiday0}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-                                
-                                <div>
-                                    <p>Job Description</p>
-                                    <input 
-                                        id='0'
-                                        type="text"
-                                        name="jobDescription0"
-                                        value={description.jobDescription0 || ''}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                {/* <div style={{backgroundColor: '#4caf50'}}> */}
-                                <div>
-                                    <p className='startA'>Start</p>
-                                    <input className='startA'
-                                        id='0'
-                                        type="time"
-                                        name="startWorkA0"
-                                        value={start.startWorkA0 || '00:00'}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                {/* <div style={{backgroundColor: '#4caf50'}}> */}
-                                <div>
-                                    <p className='endA'>End</p>
-                                    <input className='endA'
-                                        id='0'
-                                        type="time"
-                                        name="endWorkA0"
-                                        value={end.endWorkA0 || '00:00'}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <div>
-                                    <p className='startB'>Start</p>
-                                    <input  className='startB'
-                                        id='0'
-                                        type="time"
-                                        name="startWorkB0"
-                                        value={start.startWorkB0 || '00:00'}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <div>
-                                    <p className='endB'>End</p>
-                                    <input  className='endB'
-                                        id='0'
-                                        type="time"
-                                        name="endWorkB0"
-                                        value={end.endWorkB0 || '00:00'}
-                                        onChange={handleChange}
-                                />
-                                </div>
-
-                                {/* <p>{ start.startWorkA0 !== end.endWorkA0 &&
-                                    JSON.stringify(calculate(timeToDecimal(start.startWorkA0), timeToDecimal(end.endWorkA0))) }</p> */}
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[1].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='1'
-                                    type="date"
-                                    name="day1"
-                                    value={day.day1 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='1'
-                                        type="checkbox"
-                                        name="holiday1"
-                                        checked={checked.holiday1 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='1'
-                                    type="text"
-                                    name="jobDescription1"
-                                    value={description.jobDescription1 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='1'
-                                    type="time"
-                                    name="startWorkA1"
-                                    value={start.startWorkA1 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='1'
-                                    type="time"
-                                    name="endWorkA1"
-                                    value={end.endWorkA1 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='1'
-                                    type="time"
-                                    name="startWorkB1"
-                                    value={start.startWorkB1 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='1'
-                                    type="time"
-                                    name="endWorkB1"
-                                    value={end.endWorkB1 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[2].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='2'
-                                    type="date"
-                                    name="day2"
-                                    value={day.day2 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='2'
-                                        type="checkbox"
-                                        name="holiday2"
-                                        checked={checked.holiday2 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='2'
-                                    type="text"
-                                    name="jobDescription2"
-                                    value={description.jobDescription2 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='2'
-                                    type="time"
-                                    name="startWorkA2"
-                                    value={start.startWorkA2 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='2'
-                                    type="time"
-                                    name="endWorkA2"
-                                    value={end.endWorkA2 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='2'
-                                    type="time"
-                                    name="startWorkB2"
-                                    value={start.startWorkB2 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='2'
-                                    type="time"
-                                    name="endWorkB2"
-                                    value={end.endWorkB2 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[3].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='3'
-                                    type="date"
-                                    name="day3"
-                                    value={day.day3 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='3'
-                                        type="checkbox"
-                                        name="holiday3"
-                                        checked={checked.holiday3 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='3'
-                                    type="text"
-                                    name="jobDescription3"
-                                    value={description.jobDescription3 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='3'
-                                    type="time"
-                                    name="startWorkA3"
-                                    value={start.startWorkA3 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='3'
-                                    type="time"
-                                    name="endWorkA3"
-                                    value={end.endWorkA3 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='3'
-                                    type="time"
-                                    name="startWorkB3"
-                                    value={start.startWorkB3 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='3'
-                                    type="time"
-                                    name="endWorkB3"
-                                    value={end.endWorkB3 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[4].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='4'
-                                    type="date"
-                                    name="day4"
-                                    value={day.day4 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='4'
-                                        type="checkbox"
-                                        name="holiday4"
-                                        checked={checked.holiday4 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='4'
-                                    type="text"
-                                    name="jobDescription4"
-                                    value={description.jobDescription4 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='4'
-                                    type="time"
-                                    name="startWorkA4"
-                                    value={start.startWorkA4 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='4'
-                                    type="time"
-                                    name="endWorkA4"
-                                    value={end.endWorkA4 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='4'
-                                    type="time"
-                                    name="startWorkB4"
-                                    value={start.startWorkB4 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='4'
-                                    type="time"
-                                    name="endWorkB4"
-                                    value={end.endWorkB4 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[5].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='5'
-                                    type="date"
-                                    name="day5"
-                                    value={day.day5 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='5'
-                                        type="checkbox"
-                                        name="holiday5"
-                                        checked={checked.holiday5 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='5'
-                                    type="text"
-                                    name="jobDescription5"
-                                    value={description.jobDescription5 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='5'
-                                    type="time"
-                                    name="startWorkA5"
-                                    value={start.startWorkA5 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='5'
-                                    type="time"
-                                    name="endWorkA5"
-                                    value={end.endWorkA5 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='5'
-                                    type="time"
-                                    name="startWorkB5"
-                                    value={start.startWorkB5 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='5'
-                                    type="time"
-                                    name="endWorkB5"
-                                    value={end.endWorkB5 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[6].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='6'
-                                    type="date"
-                                    name="day6"
-                                    value={day.day6 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='6'
-                                        type="checkbox"
-                                        name="holiday6"
-                                        checked={checked.holiday6 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='6'
-                                    type="text"
-                                    name="jobDescription6"
-                                    value={description.jobDescription6 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='6'
-                                    type="time"
-                                    name="startWorkA6"
-                                    value={start.startWorkA6 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='6'
-                                    type="time"
-                                    name="endWorkA6"
-                                    value={end.endWorkA6 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='6'
-                                    type="time"
-                                    name="startWorkB6"
-                                    value={start.startWorkB6 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='6'
-                                    type="time"
-                                    name="endWorkB6"
-                                    value={end.endWorkB6 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[7].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='7'
-                                    type="date"
-                                    name="day7"
-                                    value={day.day7 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='7'
-                                        type="checkbox"
-                                        name="holiday7"
-                                        checked={checked.holiday7 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='7'
-                                    type="text"
-                                    name="jobDescription7"
-                                    value={description.jobDescription7 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='7'
-                                    type="time"
-                                    name="startWorkA7"
-                                    value={start.startWorkA7 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='7'
-                                    type="time"
-                                    name="endWorkA7"
-                                    value={end.endWorkA7 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='7'
-                                    type="time"
-                                    name="startWorkB7"
-                                    value={start.startWorkB7 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='7'
-                                    type="time"
-                                    name="endWorkB7"
-                                    value={end.endWorkB7 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[8].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='8'
-                                    type="date"
-                                    name="day8"
-                                    value={day.day8 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='8'
-                                        type="checkbox"
-                                        name="holiday8"
-                                        checked={checked.holiday8 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='8'
-                                    type="text"
-                                    name="jobDescription8"
-                                    value={description.jobDescription8 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='8'
-                                    type="time"
-                                    name="startWorkA8"
-                                    value={start.startWorkA8 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='8'
-                                    type="time"
-                                    name="endWorkA8"
-                                    value={end.endWorkA8 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='8'
-                                    type="time"
-                                    name="startWorkB8"
-                                    value={start.startWorkB8 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='8'
-                                    type="time"
-                                    name="endWorkB8"
-                                    value={end.endWorkB8 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[9].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='9'
-                                    type="date"
-                                    name="day9"
-                                    value={day.day9 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='9'
-                                        type="checkbox"
-                                        name="holiday9"
-                                        checked={checked.holiday9 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='9'
-                                    type="text"
-                                    name="jobDescription9"
-                                    value={description.jobDescription9 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='9'
-                                    type="time"
-                                    name="startWorkA9"
-                                    value={start.startWorkA9 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='9'
-                                    type="time"
-                                    name="endWorkA9"
-                                    value={end.endWorkA9 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='9'
-                                    type="time"
-                                    name="startWorkB9"
-                                    value={start.startWorkB9 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='9'
-                                    type="time"
-                                    name="endWorkB9"
-                                    value={end.endWorkB9 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[10].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='10'
-                                    type="date"
-                                    name="day10"
-                                    value={day.day10 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='10'
-                                        type="checkbox"
-                                        name="holiday10"
-                                        checked={checked.holiday10 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='10'
-                                    type="text"
-                                    name="jobDescription10"
-                                    value={description.jobDescription10 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='10'
-                                    type="time"
-                                    name="startWorkA10"
-                                    value={start.startWorkA10 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='10'
-                                    type="time"
-                                    name="endWorkA10"
-                                    value={end.endWorkA10 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='10'
-                                    type="time"
-                                    name="startWorkB10"
-                                    value={start.startWorkB10 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='10'
-                                    type="time"
-                                    name="endWorkB10"
-                                    value={end.endWorkB10 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[11].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='11'
-                                    type="date"
-                                    name="day11"
-                                    value={day.day11 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='11'
-                                        type="checkbox"
-                                        name="holiday11"
-                                        checked={checked.holiday11 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='11'
-                                    type="text"
-                                    name="jobDescription11"
-                                    value={description.jobDescription11 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='11'
-                                    type="time"
-                                    name="startWorkA11"
-                                    value={start.startWorkA11 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='11'
-                                    type="time"
-                                    name="endWorkA11"
-                                    value={end.endWorkA11 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='11'
-                                    type="time"
-                                    name="startWorkB11"
-                                    value={start.startWorkB11 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='11'
-                                    type="time"
-                                    name="endWorkB11"
-                                    value={end.endWorkB11 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[12].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='12'
-                                    type="date"
-                                    name="day12"
-                                    value={day.day12 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='12'
-                                        type="checkbox"
-                                        name="holiday12"
-                                        checked={checked.holiday12 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='12'
-                                    type="text"
-                                    name="jobDescription12"
-                                    value={description.jobDescription12 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='12'
-                                    type="time"
-                                    name="startWorkA12"
-                                    value={start.startWorkA12 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='12'
-                                    type="time"
-                                    name="endWorkA12"
-                                    value={end.endWorkA12 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='12'
-                                    type="time"
-                                    name="startWorkB12"
-                                    value={start.startWorkB12 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='12'
-                                    type="time"
-                                    name="endWorkB12"
-                                    value={end.endWorkB12 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[13].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='13'
-                                    type="date"
-                                    name="day13"
-                                    value={day.day13 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='13'
-                                        type="checkbox"
-                                        name="holiday13"
-                                        checked={checked.holiday13 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='13'
-                                    type="text"
-                                    name="jobDescription13"
-                                    value={description.jobDescription13 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='13'
-                                    type="time"
-                                    name="startWorkA13"
-                                    value={start.startWorkA13 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='13'
-                                    type="time"
-                                    name="endWorkA13"
-                                    value={end.endWorkA13 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='13'
-                                    type="time"
-                                    name="startWorkB13"
-                                    value={start.startWorkB13 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='13'
-                                    type="time"
-                                    name="endWorkB13"
-                                    value={end.endWorkB13 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[14].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='14'
-                                    type="date"
-                                    name="day14"
-                                    value={day.day14 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='14'
-                                        type="checkbox"
-                                        name="holiday14"
-                                        checked={checked.holiday14 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='14'
-                                    type="text"
-                                    name="jobDescription14"
-                                    value={description.jobDescription14 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='14'
-                                    type="time"
-                                    name="startWorkA14"
-                                    value={start.startWorkA14 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='14'
-                                    type="time"
-                                    name="endWorkA14"
-                                    value={end.endWorkA14 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='14'
-                                    type="time"
-                                    name="startWorkB14"
-                                    value={start.startWorkB14 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='14'
-                                    type="time"
-                                    name="endWorkB14"
-                                    value={end.endWorkB14 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[15].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='15'
-                                    type="date"
-                                    name="day15"
-                                    value={day.day15 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='15'
-                                        type="checkbox"
-                                        name="holiday15"
-                                        checked={checked.holiday15 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='15'
-                                    type="text"
-                                    name="jobDescription15"
-                                    value={description.jobDescription15 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='15'
-                                    type="time"
-                                    name="startWorkA15"
-                                    value={start.startWorkA15 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='15'
-                                    type="time"
-                                    name="endWorkA15"
-                                    value={end.endWorkA15 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='15'
-                                    type="time"
-                                    name="startWorkB15"
-                                    value={start.startWorkB15 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='15'
-                                    type="time"
-                                    name="endWorkB15"
-                                    value={end.endWorkB15 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[16].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='16'
-                                    type="date"
-                                    name="day16"
-                                    value={day.day16 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='16'
-                                        type="checkbox"
-                                        name="holiday16"
-                                        checked={checked.holiday16 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='16'
-                                    type="text"
-                                    name="jobDescription16"
-                                    value={description.jobDescription16 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='16'
-                                    type="time"
-                                    name="startWorkA16"
-                                    value={start.startWorkA16 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='16'
-                                    type="time"
-                                    name="endWorkA16"
-                                    value={end.endWorkA16 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='16'
-                                    type="time"
-                                    name="startWorkB16"
-                                    value={start.startWorkB16 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='16'
-                                    type="time"
-                                    name="endWorkB16"
-                                    value={end.endWorkB16 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[17].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='17'
-                                    type="date"
-                                    name="day17"
-                                    value={day.day17 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='17'
-                                        type="checkbox"
-                                        name="holiday17"
-                                        checked={checked.holiday17 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='17'
-                                    type="text"
-                                    name="jobDescription17"
-                                    value={description.jobDescription17 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='17'
-                                    type="time"
-                                    name="startWorkA17"
-                                    value={start.startWorkA17 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='17'
-                                    type="time"
-                                    name="endWorkA17"
-                                    value={end.endWorkA17 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='17'
-                                    type="time"
-                                    name="startWorkB17"
-                                    value={start.startWorkB17 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='17'
-                                    type="time"
-                                    name="endWorkB17"
-                                    value={end.endWorkB17 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[18].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='18'
-                                    type="date"
-                                    name="day18"
-                                    value={day.day18 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='18'
-                                        type="checkbox"
-                                        name="holiday18"
-                                        checked={checked.holiday18 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='18'
-                                    type="text"
-                                    name="jobDescription18"
-                                    value={description.jobDescription18 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='18'
-                                    type="time"
-                                    name="startWorkA18"
-                                    value={start.startWorkA18 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='18'
-                                    type="time"
-                                    name="endWorkA18"
-                                    value={end.endWorkA18 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='18'
-                                    type="time"
-                                    name="startWorkB18"
-                                    value={start.startWorkB18 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='18'
-                                    type="time"
-                                    name="endWorkB18"
-                                    value={end.endWorkB18 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[19].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='19'
-                                    type="date"
-                                    name="day19"
-                                    value={day.day19 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='19'
-                                        type="checkbox"
-                                        name="holiday19"
-                                        checked={checked.holiday19 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='19'
-                                    type="text"
-                                    name="jobDescription19"
-                                    value={description.jobDescription19 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='19'
-                                    type="time"
-                                    name="startWorkA19"
-                                    value={start.startWorkA19 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='19'
-                                    type="time"
-                                    name="endWorkA19"
-                                    value={end.endWorkA19 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='19'
-                                    type="time"
-                                    name="startWorkB19"
-                                    value={start.startWorkB19 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='19'
-                                    type="time"
-                                    name="endWorkB19"
-                                    value={end.endWorkB19 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[20].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='20'
-                                    type="date"
-                                    name="day20"
-                                    value={day.day20 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='20'
-                                        type="checkbox"
-                                        name="holiday20"
-                                        checked={checked.holiday20 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='20'
-                                    type="text"
-                                    name="jobDescription20"
-                                    value={description.jobDescription20 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='20'
-                                    type="time"
-                                    name="startWorkA20"
-                                    value={start.startWorkA20 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='20'
-                                    type="time"
-                                    name="endWorkA20"
-                                    value={end.endWorkA20 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='20'
-                                    type="time"
-                                    name="startWorkB20"
-                                    value={start.startWorkB20 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='20'
-                                    type="time"
-                                    name="endWorkB20"
-                                    value={end.endWorkB20 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[21].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='21'
-                                    type="date"
-                                    name="day21"
-                                    value={day.day21 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='21'
-                                        type="checkbox"
-                                        name="holiday21"
-                                        checked={checked.holiday21 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='21'
-                                    type="text"
-                                    name="jobDescription21"
-                                    value={description.jobDescription21 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='21'
-                                    type="time"
-                                    name="startWorkA21"
-                                    value={start.startWorkA21 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='21'
-                                    type="time"
-                                    name="endWorkA21"
-                                    value={end.endWorkA21 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='21'
-                                    type="time"
-                                    name="startWorkB21"
-                                    value={start.startWorkB21 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='21'
-                                    type="time"
-                                    name="endWorkB21"
-                                    value={end.endWorkB21 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[22].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='22'
-                                    type="date"
-                                    name="day22"
-                                    value={day.day22 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='22'
-                                        type="checkbox"
-                                        name="holiday22"
-                                        checked={checked.holiday22 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='22'
-                                    type="text"
-                                    name="jobDescription22"
-                                    value={description.jobDescription22 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='22'
-                                    type="time"
-                                    name="startWorkA22"
-                                    value={start.startWorkA22 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='22'
-                                    type="time"
-                                    name="endWorkA22"
-                                    value={end.endWorkA22 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='22'
-                                    type="time"
-                                    name="startWorkB22"
-                                    value={start.startWorkB22 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='22'
-                                    type="time"
-                                    name="endWorkB22"
-                                    value={end.endWorkB22 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[23].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='23'
-                                    type="date"
-                                    name="day23"
-                                    value={day.day23 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='23'
-                                        type="checkbox"
-                                        name="holiday23"
-                                        checked={checked.holiday23 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='23'
-                                    type="text"
-                                    name="jobDescription23"
-                                    value={description.jobDescription23 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='23'
-                                    type="time"
-                                    name="startWorkA23"
-                                    value={start.startWorkA23 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='23'
-                                    type="time"
-                                    name="endWorkA23"
-                                    value={end.endWorkA23 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='23'
-                                    type="time"
-                                    name="startWorkB23"
-                                    value={start.startWorkB23 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='23'
-                                    type="time"
-                                    name="endWorkB23"
-                                    value={end.endWorkB23 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[24].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='24'
-                                    type="date"
-                                    name="day24"
-                                    value={day.day24 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='24'
-                                        type="checkbox"
-                                        name="holiday24"
-                                        checked={checked.holiday24 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='24'
-                                    type="text"
-                                    name="jobDescription24"
-                                    value={description.jobDescription24 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='24'
-                                    type="time"
-                                    name="startWorkA24"
-                                    value={start.startWorkA24 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='24'
-                                    type="time"
-                                    name="endWorkA24"
-                                    value={end.endWorkA24 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='24'
-                                    type="time"
-                                    name="startWorkB24"
-                                    value={start.startWorkB24 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='24'
-                                    type="time"
-                                    name="endWorkB24"
-                                    value={end.endWorkB24 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[25].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='25'
-                                    type="date"
-                                    name="day25"
-                                    value={day.day25 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='25'
-                                        type="checkbox"
-                                        name="holiday25"
-                                        checked={checked.holiday25 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='25'
-                                    type="text"
-                                    name="jobDescription25"
-                                    value={description.jobDescription25 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='25'
-                                    type="time"
-                                    name="startWorkA25"
-                                    value={start.startWorkA25 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='25'
-                                    type="time"
-                                    name="endWorkA25"
-                                    value={end.endWorkA25 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='25'
-                                    type="time"
-                                    name="startWorkB25"
-                                    value={start.startWorkB25 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='25'
-                                    type="time"
-                                    name="endWorkB25"
-                                    value={end.endWorkB25 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[26].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='26'
-                                    type="date"
-                                    name="day26"
-                                    value={day.day26 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='26'
-                                        type="checkbox"
-                                        name="holiday26"
-                                        checked={checked.holiday26 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='26'
-                                    type="text"
-                                    name="jobDescription26"
-                                    value={description.jobDescription26 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='26'
-                                    type="time"
-                                    name="startWorkA26"
-                                    value={start.startWorkA26 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='26'
-                                    type="time"
-                                    name="endWorkA26"
-                                    value={end.endWorkA26 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='26'
-                                    type="time"
-                                    name="startWorkB26"
-                                    value={start.startWorkB26 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='26'
-                                    type="time"
-                                    name="endWorkB26"
-                                    value={end.endWorkB26 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[27].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='27'
-                                    type="date"
-                                    name="day27"
-                                    value={day.day27 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='27'
-                                        type="checkbox"
-                                        name="holiday27"
-                                        checked={checked.holiday27 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='27'
-                                    type="text"
-                                    name="jobDescription27"
-                                    value={description.jobDescription27 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='27'
-                                    type="time"
-                                    name="startWorkA27"
-                                    value={start.startWorkA27 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='27'
-                                    type="time"
-                                    name="endWorkA27"
-                                    value={end.endWorkA27 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='27'
-                                    type="time"
-                                    name="startWorkB27"
-                                    value={start.startWorkB27 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='27'
-                                    type="time"
-                                    name="endWorkB27"
-                                    value={end.endWorkB27 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[28].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='28'
-                                    type="date"
-                                    name="day28"
-                                    value={day.day28 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='28'
-                                        type="checkbox"
-                                        name="holiday28"
-                                        checked={checked.holiday28 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='28'
-                                    type="text"
-                                    name="jobDescription28"
-                                    value={description.jobDescription28 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='28'
-                                    type="time"
-                                    name="startWorkA28"
-                                    value={start.startWorkA28 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='28'
-                                    type="time"
-                                    name="endWorkA28"
-                                    value={end.endWorkA28 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='28'
-                                    type="time"
-                                    name="startWorkB28"
-                                    value={start.startWorkB28 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='28'
-                                    type="time"
-                                    name="endWorkB28"
-                                    value={end.endWorkB28 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[29].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='29'
-                                    type="date"
-                                    name="day29"
-                                    value={day.day29 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='29'
-                                        type="checkbox"
-                                        name="holiday29"
-                                        checked={checked.holiday29 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='29'
-                                    type="text"
-                                    name="jobDescription29"
-                                    value={description.jobDescription29 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='29'
-                                    type="time"
-                                    name="startWorkA29"
-                                    value={start.startWorkA29 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='29'
-                                    type="time"
-                                    name="endWorkA29"
-                                    value={end.endWorkA29 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='29'
-                                    type="time"
-                                    name="startWorkB29"
-                                    value={start.startWorkB29 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='29'
-                                    type="time"
-                                    name="endWorkB29"
-                                    value={end.endWorkB29 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
-                            <div className='eachDay'>
-                                <p className='date'>{hours.days[30].dayNumber || '----------------------'}</p>
-
-                                <input 
-                                    id='30'
-                                    type="date"
-                                    name="day30"
-                                    value={day.day30 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <div>                                    
-                                    <input className='holiday'
-                                        id='30'
-                                        type="checkbox"
-                                        name="holiday30"
-                                        checked={checked.holiday30 || false}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <input 
-                                    id='30'
-                                    type="text"
-                                    name="jobDescription30"
-                                    value={description.jobDescription30 || ''}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startA'
-                                    id='30'
-                                    type="time"
-                                    name="startWorkA30"
-                                    value={start.startWorkA30 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endA'
-                                    id='30'
-                                    type="time"
-                                    name="endWorkA30"
-                                    value={end.endWorkA30 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='startB'
-                                    id='30'
-                                    type="time"
-                                    name="startWorkB30"
-                                    value={start.startWorkB30 || '00:00'}
-                                    onChange={handleChange}
-                                />
-
-                                <input className='endB'
-                                    id='30'
-                                    type="time"
-                                    name="endWorkB30"
-                                    value={end.endWorkB30 || '00:00'}
-                                    onChange={handleChange}
-                                />
-                            </div>
-
+                            )
                             
-
-                            {/* {inputs.days.map( */}
-                            {/* {days.map(
-                                day =>
-                                <div key={day.dayNumber} className='eachDay'>
-                                    <p className='dateright'>{ day.dayNumber}</p>
-                            
-                                    <input className='jobright'
-                                        id={day.dayNumber}
-                                        type="text"
-                                        name="jobDescription"
-                                        value={inputs.jobDescription || ''}
-                                        onChange={handleChange}
-                                    />
-                                    <input className='startright'
-                                        id={day.dayNumber}
-                                        type="time"
-                                        name="startWorkA"
-                                        value={inputs.startWorkA || ''}
-                                        onChange={handleChange}
-                                    />
-                                    <input className='finishright'
-                                        id={day.dayNumber}
-                                        type="time"
-                                        name="endWorkA"
-                                        value={inputs.endWorkA || ''}
-                                        onChange={handleChange}
-                                    />                            
-
-                                    <p className='totalright'>{ inputs.startTime !== inputs.finishTime &&
-                                    JSON.stringify(calculate(timeToDecimal(inputs.startTime), timeToDecimal(inputs.finishTime))) }</p>
-                            
-                                </div>
-                            ) } */}
-                        
-                        {/* this form format works
-                        // ----------------------- */}
-                            {/* <p className='dateright'>21</p>
-                            
-                            <input className='jobright'
-                                type="text"
-                                name="jobDescription"
-                                value={inputs.jobDescription || ''}
-                                onChange={handleChange}
-                            />
-                            <input className='startright'
-                                type="time"
-                                name="startTime"
-                                value={inputs.startTime || ''}
-                                onChange={handleChange}
-                            />
-                            <input className='finishright'
-                                type="time"
-                                name="finishTime"
-                                value={inputs.finishTime || ''}
-                                onChange={handleChange}
-                            />
-                            
-                            
-                            <p className='totalright'>{ inputs.startTime !== inputs.finishTime &&
-                            JSON.stringify(calculate(timeToDecimal(inputs.startTime), timeToDecimal(inputs.finishTime))) }</p> */}
-                        
+                        })}
                     </div>
-                    {/* <div className='timecard'>
-                        
-                            
-                            <p className='left22'>DATO / DATE</p>
-                            <p className='left22'>JOB DESCRIPTION</p>
-                            <p className='left22'>START: TIME</p>
-                            <p className='left22'>FINISH: TIME</p>
-                            <p className='left22'>TOTAL HOURS/TIMER</p>
-                        
-                        
-                            <p className='dateright'>22</p>
-                            
-                            <input className='jobright'
-                                type="text"
-                                name="jobDescription22"
-                                value={inputs.jobDescription22 || ''}
-                                onChange={handleChange}
-                            />
-                            <input className='startright'
-                                type="time"
-                                name="startTime22"
-                                value={inputs.startTime22 || ''}
-                                onChange={handleChange}
-                            />
-                            <input className='finishright'
-                                type="time"
-                                name="finishTime22"
-                                value={inputs.finishTime22 || ''}
-                                onChange={handleChange}
-                            />
-                                                        
-                            <p className='totalright'>{ inputs.startTime22 !== inputs.finishTime22 &&
-                            JSON.stringify(calculate(timeToDecimal(inputs.startTime22), timeToDecimal(inputs.finishTime22))) }</p>
-                        
-                    </div> */}
+
                     <button className='uploadBtn screenBtn' type="submit">Upload</button>
+
                 </form>
             </div>
         )

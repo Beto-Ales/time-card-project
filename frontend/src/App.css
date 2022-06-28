@@ -209,6 +209,31 @@ p{
   margin-top: 2em;
 }
 
+/* seguir desde aca */
+/* @media only screen and (max-width: 600px) {
+  
+  .eachDay{
+    flex-direction: column;
+    padding: 3em 0;
+    width: 96vw;
+  }
+
+    .topDay{
+      bottom: 0em;
+    }
+
+  .eachDay:nth-child(odd){
+    background-color: #c5e6f6;
+  }
+
+  .mobileHide{
+    display: none;
+  }
+
+} */
+
+
+
 /* @media only screen and (max-width: 600px) {
   .timecard{
     display: grid;
