@@ -67,7 +67,7 @@ const App = () => {
           setErrorMessage(null)
         }, 5000)
     } catch (exception) {
-        setErrorMessage(exception.messagge)
+        setErrorMessage(exception.response.data.error)        
         setTimeout(() => {
           setErrorMessage(null)
         }, 5000)
@@ -91,31 +91,6 @@ const App = () => {
     }
   }, [user])
 
-  // get specific user works but not needed. solved with login populate hours
-  // ------------------------------------------------------------------------
-  // useEffect(() => {
-  //   if (user) {
-  //     console.log('user', user);
-  //     try {
-  //       usersService.getOneUser(user.id)
-  //         .then(employee => setSingleEmployee(employee))
-  //     } catch (error) {
-  //       setErrorMessage(error)
-  //       setTimeout(() => {
-  //         setErrorMessage(null)
-  //       }, 5000)
-  //     }      
-  //   }
-  // },[user])
-
-  // const addTimeCard = async (event) => {
-  //   event.preventDefault()
-  //   await hoursService
-  //     .create(newTimeCard)
-  //     setNewTimeCard({})
-  //     setErrorMessage('Time card created')
-  // }
-
   const display = () => {
     if (user === null) {
       return <LoginForm
@@ -136,9 +111,6 @@ const App = () => {
       user={ user }
       setUser={setUser}
       setErrorMessage={setErrorMessage}
-      // addTimeCard={ addTimeCard }
-      // newTimeCard={ newTimeCard }
-      // setNewTimeCard={ setNewTimeCard }
       />
     }
   }
@@ -165,29 +137,7 @@ const App = () => {
       </header>
 
       {display()}
-      {/* {<SignIn
-        handleSignin={handleSignin}
-        username={username}
-        setUsername={setUsername}
-        password={password}
-        setPassword={setPassword}
-      />} */}
-
-      {/* <TimeCard/> */}
-
-      {/* {user === null ?
-        <LoginForm
-          handleLogin={handleLogin}
-          username={username}
-          setUsername={setUsername}
-          password={password}
-          setPassword={setPassword}
-        /> :
-        <User
-          user={user}          
-          employees={employees}
-        />        
-      } */}
+      
     </div>
   )
 }

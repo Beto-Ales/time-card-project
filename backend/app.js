@@ -3,6 +3,7 @@ const express = require('express')
 require('express-async-errors')
 const app = express()
 const cors = require('cors')
+const middleware = require('./utils/middleware')
 
 
 // replace routers
@@ -15,7 +16,6 @@ const createUsersRouter = require('./controllers/createUser')
 const hoursRouter = require('./controllers/hours')
 
 
-const middleware = require('./utils/middleware')
 const logger = require('./utils/logger')
 const mongoose = require('mongoose')
 

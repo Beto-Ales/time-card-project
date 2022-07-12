@@ -41,7 +41,10 @@ const ScreenTwo = ({ worker }) => {
         {worker &&
         worker.hours.map((hours, index) => 
           <li key={index}>
-            <button onClick={() => handleGetHours(hours)}>Period: {hours.month}</button>
+            <button onClick={() => handleGetHours(hours)}>
+              <p><b>Period: </b>{hours.month}</p>
+              <p><b>Last update: </b>{hours.date}</p>
+            </button>
             <br/>
           </li>
           )}

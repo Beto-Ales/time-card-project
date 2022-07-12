@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import hoursService from '../services/hours'
 import usersService from '../services/users'
+import Dropdown from '../components/Dropdown'
 
 
 // component containing inner components for each screen: employee list of time cards, specific time card,
@@ -24,6 +25,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
         }
       }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [screen])
 
     const loading = () => {
@@ -46,7 +48,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             <li key={hours.id}>
                                 <button onClick={() => handleGetHours(hours)}>
                                     <p><b>Period: </b>{hours.month}</p>
-                                    <p><b>Last update: </b>{hours.date}</p>                                    
+                                    <p><b>Last update: </b>{hours.date}</p>
                                 </button>
                             </li>
                         )
@@ -150,8 +152,164 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
         const [start, setStart] = useState({})
         const [end, setEnd] = useState({})
         const [description, setDescription] = useState({})
-        const [day, setDay] = useState({})
+        // const [day, setDay] = useState({})  remove?
         const [checked, setChecked] = useState({})
+
+        useEffect(() => {
+            
+            if (inputs.month) {
+                hours.days.map((singleDay, index) => {
+                    return inputs[`day${index}`] = ''
+                })
+
+                console.log('month' ,inputs.month)
+                const date = new Date().toString().split(' ')
+                
+                console.log('date', date)
+                
+                let monthA = ''
+                let monthB = ''
+
+                switch (inputs.month) {
+                    case 'January/February':
+                        monthA = '01'
+                        monthB = '02'
+                        break;
+                    
+                    case 'February/March':
+                        monthA = '02'
+                        monthB = '03'
+                        break;
+
+                    case 'March/April':
+                        monthA = '03'
+                        monthB = '04'
+                        break;
+                    
+                    case 'April/May':
+                        monthA = '04'
+                        monthB = '05'
+                        break;
+
+                    case 'May/June':
+                        monthA = '05'
+                        monthB = '06'
+                        break;
+                    
+                    case 'June/July':
+                        monthA = '06'
+                        monthB = '07'
+                        break;
+
+                    case 'July/August':
+                        monthA = '07'
+                        monthB = '08'
+                        break;
+                    
+                    case 'August/September':
+                        monthA = '08'
+                        monthB = '09'
+                        break;
+
+                    case 'September/October':
+                        monthA = '09'
+                        monthB = '10'
+                        break;
+                    
+                    case 'October/November':
+                        monthA = '10'
+                        monthB = '11'
+                        break;
+
+                    case 'November/December':
+                        monthA = '11'
+                        monthB = '12'
+                        break;
+                    
+                    case 'December/January':
+                        monthA = '12'
+                        monthB = '01'
+                        break;
+                
+                    default:
+                        break;
+                }
+
+                const year = date[3]
+                // date.[3] (year)
+                // 2022-07-15
+
+                let yearB = new Date(year).toString().split(' ')[3]
+                ++ yearB
+                console.log('yearB', yearB)
+                
+                // february has 29 days                
+                const leapYears = ['2024', '2028', '2032', '2036', '2040']
+
+                const isLeapYear = (leapYears.indexOf(date[3]) !== -1)
+
+                // 31 days
+                const longMonth = [
+                    'January/February',
+                    'March/April',
+                    'May/June',
+                    'July/August',
+                    'August/September',
+                    'October/November',
+                    'December/January',
+                ]
+
+                const isLongMonth = (longMonth.indexOf(inputs.month) !== -1)
+
+                const isFebruary = inputs.month === 'February/March'
+
+                const newYear = inputs.month === 'December/January'
+                
+                
+                for (let index = 0; index < 31; index++) {
+                    if (index === 8 && isFebruary === true && isLeapYear === false) continue
+                    if (index === 9 && isFebruary === true) continue
+                    if (index === 10 && isLongMonth === false) continue
+
+                    if (index < 11) {
+                        setInputs(values => ({...values,
+                            [`day${index}`]: `${year}-${monthA}-${index + 21}`,
+                        }))
+                    }
+
+                    if (newYear) {
+
+                        if (index > 10 && index < 20) {
+                        setInputs(values => ({...values,
+                            [`day${index}`]: `${yearB}-${monthB}-0${index - 10}`,
+                        }))
+                        }
+                        if (index > 19) {
+                            setInputs(values => ({...values,
+                                [`day${index}`]: `${yearB}-${monthB}-${index - 10}`,
+                            }))
+                        }
+                        continue
+
+                    }
+
+                    if (index > 10 && index < 20) {
+                        setInputs(values => ({...values,
+                            [`day${index}`]: `${year}-${monthB}-0${index - 10}`,
+                        }))
+                    }
+
+                    if (index > 19) {
+                        setInputs(values => ({...values,
+                            [`day${index}`]: `${year}-${monthB}-${index - 10}`,
+                        }))
+                    }
+                }
+                
+            }
+            // eslint-disable-next-line react-hooks/exhaustive-deps
+        }, [inputs.month])
+
         
         const timeToDecimal = (t) => {
             var arr = t.split(':')
@@ -275,6 +433,11 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
             const name = event.target.name
             const value = event.target.value
+
+            // hours.days.map((singleDay, index) => {
+            //     return inputs[`day${index}`] = ''
+            // })
+
             setInputs(values => ({...values,
                 [name]: value,
             }))
@@ -291,12 +454,14 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                 [name]: value,
             }))
 
-            setDay(values => ({...values,
-                [name]: value,
-            }))
+            // setDay(values => ({...values,        remove?
+            //     [name]: value,
+            // }))
 
             setChecked(values => ({...values,
                 [name]: event.target.checked,}))
+                
+            console.log(inputs)
         }
 
         const addTimeCard = async (event) => {
@@ -358,7 +523,8 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             hours.month = inputs.month
             
             await hoursService
-              .create(hours)
+            //   .create(hours)
+            console.log('hours', hours)
               setErrorMessage('Time card created')
               setTimeout(() => {
                 setErrorMessage(null)
@@ -373,14 +539,21 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                 <br/>
                 
                 <form onSubmit={addTimeCard}>
-                    <p>MONTH</p>
+
+                    <Dropdown
+                        handleChange={handleChange}                        
+                    />
+
+                    {console.log('month', inputs.month)}
+
+                    {/* <p>MONTH</p>
                     <input
                         type="text"
                         name="month"
                         value={inputs.month || ''}
                         onChange={handleChange}
                         // placeholder="Month"
-                    />
+                    /> */}
 
                     <div className='timecard'>
 
@@ -389,94 +562,119 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                     return(
                                 
                                             <div className={index === 0 ? 'eachDay topeachday' : 'eachDay'} key={index}>
-                                                <p className={index === 0 ? 'topDay day' : 'day'}>{eachDay.dayNumber}</p>
+                                                {/* <p className={index === 0 ? 'topDay day' : 'day'}>{eachDay.dayNumber}</p> */}
 
-                                                <div>
-                                                    {index === 0 && <p className='mobileHide'>Date</p>}
+                                                {
+                                                    inputs[`day${index}`] &&
+                                                    <div>
+                                                        {index === 0 && <p className='mobileHide'>Date</p>}
 
-                                                    <input
-                                                        id={index}
-                                                        type="date"
-                                                        label='Date'
-                                                        name={`day${index}`}
-                                                        value={day[`day${index}`] || ''}
-                                                        onChange={handleChange}
-                                                        // placeholder="Date"
-                                                    />                                                    
-                                                </div>
+                                                        <p className='inputsDay'>{inputs[`day${index}`] || ''}</p>
 
-                                                <div>
-                                                    {index === 0 && <p className='mobileHide'>Holyday</p>}
+                                                        {/* <input
+                                                            id={index}
+                                                            type="date"
+                                                            label='Date'
+                                                            name={`day${index}`}
+                                                            value={inputs[`day${index}`] || ''}
+                                                            onChange={handleChange}
+                                                            // placeholder="Date"
+                                                        />                                                     */}
+                                                    </div>
+                                                }
 
-                                                    <input className='holiday'
-                                                        id={index}
-                                                        type="checkbox"
-                                                        name={`holiday${index}`}
-                                                        value={inputs[`holiday${index}`] || ''}
-                                                        onChange={handleChange}
-                                                    />
-                                                </div>
+                                                {
+                                                    inputs[`day${index}`] &&
+                                                    <div>
+                                                        {index === 0 && <p className='mobileHide'>Holyday</p>}
 
-                                                <div>
-                                                    {index === 0 && <p className='mobileHide'>Job Description</p>}
+                                                        <input className='holiday'
+                                                            id={index}
+                                                            type="checkbox"
+                                                            name={`holiday${index}`}
+                                                            value={inputs[`holiday${index}`] || ''}
+                                                            onChange={handleChange}
+                                                        />
+                                                    </div>
+                                                }
 
-                                                    <input 
-                                                        id={index}
-                                                        type="text"
-                                                        name={`jobDescription${index}`}
-                                                        value={description[`jobDescription${index}`] || ''}
-                                                        onChange={handleChange}
-                                                        // placeholder="Job description"
-                                                    />
-                                                </div>
+                                                {
+                                                    inputs[`day${index}`] &&
+                                                    <div>
+                                                        {index === 0 && <p className='mobileHide'>Job Description</p>}
+
+                                                        <input 
+                                                            id={index}
+                                                            type="text"
+                                                            name={`jobDescription${index}`}
+                                                            value={description[`jobDescription${index}`] || ''}
+                                                            onChange={handleChange}
+                                                            // placeholder="Job description"
+                                                        />
+                                                    </div>
+                                                }
+
+                                                {
+                                                    inputs[`day${index}`] &&
+                                                    <div>
+                                                        {index === 0 && <p className='startA mobileHide'>Start</p>}
+
+                                                        <input className='startA'
+                                                            id={index}
+                                                            type="time"
+                                                            name={`startWorkA${index}`}
+                                                            value={start[`startWorkA${index}`] || '00:00'}
+                                                            onChange={handleChange}
+                                                        />
+                                                    </div>
+                                                }
+
+                                                {
+                                                    inputs[`day${index}`] &&
+                                                    <div>
+                                                        {index === 0 && <p className='endA mobileHide'>End</p>}
+
+                                                        <input className='endA'
+                                                            id={index}
+                                                            type="time"
+                                                            name={`endWorkA${index}`}
+                                                            value={end[`endWorkA${index}`] || '00:00'}
+                                                            onChange={handleChange}
+                                                        />
+                                                    </div>
+                                                }
+
+                                                {
+                                                    inputs[`day${index}`] &&
+                                                    <div>
+                                                        {index === 0 && <p className='startB mobileHide'>Start</p>}
+
+                                                        <input  className='startB'
+                                                            id={index}
+                                                            type="time"
+                                                            name={`startWorkB${index}`}
+                                                            value={start[`startWorkB${index}`] || '00:00'}
+                                                            onChange={handleChange}
+                                                        />
+                                                    </div>
+                                                }
+
+                                                {
+                                                    inputs[`day${index}`] &&
+                                                    <div>
+                                                        {index === 0 && <p className='endB mobileHide'>End</p>}
+
+                                                        <input  className='endB'
+                                                            id={index}
+                                                            type="time"
+                                                            name={`endWorkB${index}`}
+                                                            value={end[`endWorkB${index}`] || '00:00'}
+                                                            onChange={handleChange}
+                                                        />
+                                                    </div>
+                                                }
+
                                                 
-                                                <div>
-                                                    {index === 0 && <p className='startA mobileHide'>Start</p>}
-
-                                                    <input className='startA'
-                                                        id={index}
-                                                        type="time"
-                                                        name={`startWorkA${index}`}
-                                                        value={start[`startWorkA${index}`] || '00:00'}
-                                                        onChange={handleChange}
-                                                    />
-                                                </div>
-                                                
-                                                <div>
-                                                    {index === 0 && <p className='endA mobileHide'>End</p>}
-
-                                                    <input className='endA'
-                                                        id={index}
-                                                        type="time"
-                                                        name={`endWorkA${index}`}
-                                                        value={end[`endWorkA${index}`] || '00:00'}
-                                                        onChange={handleChange}
-                                                    />
-                                                </div>
-
-                                                <div>
-                                                    {index === 0 && <p className='startB mobileHide'>Start</p>}
-
-                                                    <input  className='startB'
-                                                        id={index}
-                                                        type="time"
-                                                        name={`startWorkB${index}`}
-                                                        value={start[`startWorkB${index}`] || '00:00'}
-                                                        onChange={handleChange}
-                                                    />
-                                                </div>
-
-                                                <div>
-                                                    {index === 0 && <p className='endB mobileHide'>End</p>}
-
-                                                    <input  className='endB'
-                                                        id={index}
-                                                        type="time"
-                                                        name={`endWorkB${index}`}
-                                                        value={end[`endWorkB${index}`] || '00:00'}
-                                                        onChange={handleChange}
-                                                />
-                                                </div>
                                             </div>   )} 
                             )}
                     </div>                    
@@ -722,14 +920,19 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                 
                 <form onSubmit={addTimeCard}>
 
-                    <p>MONTH</p>
+                    <Dropdown
+                        handleChange={handleChange}
+                        month={inputs.month}
+                    />
+
+                    {/* <p>MONTH</p>
 
                     <input
                         type="text"
                         name="month"
                         value={inputs.month || ''}
                         onChange={handleChange}
-                    />
+                    /> */}
 
                     <div className='timecard'>
 
@@ -885,9 +1088,6 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             />
           }
     }
-    
-
-
     
     return (
         <div>

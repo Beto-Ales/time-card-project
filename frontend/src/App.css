@@ -113,14 +113,24 @@
   padding: 0 1em;
 }
 
-/* first input with descriptions */
-.topeachday{
-  margin-bottom: 1em;
+.topeachday div{
+  min-height: 6em;
 }
+
+/* first input with descriptions */
+/* remove? */
+/* .topeachday{
+  margin-bottom: 1em;
+} */
 
 .topDay{
   position: relative;
   bottom: -1.75em;
+}
+
+.inputsDay{
+  min-width: 5.2em;
+  min-height: 1em;
 }
 
 /* checkbox holiday */
