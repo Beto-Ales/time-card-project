@@ -4,7 +4,7 @@ const SignIn = ({handleSignin, username, setUsername, password, setPassword} ) =
     const inputStyle = {marginLeft: '1em', marginBottom: '1em'}
 
     return (
-      <><h2>Signin</h2>
+      <><h2>Sign up</h2>
       <form onSubmit={handleSignin}>
             <div>
                 Username

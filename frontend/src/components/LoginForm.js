@@ -15,9 +15,9 @@ const LoginForm = ({handleLogin, username, setUsername, password, setPassword, h
   }
   return (
     <>
-      <button className='screenBtn' style={butStyl} onClick={toggleLogSign}>{logSign ? 'Login' : 'Signin'}</button>   {/* buttons are confusing */}
+      <button className='screenBtn' style={butStyl} onClick={toggleLogSign}>{logSign ? 'Log in' : 'Sign up'}</button>   {/* buttons are confusing */}
       <div style={log}>
-      <h2>Login</h2>
+      <h2>Log in</h2>
         <form onSubmit={handleLogin}>
               <div>
                   Username
