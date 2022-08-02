@@ -56,6 +56,13 @@ const App = () => {
   
   const handleSignin = async (event) => {
     event.preventDefault()
+    if (!username) {                
+                setErrorMessage('Username is a required field')
+                setTimeout(() => {
+                setErrorMessage(null)
+                }, 5000)
+                return
+            }
     try {
       const newUser = await signinService.signin({
         username, password,
