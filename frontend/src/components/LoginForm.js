@@ -8,33 +8,34 @@ const LoginForm = ({handleLogin, username, setUsername, password, setPassword, h
   const log = {display: logSign ? 'none' : ''}
   const sign = {display: logSign ? '' : 'none'}
   const butStyl = {backgroundColor: 'red'}
+  const inputStyle = {marginLeft: '1em', marginBottom: '1em'}
 
   const toggleLogSign = () => {
     setlogSign(!logSign)
   }
   return (
     <>
-      <button style={butStyl} onClick={toggleLogSign}>{logSign ? 'Login' : 'Signin'}</button>   {/* buttons are confusing */}
+      <button className='screenBtn' style={butStyl} onClick={toggleLogSign}>{logSign ? 'Log in' : 'Sign up'}</button>   {/* buttons are confusing */}
       <div style={log}>
-      <h2>Login</h2>
+      <h2>Log in</h2>
         <form onSubmit={handleLogin}>
               <div>
-                  username
-                  <input
+                  Username
+                  <input style={inputStyle}
                       type="text"
                       value={username}
                       name="Username"
                       onChange={({ target }) => setUsername(target.value)} />
               </div>
               <div>
-                  password
-                  <input
+                  Password
+                  <input style={inputStyle}
                       type="password"
                       value={password}
                       name="Password"
                       onChange={({ target }) => setPassword(target.value)} />
               </div>
-              <button type="submit">login</button>    {/* buttons are confusing */}
+              <button className='screenBtn' type="submit">Login</button>    {/* buttons are confusing */}
         </form>
       </div>
       <div style={sign}>

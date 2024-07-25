@@ -37,7 +37,7 @@ hoursRouter.get('/:id', async (request, response) => {
 
 hoursRouter.post('/', async (request, response) => {
     
-    const { month, days, dayNumber, startWork, endWork, totalHours, monthHours } = request.body
+    const { month, days, jobDescription, dayNumber, holiday, startWorkA, endWorkA, startWorkB, endWorkB, totalHours, monthHours } = request.body
     
     const user = await User.findById(request.user.id)
 
@@ -48,9 +48,13 @@ hoursRouter.post('/', async (request, response) => {
     const hours = new Hours({
         month,
         days,
+        jobDescription,
         dayNumber,
-        startWork,
-        endWork,
+        holiday,
+        startWorkA,
+        endWorkA,
+        startWorkB,
+        endWorkB,
         totalHours,
         monthHours,
         date: new Date(),
@@ -65,7 +69,7 @@ hoursRouter.post('/', async (request, response) => {
 
 hoursRouter.put('/:id', async (request, response) => {
     const hours = await Hours.findById(request.params.id)
-    const { month, days, dayNumber, startWork, endWork, totalHours, monthHours } = request.body
+    const { month, days, jobDescription, dayNumber, holiday, startWorkA, endWorkA, startWorkB, endWorkB, totalHours, monthHours } = request.body
 
     const user = await User.findById(request.user.id)
 
@@ -76,9 +80,13 @@ hoursRouter.put('/:id', async (request, response) => {
     const hoursUpdate = {
         month,
         days,
+        jobDescription,
         dayNumber,
-        startWork,
-        endWork,
+        holiday,
+        startWorkA,
+        endWorkA,
+        startWorkB,
+        endWorkB,
         totalHours,
         monthHours        
     }

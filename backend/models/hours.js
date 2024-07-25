@@ -26,20 +26,30 @@ const hourSchema = new mongoose.Schema({
     days: [{
         dayNumber: {
             type: String,
-            required: true
+            // required: true
         },
-        startWork: {
+        holiday: Boolean,
+        jobDescription: String,
+        startWorkA: {
             type: String,
-            required: true
+            // required: true
         },
-        endWork: {
+        endWorkA: {
             type: String,
-            required: true
+            // required: true
         },
-        totalHours: String
+        startWorkB: {
+            type: String,
+            // required: true
+        },
+        endWorkB: {
+            type: String,
+            // required: true
+        },
+        totalHours: {}
     }],
 
-    monthHours: String,
+    monthHours: {},
 
     date: Date,
     
