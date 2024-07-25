@@ -2,10 +2,7 @@ const mongoose = require('mongoose')
 
 const userSchema = new mongoose.Schema({
     username: String,
-    // remove?
-    // -------
-    // name: String,
-    // lastName: String,
+    isActive: { type: Boolean, default: true },
     passwordHash: String,
     date: Date,
     hours: [{

@@ -34,6 +34,10 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
         }
     }
 
+    const handleDate = (date) => {
+      return date.split("T")[0]
+    }
+
     const ScreenOne = ({ user }) => {        
         return (
             <div>                
@@ -48,7 +52,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                             <li key={hours.id}>
                                 <button onClick={() => handleGetHours(hours)}>
                                     <p><b>Period: </b>{hours.month}</p>
-                                    <p><b>Last update: </b>{hours.date}</p>
+                                    <p><b>Last update: </b>{handleDate(hours.date)}</p>
                                 </button>
                             </li>
                         )
@@ -156,7 +160,13 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                     return setInputs(values => ({...values,[`day${index}`]: ''}))
                 })
                 
+
+                
+                // const date = ["Thu", "Dec", "19", "2022"]
+
                 const date = new Date().toString().split(' ')
+                // console.log(date)
+                // console.log('date[1]', date[1], 'is january', date[1] === 'Jan')
                 
                 let monthA = ''
                 let monthB = ''
@@ -226,7 +236,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                         break;
                 }
 
-                const year = date[3]
+                let year = date[3]
                 // date.[3] (year)
                 // 2022-07-15
 
@@ -255,6 +265,12 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                 const isFebruary = inputs.month === 'February/March'
 
                 const newYear = inputs.month === 'December/January'
+
+                // if timecard is created in january for the period of dec/jan
+                if (newYear & date[1] === 'Jan') {
+                    --year
+                    --yearB
+                }
                 
                 
                 for (let index = 0; index < 31; index++) {
@@ -268,6 +284,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                         }))
                     }
 
+                    // if (newYear & date[1] === 'Dec') {
                     if (newYear) {
 
                         if (index > 10 && index < 20) {

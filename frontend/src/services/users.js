@@ -31,25 +31,32 @@ const getOne = async (id) => {
   return response.data
 }
 
-// no needed for now. solution given with login populate hours
-// -----------------------------------------------------------
-// const getOneUser = async (id) => {
-//   const config = {
-//     headers: { Authorization: token }
-//   }
-//   console.log(id)
-  
-//   const response = await axios.get(`${baseUrl}/${id}`, config)
-//   response.data.hours.reverse()
-//   return response.data
-// }
-
 const create = async newObject => {
   const config = {
     headers: { Authorization: token}
   }
 
   const response = await axios.post(baseUrl, newObject, config)
+  return response.data
+}
+
+const activateUser = async (id) => {
+  const isActive = true
+  const config = {
+    headers: { Authorization: token }
+  }
+
+  const response = await axios.put(`${baseUrl}/updateIsActive/${id}`, { isActive }, config)
+  return response.data
+}
+
+const deactivateUser = async (id) => {
+  const isActive = false
+  const config = {
+    headers: { Authorization: token }
+  }
+
+  const response = await axios.put(`${baseUrl}/updateIsActive/${id}`, { isActive }, config)
   return response.data
 }
 
@@ -60,4 +67,14 @@ const create = async newObject => {
 
 // export default { getAll, create, update, setToken }
 // export default { getAll, getOneUser, create, setToken }
-export default { getAll, create, getOne, setToken }
+
+const userService = {
+  getAll,
+  create,
+  getOne,
+  activateUser,
+  deactivateUser,
+  setToken
+}
+
+export default userService

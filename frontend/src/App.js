@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback  } from 'react'
 import loginService from './services/login'
 import usersService from './services/users'
 import signinService from './services/signin'
@@ -81,22 +81,28 @@ const App = () => {
       }
   }
 
-  useEffect(() => {
-    if(user) {
-      if (user.username === 'jan') {
-        try {
-          // console.log('first try');
-          usersService.getAll()        
-          .then(users => setEmployees(users))
-        } catch (error) {
-            setErrorMessage('failed getting employees')
-            setTimeout(() => {
-              setErrorMessage(null)
-            }, 5000)
-          }
-      }      
+  const fetchEmployees = useCallback(async () => {
+    if (user && user.username === 'jan') {
+      try {
+        const users = await usersService.getAll()
+        setEmployees(users)
+      } catch (error) {
+        setErrorMessage('Failed getting employees')
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
+      }
     }
   }, [user])
+
+  useEffect(() => {
+    fetchEmployees()
+  }, [user, fetchEmployees])
+
+  const updateEmployees = () => {
+    console.log('update employees')
+    fetchEmployees()
+  }
 
   const display = () => {
     if (user === null) {
@@ -112,6 +118,7 @@ const App = () => {
       return <User
       user={ user }          
       employees={ employees }
+      onUpdateEmployees={updateEmployees}
       />
     }else if (user.username !== 'jan') {
       return <TimeCard

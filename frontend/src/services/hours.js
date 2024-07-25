@@ -26,4 +26,11 @@ const create = async newObject => {
     return request.then(response => response.data)
   }
 
-  export default { setToken, create, update }
+  const hoursService = {
+    setToken,
+    create,
+    update
+  }
+
+  // export default { setToken, create, update }
+  export default hoursService
