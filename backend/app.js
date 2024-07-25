@@ -11,6 +11,7 @@ const middleware = require('./utils/middleware')
 const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
 const createUsersRouter = require('./controllers/createUser')
+const emailRouter = require('./controllers/email')
 // ---------------
 
 const hoursRouter = require('./controllers/hours')
@@ -37,6 +38,7 @@ app.use(middleware.requestLogger)
 // app.use(middleware.calcSpecialHours) should be done by the frontend
 
 
+app.use('/api/sendEmail', emailRouter)
 app.use('/api/login', loginRouter)  // declare this first to avoid token problems
 app.use('/api/createUser', createUsersRouter)    // declare this first to avoid token problems
 
@@ -45,9 +47,6 @@ app.use(middleware.userExtractor)
 
 app.use('/api/hours', hoursRouter)
 app.use('/api/users', usersRouter)
-
-
-
 
 
 app.use(middleware.unknownEndpoint)

@@ -1,17 +1,28 @@
 import React from 'react'
 import { useState } from 'react'
+// components
 import SignIn from './SignIn'
+import ContactForm from './ContactForm'
+// material
+import { Button } from '@mui/material'
 
 const LoginForm = ({handleLogin, username, setUsername, password, setPassword, handleSignin} ) => {
   const [logSign, setlogSign] = useState(false)
+  const [recoverPassword, setRecoverPassword] = useState(false)
 
   const log = {display: logSign ? 'none' : ''}
   const sign = {display: logSign ? '' : 'none'}
   const butStyl = {backgroundColor: 'red'}
   const inputStyle = {marginLeft: '1em', marginBottom: '1em'}
 
+  const contactForm = {display: recoverPassword ? '' : 'none'}
+
   const toggleLogSign = () => {
     setlogSign(!logSign)
+  }
+
+  const handleRecoverPassword = () => {
+    setRecoverPassword(true)
   }
   return (
     <>
@@ -36,6 +47,7 @@ const LoginForm = ({handleLogin, username, setUsername, password, setPassword, h
                       onChange={({ target }) => setPassword(target.value)} />
               </div>
               <button className='screenBtn' type="submit">Login</button>    {/* buttons are confusing */}
+              <Button variant="contained" onClick={() => handleRecoverPassword()}>Recover Password</Button>
         </form>
       </div>
       <div style={sign}>
@@ -46,6 +58,10 @@ const LoginForm = ({handleLogin, username, setUsername, password, setPassword, h
           setUsername={setUsername}
           password={password}
           setPassword={setPassword}
+        />
+      </div>
+      <div style={contactForm}>
+        <ContactForm
         />
       </div>
     </>
