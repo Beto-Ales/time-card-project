@@ -144,7 +144,6 @@ const App = () => {
         {
           user &&
           <p><button onClick={() => handleLogout()}>Logout</button></p>
-          
         }
         <br/>
         

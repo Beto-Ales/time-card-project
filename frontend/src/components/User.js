@@ -2,6 +2,8 @@ import React from 'react'
 import {useState, useEffect} from 'react'
 // services
 import userService from '../services/users'
+// components
+import UserSettings from './UserSettings'
 // material
 import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
@@ -109,6 +111,7 @@ const User = ({ user, employees, onUpdateEmployees }) => {
   
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <UserSettings/>
       <ToggleButtonGroup
         style={{ margin: '20px 0', width: '12em' }}
         color="primary"

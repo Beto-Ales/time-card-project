@@ -60,13 +60,35 @@ const deactivateUser = async (id) => {
   return response.data
 }
 
-// const update = (id, newObject) => {
-//   const request = axios.put(`${baseUrl}/${id}`, newObject)
-//   return request.then(response => response.data)
-// }
+const changePassword = async (userEmail, newPassword) => {
+  const config = {
+    headers: { Authorization: token }
+  }
+  try {
+    const response = await axios.post(`${baseUrl}/changePassword`, {
+      userEmail: userEmail,
+      newPassword: newPassword
+    }, config)
+    return response.data
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Error changing password')
+  }
+}
 
-// export default { getAll, create, update, setToken }
-// export default { getAll, getOneUser, create, setToken }
+const changeEmail = async (currentEmail, newEmail) => {
+  const config = {
+    headers: { Authorization: token }
+  }
+  try {
+    const response = await axios.post(`${baseUrl}/changeEmail`, {
+      userEmail: currentEmail,
+      newEmail: newEmail
+    }, config)
+    return response.data
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Error changing email')
+  }
+}
 
 const userService = {
   getAll,
@@ -74,7 +96,9 @@ const userService = {
   getOne,
   activateUser,
   deactivateUser,
-  setToken
+  setToken,
+  changeEmail,
+  changePassword
 }
 
 export default userService

@@ -1,8 +1,11 @@
 // import React, { useEffect } from 'react'
 import { useState, useEffect } from 'react'
+// services
 import hoursService from '../services/hours'
 import usersService from '../services/users'
+// components
 import Dropdown from '../components/Dropdown'
+import UserSettings from './UserSettings'
 
 
 // component containing inner components for each screen: employee list of time cards, specific time card,
@@ -40,7 +43,8 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
     const ScreenOne = ({ user }) => {        
         return (
-            <div>                
+            <div>
+                <UserSettings/>
                 <h1>{ loading() }</h1>
                 <br/>
                 <button className='screenBtn' onClick={() => toScreen('3')} >New time card</button>
