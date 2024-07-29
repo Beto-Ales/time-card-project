@@ -1,10 +1,17 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
+// global context
+import { GlobalContext } from '../App'
+// services
 import userService from '../services/users'
 
 const UpdateEmailForm = () => {
   const [newEmail, setNewEmail] = useState('')
   const currentEmail = ''
   const [status, setStatus] = useState('')
+
+  const { user } = useContext(GlobalContext)
+
+  console.log(user)
 
   const handleChange = (e) => {
     setNewEmail(e.target.value)
@@ -23,6 +30,8 @@ const UpdateEmailForm = () => {
   return (
     <div>
       <form onSubmit={handleSubmit}>
+        {/* mostrar el current email */}
+        <p>{ user.username }</p>
         <input
           type="email"
           name="email"

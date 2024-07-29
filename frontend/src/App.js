@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback  } from 'react'
+import { createContext, useState, useEffect, useCallback  } from 'react'
 // material
 import Button from '@mui/material/Button'
 import Snackbar from '@mui/material/Snackbar'
@@ -15,6 +15,8 @@ import User from './components/User'
 import TimeCard from './components/TimeCard'
 // styles
 import './App.css'
+
+export const GlobalContext = createContext()
 
 const App = () => {
   const [errorMessage, setErrorMessage] = useState(null)
@@ -174,31 +176,33 @@ const App = () => {
   }
 
   return (
-    <div className="App">
-      
-      <header className="App-header">        
-        {/* <h1 className='errorMessage'>{errorMessage}</h1> */}
-        <Snackbar
-          open={openSnackbar}
-          autoHideDuration={4000}
-          onClose={handleSnackbarClose}
-          message={errorMessage}
-          action={actionSnackbar}
-          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        />
-        <br/>
-        <h1>{ user && user.username[0].toUpperCase() + user.username.slice(1).toLowerCase() }</h1>
-        {
-          user &&
-          <p><button onClick={() => handleLogout()}>Logout</button></p>
-        }
-        <br/>
-        
-      </header>
+    <GlobalContext.Provider value={{ user }}>
+      <div className="App">
 
-      {display()}
-      
-    </div>
+        <header className="App-header">        
+          {/* <h1 className='errorMessage'>{errorMessage}</h1> */}
+          <Snackbar
+            open={openSnackbar}
+            autoHideDuration={4000}
+            onClose={handleSnackbarClose}
+            message={errorMessage}
+            action={actionSnackbar}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          />
+          <br/>
+          <h1>{ user && user.username[0].toUpperCase() + user.username.slice(1).toLowerCase() }</h1>
+          {
+            user &&
+            <p><button onClick={() => handleLogout()}>Logout</button></p>
+          }
+          <br/>
+
+        </header>
+
+        {display()}
+        
+      </div>
+    </GlobalContext.Provider>
   )
 }
 
