@@ -1,11 +1,19 @@
 import { useState, useEffect, useCallback  } from 'react'
+// material
+import Button from '@mui/material/Button'
+import Snackbar from '@mui/material/Snackbar'
+import IconButton from '@mui/material/IconButton'
+import CloseIcon from '@mui/icons-material/Close'
+// services
 import loginService from './services/login'
 import usersService from './services/users'
 import signinService from './services/signin'
 import hoursService from './services/hours'
+// components
 import LoginForm from './components/LoginForm'
 import User from './components/User'
 import TimeCard from './components/TimeCard'
+// styles
 import './App.css'
 
 const App = () => {
@@ -14,11 +22,36 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [employees, setEmployees] = useState(null)
-  // const [newTimeCard, setNewTimeCard] = useState({})
-  // const [sigleEmployee, setSingleEmployee] = useState(null)
   
-  // sigleEmployee &&
-  // console.log('sigleEmployee', sigleEmployee)
+  // material snackbar
+  // -----------------
+  const [openSnackbar, setOpenSnackbar] = useState(false)
+
+  const handleSnackbarClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return
+    }
+
+    setOpenSnackbar(false)
+  }
+
+  const actionSnackbar = (
+    <>
+      <Button color="secondary" size="small" onClick={handleSnackbarClose}>
+        Close
+      </Button>
+      <IconButton
+        size="small"
+        aria-label="close"
+        color="inherit"
+        onClick={handleSnackbarClose}
+      >
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </>
+  )
+  // -----------------
+  // material snackbar
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedNoteappUser')
@@ -31,6 +64,12 @@ const App = () => {
       // console.log(user)
     }    
   }, [])
+
+  useEffect(() => {
+    if (errorMessage) {
+      setOpenSnackbar(true)
+    }
+  }, [errorMessage])
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -138,7 +177,15 @@ const App = () => {
     <div className="App">
       
       <header className="App-header">        
-        <h1 className='errorMessage'>{errorMessage}</h1>
+        {/* <h1 className='errorMessage'>{errorMessage}</h1> */}
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={4000}
+          onClose={handleSnackbarClose}
+          message={errorMessage}
+          action={actionSnackbar}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        />
         <br/>
         <h1>{ user && user.username[0].toUpperCase() + user.username.slice(1).toLowerCase() }</h1>
         {
