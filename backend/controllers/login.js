@@ -32,7 +32,7 @@ loginRouter.post('/', async (request, response) => {
 
     response
         .status(200)
-        .send({ token, username: user.username, hours: user.hours, id: user._id })
+        .send({ token, username: user.username, hours: user.hours, id: user._id, email: user.userEmail })
         // id was used to get all this user data. now it's not needed anymore
         // becouse we populate the hours
 })

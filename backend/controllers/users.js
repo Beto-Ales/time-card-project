@@ -95,4 +95,38 @@ usersRouter.put('/updateIsActive/:id', async (request, response) => {
     }
 })
 
+// const isValidPassword = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).+$/
+
+function validateEmail(email) {
+  // Define a regular expression for validating an email
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
+}
+
+usersRouter.put('/changeEmail/:id', async (request, response) => {
+    try {
+        const { userEmail, newEmail } = request.body
+        const user = await User.findById(request.params.id)
+    
+        if (user) {
+            if (user.userEmail === newEmail) {
+              return response.status(400).json({ error: 'The new email cannot be the same as the current email' });
+            }
+
+            if (validateEmail(newEmail)) {
+                user.userEmail = newEmail
+                await user.save()
+                response.status(200).json({ message: 'Email updated successfully' })
+            } else {
+                return response.status(400).json({ error: 'Invalid new email format' })
+            }
+        } else {
+            return response.status(404).json({ error: 'User not found' })
+        }
+    } catch (error) {
+        console.error('Error changing email:', error)
+        response.status(500).json({ error: 'Internal server error' })
+    }
+})
+
 module.exports = usersRouter

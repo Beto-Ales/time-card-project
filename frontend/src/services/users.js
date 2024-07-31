@@ -75,12 +75,12 @@ const changePassword = async (userEmail, newPassword) => {
   }
 }
 
-const changeEmail = async (currentEmail, newEmail) => {
+const changeEmail = async (id, currentEmail, newEmail) => {
   const config = {
     headers: { Authorization: token }
   }
   try {
-    const response = await axios.post(`${baseUrl}/changeEmail`, {
+    const response = await axios.put(`${baseUrl}/changeEmail/${id}`, {
       userEmail: currentEmail,
       newEmail: newEmail
     }, config)

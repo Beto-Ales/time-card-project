@@ -176,7 +176,7 @@ const App = () => {
   }
 
   return (
-    <GlobalContext.Provider value={{ user }}>
+    <GlobalContext.Provider value={{ user, setErrorMessage }}>
       <div className="App">
 
         <header className="App-header">        
