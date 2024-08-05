@@ -3,9 +3,21 @@ const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 
 const requestLogger = (request, response, next) => {
-    logger.info('Method', request.method)
-    logger.info('Path', request.path)
-    logger.info('Body', request.body)
+    const { method, path, body, headers } = request
+
+    // Create a sanitized copy of the body
+    const sanitizedBody = { ...body }
+    if (sanitizedBody.password) {
+        sanitizedBody.password = '***' // Mask password
+    } else if(sanitizedBody.newPassword) {
+        sanitizedBody.newPassword = '***' // Mask password
+    }
+
+    // Log sanitized information
+    logger.info('Method', method)
+    logger.info('Path', path)
+    logger.info('Body', sanitizedBody)
+    // logger.info('Headers', headers) // Optionally log headers, avoid sensitive information
     logger.info('---')
     next()
 }

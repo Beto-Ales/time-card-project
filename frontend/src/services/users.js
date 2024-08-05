@@ -60,12 +60,12 @@ const deactivateUser = async (id) => {
   return response.data
 }
 
-const changePassword = async (userEmail, newPassword) => {
+const changePassword = async (id, userEmail, newPassword) => {
   const config = {
     headers: { Authorization: token }
   }
   try {
-    const response = await axios.post(`${baseUrl}/changePassword`, {
+    const response = await axios.put(`${baseUrl}/changePassword/${id}`, {
       userEmail: userEmail,
       newPassword: newPassword
     }, config)
@@ -90,6 +90,15 @@ const changeEmail = async (id, currentEmail, newEmail) => {
   }
 }
 
+const forgotPassword = async (userEmail) => {
+  try {
+    const response = await axios.post(`/api/forgotPassword`, { userEmail })
+      return response.data
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Error sending password reset email')
+  }
+}
+
 const userService = {
   getAll,
   create,
@@ -98,7 +107,8 @@ const userService = {
   deactivateUser,
   setToken,
   changeEmail,
-  changePassword
+  changePassword,
+  forgotPassword
 }
 
 export default userService

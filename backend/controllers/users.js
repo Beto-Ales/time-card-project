@@ -1,5 +1,6 @@
 // const bcrypt = require('bcrypt')
 const usersRouter = require('express').Router()
+const bcrypt = require('bcrypt')
 const User = require('../models/user')
 
 // get all the users
@@ -126,6 +127,31 @@ usersRouter.put('/changeEmail/:id', async (request, response) => {
     } catch (error) {
         console.error('Error changing email:', error)
         response.status(500).json({ error: 'Internal server error' })
+    }
+})
+
+usersRouter.put('/changePassword/:id', async (request, response) => {
+    try {
+        const { userEmail, newPassword } = request.body
+        const user = await User.findById(request.params.id)
+
+        if (user) {
+            if (user.userEmail !== userEmail) {
+              return response.status(400).json({ error: 'The email provided does not match the current email associated with the account' });
+            }
+            
+            const saltRounds = 10
+            const passwordHash = await bcrypt.hash(newPassword, saltRounds)
+            user.passwordHash = passwordHash
+            const updatedUser = await user.save()
+            // response.json(updatedUser)
+            response.status(200).json({ message: 'Email updated successfully', updatedUser: updatedUser })
+            
+        } else {
+            return response.status(404).json({ error: 'User not found' })
+        }
+    } catch (error) {
+        return response.status(500).json({ error: 'Something went wrong' })
     }
 })
 

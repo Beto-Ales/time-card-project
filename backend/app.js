@@ -12,6 +12,7 @@ const usersRouter = require('./controllers/users')
 const loginRouter = require('./controllers/login')
 const createUsersRouter = require('./controllers/createUser')
 const emailRouter = require('./controllers/email')
+const forgotPasswordRouter = require('./controllers/forgotPassword')
 // ---------------
 
 const hoursRouter = require('./controllers/hours')
@@ -20,7 +21,20 @@ const hoursRouter = require('./controllers/hours')
 const logger = require('./utils/logger')
 const mongoose = require('mongoose')
 
-logger.info('connecting to', config.MONGODB_URI)
+const sanitizeMongoUri = (uri) => {
+    const parsedUri = new URL(uri)
+    // Replace userinfo (username:password) with '***'
+    if (parsedUri.username || parsedUri.password) {
+        parsedUri.username = '***'
+        parsedUri.password = '***'
+    }
+    return parsedUri.toString()
+}
+
+const sanitizedUri = sanitizeMongoUri(config.MONGODB_URI)
+logger.info('Connecting to', sanitizedUri)
+
+// logger.info('connecting to', config.MONGODB_URI)
 
 mongoose
     .connect(config.MONGODB_URI)
@@ -34,13 +48,19 @@ mongoose
 app.use(cors())
 app.use(express.static('build'))
 app.use(express.json())
+app.use((req, res, next) => {
+    if (req.path === '/favicon.ico') {
+        return res.status(204).end() // No Content status
+    }
+    next()
+})
 app.use(middleware.requestLogger)
-// app.use(middleware.calcSpecialHours) should be done by the frontend
 
 
-app.use('/api/sendEmail', emailRouter)
 app.use('/api/login', loginRouter)  // declare this first to avoid token problems
 app.use('/api/createUser', createUsersRouter)    // declare this first to avoid token problems
+app.use('/api/forgotPassword', forgotPasswordRouter)
+app.use('/api/sendEmail', emailRouter)
 
 app.use(middleware.tokenExtractor)
 app.use(middleware.userExtractor)

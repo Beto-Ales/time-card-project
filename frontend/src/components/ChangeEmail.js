@@ -9,7 +9,6 @@ const UpdateEmailForm = () => {
   
   const { user, setErrorMessage } = useContext(GlobalContext)
   
-  console.log(user)
   const currentEmail = user.email
   const userId = user.id
 

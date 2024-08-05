@@ -179,8 +179,7 @@ const App = () => {
     <GlobalContext.Provider value={{ user, setErrorMessage }}>
       <div className="App">
 
-        <header className="App-header">        
-          {/* <h1 className='errorMessage'>{errorMessage}</h1> */}
+        <header className="App-header">
           <Snackbar
             open={openSnackbar}
             autoHideDuration={4000}
