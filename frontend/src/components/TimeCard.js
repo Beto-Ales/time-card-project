@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 // services
 import hoursService from '../services/hours'
-import usersService from '../services/users'
+// import usersService from '../services/users'
 // components
 import Dropdown from '../components/Dropdown'
 import UserSettings from './UserSettings'
@@ -14,22 +14,22 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
     const [screen, setScreen] = useState('1')
     const [hours, setHours] = useState(null)
 
-    useEffect(() => {
-        if (user) {
-            if (user.username !== 'jan') {
-        try {
-          usersService.getOne(user.id)
-            .then(user => setUser(user))
-        } catch (error) {
-          setErrorMessage(error)
-            setTimeout(() => {
-              setErrorMessage(null)
-            }, 5000)
-        }
-      }
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [screen])
+    // useEffect(() => {
+    //     if (user) {
+    //         if (user.username !== 'jan') {
+    //     try {
+    //       usersService.getOne(user.id)
+    //         .then(user => setUser(user))
+    //     } catch (error) {
+    //       setErrorMessage(error)
+    //         setTimeout(() => {
+    //           setErrorMessage(null)
+    //         }, 5000)
+    //     }
+    //   }
+    //     }
+    //     // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [screen])
 
     const loading = () => {
         if (user === null) {
