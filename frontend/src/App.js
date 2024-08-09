@@ -1,4 +1,8 @@
 import { createContext, useState, useEffect, useCallback  } from 'react'
+import {
+  BrowserRouter as Router,
+  Routes, Route, Navigate
+} from 'react-router-dom'
 // material
 import Button from '@mui/material/Button'
 import Snackbar from '@mui/material/Snackbar'
@@ -13,6 +17,7 @@ import hoursService from './services/hours'
 import LoginForm from './components/LoginForm'
 import User from './components/User'
 import TimeCard from './components/TimeCard'
+import ResetPassword from './components/ResetPassword'
 // styles
 import './App.css'
 
@@ -141,33 +146,8 @@ const App = () => {
   }, [user, fetchEmployees])
 
   const updateEmployees = () => {
-    console.log('update employees')
+    // console.log('update employees')
     fetchEmployees()
-  }
-
-  const display = () => {
-    if (user === null) {
-      return <LoginForm
-      handleLogin={ handleLogin }
-      username={ username }
-      setUsername={ setUsername }
-      password={ password }
-      setPassword={ setPassword }
-      handleSignin={ handleSignin }
-      />
-    }else if (user.username === 'jan') {
-      return <User
-      user={ user }          
-      employees={ employees }
-      onUpdateEmployees={updateEmployees}
-      />
-    }else if (user.username !== 'jan') {
-      return <TimeCard
-      user={ user }
-      setUser={setUser}
-      setErrorMessage={setErrorMessage}
-      />
-    }
   }
 
   const handleLogout = () => {
@@ -177,30 +157,70 @@ const App = () => {
 
   return (
     <GlobalContext.Provider value={{ user, setErrorMessage }}>
-      <div className="App">
-
-        <header className="App-header">
-          <Snackbar
-            open={openSnackbar}
-            autoHideDuration={4000}
-            onClose={handleSnackbarClose}
-            message={errorMessage}
-            action={actionSnackbar}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-          />
-          <br/>
-          <h1>{ user && user.username[0].toUpperCase() + user.username.slice(1).toLowerCase() }</h1>
-          {
-            user &&
-            <p><button onClick={() => handleLogout()}>Logout</button></p>
-          }
-          <br/>
-
-        </header>
-
-        {display()}
-        
-      </div>
+      <Router>
+        <div className="App">
+          <header className="App-header">
+            <Snackbar
+              open={openSnackbar}
+              autoHideDuration={4000}
+              onClose={handleSnackbarClose}
+              message={errorMessage}
+              action={actionSnackbar}
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            />
+            <br/>
+            <h1>{ user && user.username[0].toUpperCase() + user.username.slice(1).toLowerCase() }</h1>
+            {
+              user &&
+              <p><button onClick={() => handleLogout()}>Logout</button></p>
+            }
+            <br/>
+          </header>
+          <Routes>
+            <Route
+              path='/'
+              element={user === null ? (
+                <LoginForm
+                handleLogin={ handleLogin }
+                username={ username }
+                setUsername={ setUsername }
+                password={ password }
+                setPassword={ setPassword }
+                handleSignin={ handleSignin }
+                />
+              ) : (
+                <Navigate to={user.username === 'jan' ? "/Jan" : "/Home"} replace />
+              )}
+            />
+            <Route
+              path='/Jan/*'
+              element={user && user.username === 'jan' ? (
+                <User
+                  user={user}
+                  employees={employees}
+                  onUpdateEmployees={updateEmployees}
+                />
+              ) : (
+                <Navigate to="/" replace />
+              )}
+            />
+            <Route
+              path='/Home/*'
+              element={user && user.username !== 'jan' ? (
+                <TimeCard
+                  user={user}
+                  setUser={setUser}
+                  setErrorMessage={setErrorMessage}
+                />
+              ) : (
+                <Navigate to="/" replace />
+              )}
+            />
+            <Route path="/resetPassword" element={<ResetPassword />} />
+            <Route path='*' element={<Navigate to="/" replace />} /> {/* Redirect unknown routes to the homepage */}
+          </Routes>
+        </div>
+      </Router>
     </GlobalContext.Provider>
   )
 }

@@ -17,7 +17,7 @@ forgotPasswordRouter.post('/', async (request, response) => {
             const token = jwt.sign(userForToken, process.env.SECRET, { expiresIn: '1h' })
             const to = userEmail
             const subject = 'Password Reset'
-            const message = `You requested a password reset. Click the link below to reset your password:\n\n${process.env.FRONTEND_URL}/resetPassword?token=${token}`
+            const message = `You requested a password reset. Click the link below to reset your password:\n\n${process.env.FRONTEND_URL}resetPassword?token=${token}`
             await sendEmail(to, subject, message)
             return response.status(200).json({ message: 'Password reset email sent' })
         } else {

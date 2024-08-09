@@ -1,5 +1,6 @@
 // import React, { useEffect } from 'react'
 import { useState, useEffect } from 'react'
+import { Routes, Route, Link, useNavigate } from 'react-router-dom'
 // services
 import hoursService from '../services/hours'
 // import usersService from '../services/users'
@@ -11,29 +12,14 @@ import UserSettings from './UserSettings'
 // component containing inner components for each screen: employee list of time cards, specific time card,
 // create time card & update time card 
 const TimeCard = ({ user, setUser, setErrorMessage }) => {
-    const [screen, setScreen] = useState('1')
+    // const [screen, setScreen] = useState('1')
     const [hours, setHours] = useState(null)
-
-    // useEffect(() => {
-    //     if (user) {
-    //         if (user.username !== 'jan') {
-    //     try {
-    //       usersService.getOne(user.id)
-    //         .then(user => setUser(user))
-    //     } catch (error) {
-    //       setErrorMessage(error)
-    //         setTimeout(() => {
-    //           setErrorMessage(null)
-    //         }, 5000)
-    //     }
-    //   }
-    //     }
-    //     // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [screen])
 
     const loading = () => {
         if (user === null) {
             return 'Loading...'
+        } else {
+            localStorage.setItem('employeeUser', JSON.stringify(user))
         }
     }
 
@@ -41,23 +27,24 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
       return date.split("T")[0]
     }
 
-    const ScreenOne = ({ user }) => {        
+    const ScreenOne = ({ user }) => {    
+        const localUser = user ? user : JSON.parse(localStorage.getItem('employeeUser'))    
         return (
             <div>
                 <UserSettings/>
                 <h1>{ loading() }</h1>
                 <br/>
-                <button className='screenBtn' onClick={() => toScreen('3')} >New time card</button>
+                <Link to="/Home/createTimeCard"><button className='screenBtn'>New time card</button></Link>
                 <ul>
                     {
-                        user &&
-                        user.hours.map(
+                        localUser &&
+                        localUser.hours.map(
                             hours =>
                             <li key={hours.id}>
-                                <button onClick={() => handleGetHours(hours)}>
+                                <Link to="/Home/hours"><button onClick={() => handleGetHours(hours)}>
                                     <p><b>Period: </b>{hours.month}</p>
                                     <p><b>Last update: </b>{handleDate(hours.date)}</p>
-                                </button>
+                                </button></Link>
                             </li>
                         )
                     }
@@ -67,57 +54,57 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
     }
         
     const ScreenTwo = ({ hours }) => {
-  
+        const localHours = hours ? hours : JSON.parse(localStorage.getItem('employeeUserHours'))
 
-  return (
-    <div>
-      <h1>{hours.month.toUpperCase()}</h1>
-      <button className='screenBtn' onClick={() => toScreen('1')} >Back</button>
-        <button className='screenBtn' onClick={() => toScreen('4')} >Edit</button>
-      
-      <div className='userTable userTableHeader'>
-          <span className='headerTitle date-column'>DATE</span>
-          <span className='headerTitle holiday-column'>HOLYDAY</span>
-          <span className='headerTitle jobdescription'>JOB DESCRIPTION</span>
-          <span className='headerTitle startA'>START</span>
-          <span className='headerTitle endA'>FINISH</span>
-          <span className='headerTitle startB'>START</span>
-          <span className='headerTitle endB'>FINISH</span>
-          <span className='headerTitle hours-min-width'>TOTAL</span>
-          <span className='headerTitle hours-min-width'>NORMAL</span>
-          <span className='headerTitle hours-min-width'>LATE HOURS</span>
-          <span className='headerTitle hours-min-width'>HOLYDAY HOURS</span>          
-      </div>
-      
-      
-      <ul className='freeWidth'>
-        {
-          hours &&
-          hours.days.map((day, index) =>
-            <li key={index}>
+        return (
+          <div>
+            <h1>{localHours.month.toUpperCase()}</h1>
+            <Link to="/Home"><button className='screenBtn'>Back</button></Link>
+              <Link to="/Home/editTimeCard"><button className='screenBtn'>Edit</button></Link>
 
-              <div className='userTable'>
-                <span className='userSpan date-column'>{day.dayNumber}</span>
-                <span className='userSpan holiday-column'>{day.holiday ? '✔' : ''}</span>
-                <span className='userSpan jobdescription'>{day.jobDescription}</span>
-                <span className='userSpan startA'>{day.startWorkA}</span>
-                <span className='userSpan endA'>{day.endWorkA}</span>
-                <span className='userSpan startB'>{day.startWorkB}</span>
-                <span className='userSpan endB'>{day.endWorkB}</span>
-                <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.total}</span>
-                <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.normal}</span>
-                <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.lateHours}</span>
-                <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.holidayHours}</span>
-              </div>
-              
-            </li>
-          )
-        }
-      </ul>      
-      
-      <h3>Month total Hours: <span className='totalHoursStyle'>{hours.monthHours.totalHours}</span>, Normal rate: <span className='totalHoursStyle'>{hours.monthHours.normalRate}</span>, Late hours rate: <span className='totalHoursStyle'>{hours.monthHours.lateHoursRate}</span>, Holyday hours rate: <span className='totalHoursStyle'>{hours.monthHours.holidayHoursRate}</span></h3>
-    </div>
-  )
+            <div className='userTable userTableHeader'>
+                <span className='headerTitle date-column'>DATE</span>
+                <span className='headerTitle holiday-column'>HOLYDAY</span>
+                <span className='headerTitle jobdescription'>JOB DESCRIPTION</span>
+                <span className='headerTitle startA'>START</span>
+                <span className='headerTitle endA'>FINISH</span>
+                <span className='headerTitle startB'>START</span>
+                <span className='headerTitle endB'>FINISH</span>
+                <span className='headerTitle hours-min-width'>TOTAL</span>
+                <span className='headerTitle hours-min-width'>NORMAL</span>
+                <span className='headerTitle hours-min-width'>LATE HOURS</span>
+                <span className='headerTitle hours-min-width'>HOLYDAY HOURS</span>          
+            </div>
+
+
+            <ul className='freeWidth'>
+              {
+                localHours &&
+                localHours.days.map((day, index) =>
+                  <li key={index}>
+
+                    <div className='userTable'>
+                      <span className='userSpan date-column'>{day.dayNumber}</span>
+                      <span className='userSpan holiday-column'>{day.holiday ? '✔' : ''}</span>
+                      <span className='userSpan jobdescription'>{day.jobDescription}</span>
+                      <span className='userSpan startA'>{day.startWorkA}</span>
+                      <span className='userSpan endA'>{day.endWorkA}</span>
+                      <span className='userSpan startB'>{day.startWorkB}</span>
+                      <span className='userSpan endB'>{day.endWorkB}</span>
+                      <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.total}</span>
+                      <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.normal}</span>
+                      <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.lateHours}</span>
+                      <span className='userSpan hours-min-width'>{day.totalHours && day.totalHours.holidayHours}</span>
+                    </div>
+
+                  </li>
+                )
+              }
+            </ul>      
+          
+            <h3>Month total Hours: <span className='totalHoursStyle'>{localHours.monthHours.totalHours}</span>, Normal rate: <span className='totalHoursStyle'>{localHours.monthHours.normalRate}</span>, Late hours rate: <span className='totalHoursStyle'>{localHours.monthHours.lateHoursRate}</span>, Holyday hours rate: <span className='totalHoursStyle'>{localHours.monthHours.holidayHoursRate}</span></h3>
+          </div>
+        )
 
     }
       
@@ -525,7 +512,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             <div>
                 <h1>TIME CARD</h1>
                 <br/>
-                <button className='screenBtn' onClick={() => toScreen('1')} >Back</button>
+                <Link to="/Home"><button className='screenBtn'>Back</button></Link>
                 <br/>
                 
                 <form onSubmit={addTimeCard}>
@@ -653,8 +640,9 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
     // edit and update time card
     const ScreenFour = ({ hours }) => {
+        const localHours = hours ? hours : JSON.parse(localStorage.getItem('employeeUserHours'))
 
-        const hoursToUpdate = hours
+        const hoursToUpdate = localHours
 
         const inputsInitialValues = hoursToUpdate.days
             .reduce((name, value, index)=> {
@@ -685,7 +673,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
         useEffect(() => {
             
             if (inputs.month) {
-                hours.days.map((singleDay, index) => {
+                localHours.days.map((singleDay, index) => {
                     return setInputs(values => ({...values,[`day${index}`]: ''}))
                 })
                 
@@ -1022,7 +1010,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             
             
             await hoursService
-              .update(hours.id, hoursToUpdate)
+              .update(localHours.id, hoursToUpdate)
               setErrorMessage('Time card updated')
               setTimeout(() => {
                 setErrorMessage(null)
@@ -1033,7 +1021,9 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             <div>
                 <h1>TIME CARD</h1>
                 <br/>
-                <button className='screenBtn' onClick={() => toScreen('1')} >Back</button>
+                <Link to="/Home/hours"><button className='screenBtn'>Back</button></Link>
+                <Link to="/Home"><button className='screenBtn'>Home</button></Link>
+
                 <br/>
                 
                 <form onSubmit={addTimeCard}>
@@ -1045,7 +1035,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                     <div className='timecard'>
 
-                        {hours.days.map((eachDay, index) => {
+                        {localHours.days.map((eachDay, index) => {
 
                             return(
 
@@ -1185,39 +1175,19 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
         )
 
     }
-    
-
-    const toScreen = (screen) => {
-        setScreen(screen)
-      }
 
     const handleGetHours = (hours) => {
         setHours(hours)
-        toScreen('2')
-    }
-
-    const display = () => {
-        if (screen === '1') {
-            return <ScreenOne
-                user={ user }
-            />
-          }else if (screen === '2') {
-            return <ScreenTwo
-                hours={ hours }
-            />
-          }else if (screen === '3') {
-            return <ScreenThree/>
-          }else if (screen === '4') {
-            return <ScreenFour
-                hours={ hours }
-            />
-          }
+        localStorage.setItem('employeeUserHours', JSON.stringify(hours))
     }
     
     return (
-        <div>
-            {display()}
-        </div>    
+        <Routes>
+          <Route path="/*" element={<ScreenOne user={user}/>} />
+          <Route path="hours" element={<ScreenTwo hours={ hours }/>} />
+          <Route path="createTimeCard" element={<ScreenThree/>}/>
+          <Route path="editTimeCard" element={<ScreenFour hours={ hours }/>} />
+        </Routes>    
     )
 }
 

@@ -1,5 +1,5 @@
-import React from 'react'
-import {useState, useEffect} from 'react'
+import React, { useState, useEffect } from 'react';
+import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 // services
 import userService from '../services/users'
 // components
@@ -14,8 +14,7 @@ import FormControl from '@mui/material/FormControl'
 import Select from '@mui/material/Select'
 import Button from '@mui/material/Button'
 
-const User = ({ user, employees, onUpdateEmployees }) => {  
-  const [screen, setScreen] = useState('1')
+const User = ({ user, employees, onUpdateEmployees }) => {
 
   const [periodResume, setPeriodResume] = useState([])
   const [period, setPeriod] = useState('January/February')
@@ -26,6 +25,8 @@ const User = ({ user, employees, onUpdateEmployees }) => {
   
   const [activeEmployees, setActiveEmployees] = useState([])
   const [onlyActiveUsers, setOnlyActiveUsers] = useState('false')
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (employees) {
@@ -59,7 +60,7 @@ const User = ({ user, employees, onUpdateEmployees }) => {
       }
     }).filter(user => user.matchedHours.length > 0)
 
-    console.log(results)
+    // console.log(results)
     setPeriodResume(results)
   }
 
@@ -94,7 +95,7 @@ const User = ({ user, employees, onUpdateEmployees }) => {
 
   const ScreenOne = ({ user, employees }) => {
     
-    console.log(employees)
+    // console.log(employees)
 
 
     const handleToggleActive = (event, newValue) => {
@@ -132,7 +133,7 @@ const User = ({ user, employees, onUpdateEmployees }) => {
             labelId="select1-label"
             id="select1"
             value={year}
-            label="Age 1"
+            label="Year"
             onChange={handleChangeYear}
           >
             {yearOptions.map((option) => (
@@ -140,9 +141,6 @@ const User = ({ user, employees, onUpdateEmployees }) => {
                 {option.label}
               </MenuItem>
             ))}
-            {/* <MenuItem value={2024}>2024</MenuItem>
-            <MenuItem value={2023}>2023</MenuItem>
-            <MenuItem value={2022}>2022</MenuItem> */}
           </Select>
         </FormControl>
 
@@ -152,7 +150,7 @@ const User = ({ user, employees, onUpdateEmployees }) => {
             labelId="select2-label"
             id="select2"
             value={period}
-            label="Age 2"
+            label="Period"
             onChange={handleChangePeriod}
           >
             {periodOptions.map((option) => (
@@ -160,9 +158,6 @@ const User = ({ user, employees, onUpdateEmployees }) => {
                 {option.label}
               </MenuItem>
             ))}
-            {/* <MenuItem value={'January/February'}>January / February</MenuItem>
-            <MenuItem value={'February/March'}>February / March</MenuItem>
-            <MenuItem value={'March/April'}>March / April</MenuItem> */}
           </Select>
         </FormControl>
       </Box>
@@ -173,11 +168,11 @@ const User = ({ user, employees, onUpdateEmployees }) => {
             'Loading' :
             activeEmployees.filter(worker => worker.username !== user.username).map(employee =>
                 <li key={employee.username}>                  
-                  <button onClick={() => handleGetEmployee(employee)}>
+                  <Link to={`/Jan/employee/${employee.username}`} onClick={() => handleGetEmployee(employee)}>
                     <p><b>Name: </b>{employee.username[0].toUpperCase() + employee.username.slice(1).toLowerCase()}</p>                  
                     <p><b>Last update: </b>{employee.hours.length > 0 && handleDate(employee.hours[0].date)}  {/* some employees don't have hours uploaded */}</p>                  
                     <p><b>Period: </b>{employee.hours.length > 0 && employee.hours[0].month}  {/* some employees don't have hours uploaded */}</p>                  
-                  </button>
+                  </Link>
                   {
                     employee.isActive ? (
                       <button onClick={() => onDeactivate(employee)}>Deactivate</button>
@@ -194,18 +189,19 @@ const User = ({ user, employees, onUpdateEmployees }) => {
 }
 
 const ScreenTwo = ({ worker }) => {
+  const localWorker = worker ? worker : JSON.parse(localStorage.getItem('janUserEmployee'))
   return (
     <div>
-      <h1>{worker.username[0].toUpperCase() + worker.username.slice(1).toLowerCase()}</h1>
-      <button className='screenBtn' onClick={() => toScreen('1')} >Back</button>
+      <h1>{localWorker.username[0].toUpperCase() + localWorker.username.slice(1).toLowerCase()}</h1>
+      <Link to="/"><button className='screenBtn'>Back</button></Link>
       <ul>
-        {worker &&
-        worker.hours.map((hours, index) => 
+        {localWorker &&
+        localWorker.hours.map((hours, index) => 
           <li key={index}>
-            <button onClick={() => handleGetHours(hours)}>
+            <Link to={`/Jan/employee/${localWorker.username}/hours`} onClick={() => handleGetHours(hours)}>
               <p><b>Period: </b>{hours.month}</p>
               <p><b>Last update: </b>{handleDate(hours.date)}</p>
-            </button>
+            </Link>
             <br/>
           </li>
           )}
@@ -214,12 +210,15 @@ const ScreenTwo = ({ worker }) => {
   )
 }
 const ScreenThree = ({ hours, worker }) => {
+  const localHours = hours ? hours : JSON.parse(localStorage.getItem('janUserHours'))
+  const localWorker = worker ? worker : JSON.parse(localStorage.getItem('janUserEmployee'))
   return (
     <div>
-      <h1>{worker.username[0].toUpperCase() + worker.username.slice(1).toLowerCase()}</h1>
-      <h3>{hours.month.toUpperCase()}</h3>
-      <button className='screenBtn' onClick={() => toScreen('2')} >Back</button>
-      
+      <h1>{localWorker.username[0].toUpperCase() + localWorker.username.slice(1).toLowerCase()}</h1>
+      <h3>{localHours.month.toUpperCase()}</h3>
+      <Link to={`/Jan/employee/${localWorker.username}`}><button className='screenBtn'>Back</button></Link>
+      <Link to="/"><button className='screenBtn'>Home</button></Link>
+
       <div className='userTable userTableHeader'>
           <span className='headerTitle date-column'>DATE</span>
           <span className='headerTitle holiday-column'>HOLIDAY</span>
@@ -237,8 +236,8 @@ const ScreenThree = ({ hours, worker }) => {
       
       <ul className='freeWidth'>
         {
-          hours &&
-          hours.days.map((day, index) => 
+          localHours &&
+          localHours.days.map((day, index) => 
             <li key={index}>
               <div className='userTable'>
                 <span className='userSpan date-column'>{day.dayNumber}</span>
@@ -257,7 +256,7 @@ const ScreenThree = ({ hours, worker }) => {
           )
         }
       </ul>
-      <h3>Month total Hours: <span className='totalHoursStyle'>{hours.monthHours.totalHours}</span>, Normal rate: <span className='totalHoursStyle'>{hours.monthHours.normalRate}</span>, Late hours rate: <span className='totalHoursStyle'>{hours.monthHours.lateHoursRate}</span>, Holyday hours rate: <span className='totalHoursStyle'>{hours.monthHours.holidayHoursRate}</span></h3>
+      <h3>Month total Hours: <span className='totalHoursStyle'>{localHours.monthHours.totalHours}</span>, Normal rate: <span className='totalHoursStyle'>{localHours.monthHours.normalRate}</span>, Late hours rate: <span className='totalHoursStyle'>{localHours.monthHours.lateHoursRate}</span>, Holyday hours rate: <span className='totalHoursStyle'>{localHours.monthHours.holidayHoursRate}</span></h3>
     </div>
   )
 }
@@ -265,8 +264,8 @@ const ScreenFour = ({ periodResume }) => {
   return (
     <div>
       <h1>Resume of the Period { period } { year }</h1>
-      <button className='screenBtn' onClick={() => toScreen('1')} >Back</button>
-      {console.log(periodResume)}
+      <Link to="/Jan/"><button className='screenBtn'>Back</button></Link>
+      {/* {console.log(periodResume)} */}
       <ul>
         {
             periodResume === null ?
@@ -287,61 +286,40 @@ const ScreenFour = ({ periodResume }) => {
 }
 
 const onDeactivate = async  (employee) => {
-  console.log('implementar delete ', employee)
+  // console.log('implementar delete ', employee)
   const id = employee.id
   await userService.deactivateUser(id)
   onUpdateEmployees()
 }
 
 const onActivate = async  (employee) => {
-  console.log('implementar delete ', employee)
+  // console.log('implementar delete ', employee)
   const id = employee.id
   await userService.activateUser(id)
   onUpdateEmployees()
 }
 
 const handleGetEmployee = (employee) => {
-  console.log(employee)
+  // console.log(employee)
   setWorker(employee)
-  toScreen('2')
+  localStorage.setItem('janUserEmployee', JSON.stringify(employee))
 }
 const handleGetHours = (hours) => {
   setHours(hours)
-  toScreen('3')
+  localStorage.setItem('janUserHours', JSON.stringify(hours))
 }
 const handleSetPeriod = () => {
   filterByPeriod()
-  toScreen('4')
+  navigate('/Jan/employees/hours/period')
 }
-const toScreen = (screen) => {
-  setScreen(screen)
-}
-const display = () => {
-    if (screen === '1') {
-      return <ScreenOne
-      user={user}
-      employees={employees}
-      />
-    }else if (screen === '2') {
-      return <ScreenTwo
-      worker={worker}
-      />
-    }else if (screen === '3') {
-      return <ScreenThree
-      hours={hours}
-      worker={worker}
-      />
-    }else if (screen === '4') {
-      return <ScreenFour
-      periodResume={periodResume}
-      />
-    }
-  }
   
   return (
-    <div>  
-      {display()}  
-    </div>
+    <Routes>
+      <Route path="/*" element={<ScreenOne user={user} employees={employees} />} />
+      <Route path="employee/:employeeName" element={<ScreenTwo worker={worker} />} />
+      <Route path="employee/:employeeName/hours" element={<ScreenThree hours={hours} worker={worker} />} />
+      <Route path="employees/hours/period" element={<ScreenFour periodResume={periodResume} />} />
+    </Routes>
     )
 }
 
