@@ -21,7 +21,7 @@ const UserSettings = () => {
         <button onClick={handleShowChangeEmail}>Change Email</button>
       </div>
       <div>
-        {activeForm === 'changePassword' && <ChangePasswordForm />}
+        {activeForm === 'changePassword' && <ChangePasswordForm isRecoverPassword={false} />}
         {activeForm === 'changeEmail' && <ChangeEmailForm />}
       </div>
     </div>
