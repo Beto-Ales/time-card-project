@@ -99,6 +99,20 @@ const forgotPassword = async (userEmail) => {
   }
 }
 
+const resetPassword = async (newPassword) => {
+  const config = {
+    headers: { Authorization: token }
+  }
+  try {
+    const response = await axios.post(`${baseUrl}/resetpassword`, {
+      newPassword: newPassword
+    }, config)
+    return response.data
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Error changing password. Link is valid only for 1H.')
+  }
+}
+
 const userService = {
   getAll,
   create,
@@ -108,7 +122,8 @@ const userService = {
   setToken,
   changeEmail,
   changePassword,
-  forgotPassword
+  forgotPassword,
+  resetPassword
 }
 
 export default userService
