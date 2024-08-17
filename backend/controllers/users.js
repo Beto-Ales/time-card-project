@@ -155,4 +155,25 @@ usersRouter.put('/changePassword/:id', async (request, response) => {
     }
 })
 
+usersRouter.post('/resetpassword', async (request, response) => {
+    try {
+        const { newPassword } = request.body
+        const user = await User.findById(request.user._id)
+
+        if (user) {            
+            const saltRounds = 10
+            const passwordHash = await bcrypt.hash(newPassword, saltRounds)
+            user.passwordHash = passwordHash
+            const updatedUser = await user.save()
+            // response.json(updatedUser)
+            response.status(200).json({ message: 'Password updated successfully', updatedUser: updatedUser })
+            
+        } else {
+            return response.status(404).json({ error: 'User not found' })
+        }
+    } catch (error) {
+        return response.status(500).json({ error: 'Something went wrong' })
+    }
+})
+
 module.exports = usersRouter
