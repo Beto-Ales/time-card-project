@@ -10,7 +10,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material'
 // services
 import userService from '../services/users'
 
-const ChangePasswordForm = () => {
+const ChangePasswordForm = ({ isRecoverPassword }) => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [newPassword, setNewPassword] = useState('')
   const [newPasswordRepeat, setNewPasswordRepeat] = useState('')
@@ -67,11 +67,20 @@ const ChangePasswordForm = () => {
     }
 
     if (newPassword === newPasswordRepeat) {
-      try {
-        await userService.changePassword( user.id, user.email, newPassword )
-        setErrorMessage('Password updated successfully')
-      } catch (error) {
-        setErrorMessage(`Error: ${error.message}`)
+      if (isRecoverPassword) {
+        try {
+          await userService.resetPassword(newPassword)
+          setErrorMessage('Password recovered successfully')
+        } catch (error) {
+          setErrorMessage(`Error: ${error.message}`)
+        }
+      } else {
+        try {
+          await userService.changePassword( user.id, user.email, newPassword )
+          setErrorMessage('Password updated successfully')
+        } catch (error) {
+          setErrorMessage(`Error: ${error.message}`)
+        }
       }
     } else {
       setErrorMessage('Passwords do not match')
