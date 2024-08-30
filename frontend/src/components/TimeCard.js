@@ -1,6 +1,8 @@
 // import React, { useEffect } from 'react'
 import { useState, useEffect } from 'react'
-import { Routes, Route, Link } from 'react-router-dom'
+import { Routes, Route, Link, useNavigate } from 'react-router-dom'
+// material
+import { Button, Box, TableContainer, Table, TableHead, TableCell, TableRow, TableBody, Paper , Tooltip, Typography, useMediaQuery  } from '@mui/material'
 // services
 import hoursService from '../services/hours'
 // import usersService from '../services/users'
@@ -15,40 +17,98 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
     // const [screen, setScreen] = useState('1')
     const [hours, setHours] = useState(null)
 
+    const navigate = useNavigate()
+
     const loading = () => {
         if (user === null) {
-            return 'Loading...'
-        } else {
             localStorage.setItem('employeeUser', JSON.stringify(user))
         }
     }
+
+    const localUser = user ? user : JSON.parse(localStorage.getItem('employeeUser'))
 
     const handleDate = (date) => {
       return date.split("T")[0]
     }
 
-    const ScreenOne = ({ user }) => {    
-        const localUser = user ? user : JSON.parse(localStorage.getItem('employeeUser'))    
+    const copenhagenTime = (date) => {
+        // Create a Date object, either from the provided date or the current date
+        let dateObj = date ? new Date(date) : new Date()
+        
+        // Format the date to Copenhagen's time zone
+        const options = {
+            timeZone: 'Europe/Copenhagen',
+            weekday: 'short',
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: 'numeric',
+            second: 'numeric',
+            timeZoneName: 'short'
+        }
+
+        // Convert the formatted date back into a more human-readable string
+        return new Intl.DateTimeFormat('en-US', options).format(dateObj)
+    }
+
+    const ScreenOne = () => {
+        loading()
+        const isMobileScreen = useMediaQuery('(min-width: 1250px)')
+        const listScreenOneStyles = {
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            position: 'relative', // Allows absolute positioning of child elements
+        }
+        const settingsStyles = isMobileScreen ? {
+          position: 'absolute',
+          top: '10px',
+          right: '10px',
+        } : {}
         return (
-            <div>
-                <UserSettings/>
-                <h1>{ loading() }</h1>
-                <br/>
-                <Link to="/Home/createTimeCard"><button className='screenBtn'>New time card</button></Link>
-                <ul>
-                    {
-                        localUser &&
-                        localUser.hours.map(
-                            hours =>
-                            <li key={hours.id}>
-                                <Link to="/Home/hours"><button onClick={() => handleGetHours(hours)}>
-                                    <p><b>Period: </b>{hours.month}</p>
-                                    <p><b>Last update: </b>{handleDate(hours.date)}</p>
-                                </button></Link>
-                            </li>
-                        )
-                    }
-                </ul>
+            <div style={listScreenOneStyles}>
+                <div style={settingsStyles}>
+                    <UserSettings/>
+                </div>
+                <Link to="/Home/createTimeCard"><Button variant="contained" sx={{ marginBottom: '10px' }}>New time card</Button></Link>
+                <TableContainer component={Paper} sx={{ width: 'auto', marginBottom: '1em' }}>
+                  <Table sx={{ minWidth: 650 }}>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell>Period</TableCell>
+                        <TableCell>Last Update</TableCell>
+                        <TableCell>Action</TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {localUser && localUser.hours.map(hours => (
+                        <TableRow key={hours.id} hover>
+                          <TableCell component="th" scope="row">
+                            {hours.month}
+                          </TableCell>
+                          <TableCell>
+                            <Tooltip title={"YYYY-MM-DD"}>
+                                <span>
+                                    {handleDate(hours.date)}
+                                </span>
+                            </Tooltip>
+                          </TableCell>
+                          <TableCell>
+                            <Link to="/Home/hours" style={{ textDecoration: 'none' }}>
+                              <Button
+                                variant="outlined"
+                                onClick={() => handleGetHours(hours)}
+                              >
+                                View Details
+                              </Button>
+                            </Link>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
             </div>            
         )
     }
@@ -59,8 +119,10 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
         return (
           <div>
             <h1>{localHours.month.toUpperCase()}</h1>
-            <Link to="/Home"><button className='screenBtn'>Back</button></Link>
-              <Link to="/Home/editTimeCard"><button className='screenBtn'>Edit</button></Link>
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: '1em' }}>
+                <Link to="/Home"><Button variant="contained" className='screenBtn'>Back</Button></Link>
+                <Link to="/Home/editTimeCard"><Button variant="contained" className='screenBtn'>Edit</Button></Link>
+            </Box>
 
             <div className='userTable userTableHeader'>
                 <span className='headerTitle date-column'>DATE</span>
@@ -154,8 +216,10 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                 
                 // const date = ["Thu", "Dec", "19", "2022"]
+                console.log("new Date().toString().split(' ')",new Date().toString().split(' '))
+                console.log("new Date(copenhagenTime()).toString().split(' ')",new Date(copenhagenTime()).toString().split(' '))
 
-                const date = new Date().toString().split(' ')
+                const date = new Date(copenhagenTime()).toString().split(' ')
                 // console.log(date)
                 // console.log('date[1]', date[1], 'is january', date[1] === 'Jan')
                 
@@ -231,7 +295,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                 // date.[3] (year)
                 // 2022-07-15
 
-                let yearB = new Date(year).toString().split(' ')[3]
+                let yearB = new Date(copenhagenTime(year)).toString().split(' ')[3]
                 ++ yearB
                 
                 
@@ -444,6 +508,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
         const addTimeCard = async (event) => {
             event.preventDefault()
+
             const {month} = inputs
             if (!month) {                
                 setErrorMessage('Month is a required field')
@@ -470,9 +535,9 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                 singleDay.holiday = checked[`holiday${index}`] || false
 
-                singleDay.dayNumber = inputs[`day${index}`] ? `${inputs[`day${index}`]} ${dayName[new Date(inputs[`day${index}`]).getDay()]}` : ''
+                singleDay.dayNumber = inputs[`day${index}`] ? `${inputs[`day${index}`]} ${dayName[new Date(copenhagenTime(inputs[`day${index}`])).getDay()]}` : ''
 
-                singleDay.totalHours = calculate(timeToDecimal(singleDay.startWorkA), timeToDecimal(singleDay.endWorkA), timeToDecimal(singleDay.startWorkB), timeToDecimal(singleDay.endWorkB), new Date(inputs[`day${index}`]).getDay(), checked[`holiday${index}`])
+                singleDay.totalHours = calculate(timeToDecimal(singleDay.startWorkA), timeToDecimal(singleDay.endWorkA), timeToDecimal(singleDay.startWorkB), timeToDecimal(singleDay.endWorkB), new Date(copenhagenTime(inputs[`day${index}`])).getDay(), checked[`holiday${index}`])
 
             })
                         
@@ -500,21 +565,19 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
             hours.month = inputs.month
             
-            await hoursService
-              .create(hours)
-              setErrorMessage('Time card created')
-              setTimeout(() => {
-                setErrorMessage(null)
-              }, 5000)
-          }        
+            const newHours = await hoursService.create(hours)
+            setErrorMessage('Time card created')
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
+            localUser.hours.unshift(newHours)
+            navigate('/Home')
+        }
 
         return (
-            <div>
+            <div sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <h1>TIME CARD</h1>
-                <br/>
-                <Link to="/Home"><button className='screenBtn'>Back</button></Link>
-                <br/>
-                
+                <Link to="/Home"><Button variant='contained' sx={{ marginBottom: '1em' }} className='screenBtn'>Back</Button></Link>                
                 <form onSubmit={addTimeCard}>
 
                     <Dropdown
@@ -631,8 +694,8 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                                                 
                                             </div>   )} 
                             )}
-                    </div>                    
-                    <button className='uploadBtn screenBtn' type="submit">Upload</button>
+                    </div>
+                    { inputs.month && <Button variant='contained' sx={{ marginBottom: '1em' }} className='uploadBtn screenBtn' type="submit">Upload</Button> }
                 </form>
             </div>
         )
@@ -677,7 +740,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                     return setInputs(values => ({...values,[`day${index}`]: ''}))
                 })
                 
-                const date = new Date().toString().split(' ')
+                const date = new Date(copenhagenTime()).toString().split(' ')
                 
                 let monthA = ''
                 let monthB = ''
@@ -751,7 +814,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                 // date.[3] (year)
                 // 2022-07-15
 
-                let yearB = new Date(year).toString().split(' ')[3]
+                let yearB = new Date(copenhagenTime(year)).toString().split(' ')[3]
                 ++ yearB
                 
                 // february has 29 days                
@@ -978,9 +1041,9 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                 singleDay.holiday = checked[`holiday${index}`] || false
 
-                singleDay.dayNumber = inputs[`day${index}`] ? `${inputs[`day${index}`]} ${dayName[new Date(inputs[`day${index}`]).getDay()]}` : ''
+                singleDay.dayNumber = inputs[`day${index}`] ? `${inputs[`day${index}`]} ${dayName[new Date(copenhagenTime(inputs[`day${index}`])).getDay()]}` : ''
 
-                singleDay.totalHours = calculate(timeToDecimal(singleDay.startWorkA), timeToDecimal(singleDay.endWorkA), timeToDecimal(singleDay.startWorkB), timeToDecimal(singleDay.endWorkB), new Date(inputs[`day${index}`]).getDay(), checked[`holiday${index}`])
+                singleDay.totalHours = calculate(timeToDecimal(singleDay.startWorkA), timeToDecimal(singleDay.endWorkA), timeToDecimal(singleDay.startWorkB), timeToDecimal(singleDay.endWorkB), new Date(copenhagenTime(inputs[`day${index}`])).getDay(), checked[`holiday${index}`])
             })
           
 
@@ -1020,11 +1083,10 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
         return (
             <div>
                 <h1>TIME CARD</h1>
-                <br/>
-                <Link to="/Home/hours"><button className='screenBtn'>Back</button></Link>
-                <Link to="/Home"><button className='screenBtn'>Home</button></Link>
-
-                <br/>
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: '1em', marginBottom: '1em' }}>
+                    <Link to="/Home/hours"><Button variant="contained" className='screenBtn'>Back</Button></Link>
+                    <Link to="/Home"><Button variant="contained" className='screenBtn'>Home</Button></Link>
+                </Box>
                 
                 <form onSubmit={addTimeCard}>
 
@@ -1168,7 +1230,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                         })}
                     </div>
 
-                    <button className='uploadBtn screenBtn' type="submit">Upload</button>
+                    <Button variant="contained" sx={{ marginBottom: '1em' }} className='uploadBtn screenBtn' type="submit">Upload</Button>
 
                 </form>
             </div>
