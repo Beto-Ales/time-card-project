@@ -1,45 +1,56 @@
 import React, { useContext, useState } from 'react'
 // global context
 import { GlobalContext } from '../App'
+// material
+import { Button, CircularProgress, TextField, Box } from '@mui/material'
 // services
 import userService from '../services/users'
 
 const UpdateEmailForm = () => {
   const [newEmail, setNewEmail] = useState('')
+  const [loading, setLoading] = useState(false)
   
   const { user, setErrorMessage } = useContext(GlobalContext)
   
   const currentEmail = user.email
   const userId = user.id
 
-  const handleChange = (e) => {
-    setNewEmail(e.target.value)
+  const handleChange = (value) => {
+    setNewEmail(value)
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setLoading(true)
     try {
       await userService.changeEmail(userId, currentEmail, newEmail)   // al cambiar email no se actualiza la view
+      user.email = newEmail
+      setLoading(false)
       setErrorMessage('Email updated successfully')
     } catch (error) {
+      setLoading(false)
       setErrorMessage('Error updating email')
     }
   }
 
   return (
     <div>
-      <form onSubmit={handleSubmit}>
-        <p>Current Email: "{ user.email }" </p>     {/*al cambiar email no se actualiza la view*/}
-        <input
-          type="email"
-          name="email"
-          placeholder="New Email"
+      <Box component="form" onSubmit={handleSubmit}>
+        <p style={{wordBreak: 'break-all'}}>Current Email:</p>
+        <p style={{wordBreak: 'break-all'}}>{ user.email }</p>
+        <TextField
+          sx={{ marginBottom: '1em' }}
+          label="Username"
+          variant="outlined"
           value={newEmail}
-          onChange={handleChange}
+          onChange={({ target }) => handleChange(target.value)}
           required
         />
-        <button type="submit">Update Email</button>
-      </form>
+        <Button variant="contained" type="submit">Update Email</Button>
+      </Box>
+      <Box className="spinner" sx={{ display: 'flex', justifyContent: 'center' }}>
+        {loading && <CircularProgress size={24} color="inherit" />}
+      </Box>
     </div>
   )
 }

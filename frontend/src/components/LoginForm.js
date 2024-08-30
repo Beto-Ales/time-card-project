@@ -4,51 +4,72 @@ import { useState } from 'react'
 import SignIn from './SignIn'
 import ContactForm from './ContactForm'
 // material
-import { Button } from '@mui/material'
+import { Button, TextField, Box, InputAdornment, IconButton } from '@mui/material'
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 const LoginForm = ({handleLogin, username, setUsername, password, setPassword, handleSignin} ) => {
   const [logSign, setlogSign] = useState(false)
   const [recoverPassword, setRecoverPassword] = useState(false)
+   const [showPassword, setShowPassword] = useState(false)
 
   const log = {display: logSign ? 'none' : ''}
   const sign = {display: logSign ? '' : 'none'}
-  const butStyl = {backgroundColor: 'red'}
-  const inputStyle = {marginLeft: '1em', marginBottom: '1em'}
 
   const contactForm = {display: recoverPassword ? '' : 'none'}
 
   const toggleLogSign = () => {
     setlogSign(!logSign)
+    if (recoverPassword) {
+      setRecoverPassword(false)
+    }
+  }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   }
 
   const handleRecoverPassword = () => {
-    setRecoverPassword(true)
+    setRecoverPassword(!recoverPassword)
   }
   return (
     <>
-      <button className='screenBtn' style={butStyl} onClick={toggleLogSign}>{logSign ? 'Log in' : 'Sign up'}</button>   {/* buttons are confusing */}
+      <Button variant="outlined" color="error" onClick={toggleLogSign}>{logSign ? 'Log in' : 'Sign up'}</Button>
       <div style={log}>
       <h2>Log in</h2>
-        <form onSubmit={handleLogin}>
-              <div>
-                  Username
-                  <input style={inputStyle}
-                      type="text"
-                      value={username}
-                      name="Username"
-                      onChange={({ target }) => setUsername(target.value)} />
-              </div>
-              <div>
-                  Password
-                  <input style={inputStyle}
-                      type="password"
-                      value={password}
-                      name="Password"
-                      onChange={({ target }) => setPassword(target.value)} />
-              </div>
-              <button className='screenBtn' type="submit">Login</button>    {/* buttons are confusing */}
-              <Button variant="contained" onClick={() => handleRecoverPassword()}>Recover Password</Button>
-        </form>
+      <Box component="form" onSubmit={handleLogin} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <TextField
+          sx={{ width: '300px' }}
+          label="Username"
+          variant="outlined"
+          value={username}
+          onChange={({ target }) => setUsername(target.value)}
+          required
+        />
+        <TextField
+          sx={{ width: '300px' }}
+          label="Password"
+          type={showPassword ? 'text' : 'password'}
+          variant="outlined"
+          value={password}
+          onChange={({ target }) => setPassword(target.value)}
+          required
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={togglePasswordVisibility} edge="end">
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
+        <Button variant="contained" color="success" type="submit">
+          Login
+        </Button>
+        <Button variant="outlined" onClick={handleRecoverPassword}>
+          Forgot Password
+        </Button>
+      </Box>
       </div>
       <div style={sign}>
         {/* <h1>signin</h1> */}

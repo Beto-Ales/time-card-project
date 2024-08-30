@@ -4,9 +4,7 @@ import {
   Routes, Route, Navigate
 } from 'react-router-dom'
 // material
-import Button from '@mui/material/Button'
-import Snackbar from '@mui/material/Snackbar'
-import IconButton from '@mui/material/IconButton'
+import { CircularProgress, Box , Button, Snackbar, IconButton } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 // services
 import loginService from './services/login'
@@ -24,6 +22,7 @@ import './App.css'
 export const GlobalContext = createContext()
 
 const App = () => {
+  const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('')
@@ -80,6 +79,7 @@ const App = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault()
+    setLoading(true)
     try {
       const user = await loginService.login({
         username, password,
@@ -89,11 +89,13 @@ const App = () => {
       setUser(user)
       window.localStorage.setItem(
         'loggedNoteappUser', JSON.stringify(user)
-      ) 
+      )
       setUsername('')
       setPassword('')
+      setLoading(false)
     } catch (exception) {
         setErrorMessage('Wrong credentials')
+        setLoading(false)
         setTimeout(() => {
           setErrorMessage(null)
         }, 5000)
@@ -102,25 +104,28 @@ const App = () => {
   
   const handleSignin = async (event) => {
     event.preventDefault()
+    setLoading(true)
     if (!username) {                
-                setErrorMessage('Username is a required field')
-                setTimeout(() => {
-                setErrorMessage(null)
-                }, 5000)
-                return
-            }
+      setErrorMessage('Username is a required field')
+      setTimeout(() => {
+      setErrorMessage(null)
+      }, 5000)
+      return
+    }
     try {
       const newUser = await signinService.signin({
         username, password,
       })       
       setUsername('')
       setPassword('')
-      setErrorMessage(`${JSON.stringify(newUser.username)} signed in`)  /* maybe newUser.username signed in */
+      setErrorMessage(`${JSON.stringify(newUser.username)} signed in`)
+      setLoading(false)
         setTimeout(() => {
           setErrorMessage(null)
         }, 5000)
     } catch (exception) {
-        setErrorMessage(exception.response.data.error)        
+        setErrorMessage(exception.response.data.error)
+        setLoading(false)
         setTimeout(() => {
           setErrorMessage(null)
         }, 5000)
@@ -129,11 +134,14 @@ const App = () => {
 
   const fetchEmployees = useCallback(async () => {
     if (user && user.username === 'jan') {
+      setLoading(true)
       try {
         const users = await usersService.getAll()
         setEmployees(users)
+        setLoading(false)
       } catch (error) {
         setErrorMessage('Failed getting employees')
+        setLoading(false)
         setTimeout(() => {
           setErrorMessage(null)
         }, 5000)
@@ -168,14 +176,15 @@ const App = () => {
               action={actionSnackbar}
               anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             />
-            <br/>
             <h1>{ user && user.username[0].toUpperCase() + user.username.slice(1).toLowerCase() }</h1>
             {
               user &&
-              <p><button onClick={() => handleLogout()}>Logout</button></p>
+              <p><Button variant="contained" color="error" onClick={() => handleLogout()}>Logout</Button></p>
             }
-            <br/>
           </header>
+          <Box className="spinner" sx={{ display: 'flex', justifyContent: 'center' }}>
+            {loading && <CircularProgress size={24} color="inherit" />}
+          </Box>
           <Routes>
             <Route
               path='/'

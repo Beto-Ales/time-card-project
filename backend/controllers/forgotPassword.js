@@ -5,6 +5,7 @@ const sendEmail = require('../utils/email')
 // models
 const User = require('../models/user')
 
+// send email con link para recuperar password
 forgotPasswordRouter.post('/', async (request, response) => {
     try {
         const { userEmail } = request.body

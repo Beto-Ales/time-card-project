@@ -2,10 +2,8 @@ import React, { useState, useEffect, useContext } from 'react'
 // global context
 import { GlobalContext } from '../App'
 // material
-import Snackbar from '@mui/material/Snackbar'
-import Button from '@mui/material/Button'
+import { Button, CircularProgress, IconButton, InputAdornment, Snackbar, TextField, Box } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import { TextField, InputAdornment, IconButton } from '@mui/material'
 import { Visibility, VisibilityOff } from '@mui/icons-material'
 // services
 import userService from '../services/users'
@@ -15,6 +13,7 @@ const ChangePasswordForm = ({ isRecoverPassword }) => {
   const [newPassword, setNewPassword] = useState('')
   const [newPasswordRepeat, setNewPasswordRepeat] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   const { user } = useContext(GlobalContext)
 
@@ -58,10 +57,11 @@ const ChangePasswordForm = ({ isRecoverPassword }) => {
     setShowPassword(!showPassword);
   }
 
-  const handleSubmit = async (e) => {
-    console.log('submit')
+  const handleSubmit = async (e) => {    
     e.preventDefault()
+    setLoading(true)
     if (newPassword.trim() === '') {
+      setLoading(false)
       setErrorMessage('New password cannot be empty')
       return
     }
@@ -70,19 +70,24 @@ const ChangePasswordForm = ({ isRecoverPassword }) => {
       if (isRecoverPassword) {
         try {
           await userService.resetPassword(newPassword)
+          setLoading(false)
           setErrorMessage('Password recovered successfully')
         } catch (error) {
+          setLoading(false)
           setErrorMessage(`Error: ${error.message}`)
         }
       } else {
         try {
           await userService.changePassword( user.id, user.email, newPassword )
+          setLoading(false)
           setErrorMessage('Password updated successfully')
         } catch (error) {
+          setLoading(false)
           setErrorMessage(`Error: ${error.message}`)
         }
       }
     } else {
+      setLoading(false)
       setErrorMessage('Passwords do not match')
     }
   }
@@ -143,26 +148,11 @@ const ChangePasswordForm = ({ isRecoverPassword }) => {
           fullWidth
           margin="normal"
         />
-        {/* <input
-          type="password"
-          name="newPassword"
-          placeholder="New Password"
-          value={newPassword}
-          onChange={(e) => setNewPassword(e.target.value)}
-          required
-        />
-
-        <input
-          type="password"
-          name="newPasswordRepeat"
-          placeholder="Repeat Password"
-          value={newPasswordRepeat}
-          onChange={(e) => setNewPasswordRepeat(e.target.value)}
-          required
-        /> */}
-
-        <button type="submit">Change Password</button>
+        <Button variant="contained" type="submit">Change Password</Button>
       </form>
+      <Box className="spinner" sx={{ display: 'flex', justifyContent: 'center' }}>
+        {loading && <CircularProgress size={24} color="inherit" />}
+      </Box>
     </div>
   )
 }

@@ -15,8 +15,8 @@
 } */
 
 .App-header {
+  margin-bottom: 0.5em;
   background-color: #282c34;
-  /* min-height: 100vh; */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -166,7 +166,7 @@
 }
 
 form{
-  margin: 5em 0;
+  /* margin: 5em 0; */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -217,6 +217,13 @@ p{
 
 .uploadBtn{
   margin-top: 2em;
+}
+
+.spinner{
+  position: fixed;
+  left: 50%;
+  bottom: 50%;
+  z-index: 1000;
 }
 
 /* seguir desde aca */

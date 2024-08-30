@@ -5,14 +5,7 @@ import userService from '../services/users'
 // components
 import UserSettings from './UserSettings'
 // material
-import ToggleButton from '@mui/material/ToggleButton'
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
-import Box from '@mui/material/Box'
-import InputLabel from '@mui/material/InputLabel'
-import MenuItem from '@mui/material/MenuItem'
-import FormControl from '@mui/material/FormControl'
-import Select from '@mui/material/Select'
-import Button from '@mui/material/Button'
+import { Tooltip, Table, TableHead, TableCell, TableRow, TableBody, Paper, TableContainer, ToggleButton, ToggleButtonGroup, Box, InputLabel, MenuItem, FormControl, Select, Button, useMediaQuery } from '@mui/material'
 
 const User = ({ user, employees, onUpdateEmployees }) => {
 
@@ -24,7 +17,7 @@ const User = ({ user, employees, onUpdateEmployees }) => {
   const [hours, setHours] = useState(null)
   
   const [activeEmployees, setActiveEmployees] = useState([])
-  const [onlyActiveUsers, setOnlyActiveUsers] = useState('false')
+  const [onlyActiveUsers, setOnlyActiveUsers] = useState('true')
 
   const navigate = useNavigate()
 
@@ -38,6 +31,8 @@ const User = ({ user, employees, onUpdateEmployees }) => {
       }
     }
   }, [employees, onlyActiveUsers])
+
+  const localWorker = worker ? worker : JSON.parse(localStorage.getItem('janUserEmployee'))
   
   const handleDate = (date) => {
     return date.split("T")[0]
@@ -99,20 +94,29 @@ const User = ({ user, employees, onUpdateEmployees }) => {
 
 
     const handleToggleActive = (event, newValue) => {
-    if (newValue !== null) {
-      setOnlyActiveUsers(newValue)
-      if (newValue === 'true') {
-        const activeUsers = employees.filter(employee => employee.isActive)
-        setActiveEmployees(activeUsers)
-      } else {
-        setActiveEmployees(employees)
+      if (newValue !== null) {
+        setOnlyActiveUsers(newValue)
+        if (newValue === 'true') {
+          const activeUsers = employees.filter(employee => employee.isActive)
+          setActiveEmployees(activeUsers)
+        } else {
+          setActiveEmployees(employees)
+        }
       }
     }
-  }
+
+    const isMobileScreen = useMediaQuery('(min-width: 1250px)')
+    const settingsStyles = isMobileScreen ? {
+      position: 'absolute',
+      top: '10px',
+      right: '10px',
+    } : {}
   
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <UserSettings/>
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
+      <div style={settingsStyles}>
+        <UserSettings/>
+      </div>
       <ToggleButtonGroup
         style={{ margin: '20px 0', width: '12em' }}
         color="primary"
@@ -162,51 +166,113 @@ const User = ({ user, employees, onUpdateEmployees }) => {
         </FormControl>
       </Box>
 
-      <ul>
-        {
-            employees === null ?
-            'Loading' :
-            activeEmployees.filter(worker => worker.username !== user.username).map(employee =>
-                <li key={employee.username}>                  
-                  <Link to={`/Jan/employee/${employee.username}`} onClick={() => handleGetEmployee(employee)}>
-                    <p><b>Name: </b>{employee.username[0].toUpperCase() + employee.username.slice(1).toLowerCase()}</p>                  
-                    <p><b>Last update: </b>{employee.hours.length > 0 && handleDate(employee.hours[0].date)}  {/* some employees don't have hours uploaded */}</p>                  
-                    <p><b>Period: </b>{employee.hours.length > 0 && employee.hours[0].month}  {/* some employees don't have hours uploaded */}</p>                  
-                  </Link>
-                  {
-                    employee.isActive ? (
-                      <button onClick={() => onDeactivate(employee)}>Deactivate</button>
-                    ) : (
-                      <button onClick={() => onActivate(employee)}>Activate</button>
-                    )
-                  }
-                </li>
-            )
-        }
-      </ul>
+      <TableContainer component={Paper} sx={{ width: 'auto', marginBottom: '1em' }}>
+        <Table sx={{ minWidth: 650 }} aria-label="employee table">
+          <TableHead>
+            <TableRow>
+              <TableCell><b>Name</b></TableCell>
+              <TableCell><b>Last Update</b></TableCell>
+              <TableCell><b>Period</b></TableCell>
+              <TableCell><b>Status</b></TableCell>
+              <TableCell><b>Actions</b></TableCell>
+              <TableCell><b></b></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {
+              employees === null ? (
+                <TableRow>
+                  <TableCell colSpan={5} align="center">Loading...</TableCell>
+                </TableRow>
+              ) : (
+                activeEmployees
+                  .filter(worker => worker.username !== user.username)
+                  .map(employee => (
+                    <TableRow key={employee.username} hover>
+                      <TableCell>
+                        {employee.username[0].toUpperCase() + employee.username.slice(1).toLowerCase()}
+                      </TableCell>
+                      <TableCell>
+                        <Tooltip title={"YYYY-MM-DD"}>
+                          <span>
+                            {employee.hours.length > 0 && handleDate(employee.hours[0].date)}
+                          </span>
+                        </Tooltip>
+                      </TableCell>
+                      <TableCell>
+                        {employee.hours.length > 0 && employee.hours[0].month}
+                      </TableCell>
+                      <TableCell>
+                        {employee.isActive ? 'Active' : 'Inactive'}
+                      </TableCell>
+                      <TableCell>
+                        {/* Activation/Deactivation Button */}
+                        {employee.isActive ? (
+                          <Button variant="contained" color="error" onClick={() => onDeactivate(employee)}>Deactivate</Button>
+                        ) : (
+                          <Button variant="contained" color="error" onClick={() => onActivate(employee)}>Activate</Button>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {/* View Details Button */}
+                        <Button variant="contained" onClick={() => handleGetEmployee(employee)}>
+                          View Details
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+              )
+            }
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Box>
   )
 }
 
-const ScreenTwo = ({ worker }) => {
-  const localWorker = worker ? worker : JSON.parse(localStorage.getItem('janUserEmployee'))
+const ScreenTwo = () => {
   return (
-    <div>
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
       <h1>{localWorker.username[0].toUpperCase() + localWorker.username.slice(1).toLowerCase()}</h1>
-      <Link to="/"><button className='screenBtn'>Back</button></Link>
-      <ul>
-        {localWorker &&
-        localWorker.hours.map((hours, index) => 
-          <li key={index}>
-            <Link to={`/Jan/employee/${localWorker.username}/hours`} onClick={() => handleGetHours(hours)}>
-              <p><b>Period: </b>{hours.month}</p>
-              <p><b>Last update: </b>{handleDate(hours.date)}</p>
-            </Link>
-            <br/>
-          </li>
-          )}
-      </ul>
-    </div>
+      <Link to="/"><Button variant='contained' sx={{ marginBottom: '10px' }}>Back</Button></Link>
+      <TableContainer component={Paper} sx={{ width: 'auto', marginBottom: '1em' }}>
+        <Table sx={{ minWidth: 650 }} aria-label="hours table">
+          <TableHead>
+            <TableRow>
+              <TableCell><b>Period</b></TableCell>
+              <TableCell><b>Last Update</b></TableCell>
+              <TableCell><b>Actions</b></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {localWorker && localWorker.hours.length > 0 ? (
+              localWorker.hours.map((hours, index) => (
+                <TableRow key={index} hover>
+                  <TableCell>
+                    {hours.month}
+                  </TableCell>
+                  <TableCell>
+                    {handleDate(hours.date)}
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant='contained'
+                      onClick={() => handleGetHours(hours)}
+                    >
+                      View Details
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={2} align="center">No Data Available</TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
   )
 }
 const ScreenThree = ({ hours, worker }) => {
@@ -216,8 +282,10 @@ const ScreenThree = ({ hours, worker }) => {
     <div>
       <h1>{localWorker.username[0].toUpperCase() + localWorker.username.slice(1).toLowerCase()}</h1>
       <h3>{localHours.month.toUpperCase()}</h3>
-      <Link to={`/Jan/employee/${localWorker.username}`}><button className='screenBtn'>Back</button></Link>
-      <Link to="/"><button className='screenBtn'>Home</button></Link>
+      <Box sx={{ display: 'flex', justifyContent: 'center', gap: '1em' }}>
+        <Link to={`/Jan/employee/${localWorker.username}`}><Button variant='contained' className='screenBtn'>Back</Button></Link>
+        <Link to="/"><Button variant='contained' className='screenBtn'>Home</Button></Link>
+      </Box>
 
       <div className='userTable userTableHeader'>
           <span className='headerTitle date-column'>DATE</span>
@@ -262,26 +330,42 @@ const ScreenThree = ({ hours, worker }) => {
 }
 const ScreenFour = ({ periodResume }) => {
   return (
-    <div>
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
       <h1>Resume of the Period { period } { year }</h1>
-      <Link to="/Jan/"><button className='screenBtn'>Back</button></Link>
-      {/* {console.log(periodResume)} */}
-      <ul>
-        {
-            periodResume === null ?
-            'Loading' :
-            periodResume.filter(worker => worker.username !== user.username).map(employee =>
-                <li key={employee.username}>                  
-                    <p><b>Name: </b>{employee.username[0].toUpperCase() + employee.username.slice(1).toLowerCase()}</p>                  
-                    <p><b>Holiday Hours: </b>{employee.matchedHours[0].holidayHoursRate}</p>
-                    <p><b>Late Hours: </b>{employee.matchedHours[0].lateHoursRate}</p>
-                    <p><b>Normal Hours: </b>{employee.matchedHours[0].normalRate}</p>
-                    <p><b>Total Hours: </b>{employee.matchedHours[0].totalHours}</p>
-                </li>
-            )
-        }
-      </ul>
-    </div>
+      <Link to="/Jan/"><Button variant='contained' className='screenBtn'>Back</Button></Link>
+      <TableContainer component={Paper} sx={{ width: 'auto', marginBottom: '1em' }}>
+        <Table sx={{ minWidth: 650 }} aria-label="period table">
+          <TableHead>
+            <TableRow>
+              <TableCell><b>Name</b></TableCell>
+              <TableCell><b>Holiday Hours</b></TableCell>
+              <TableCell><b>Late Hours</b></TableCell>
+              <TableCell><b>Normal Hours</b></TableCell>
+              <TableCell><b>Total Hours</b></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {periodResume === null ? (
+              <TableRow>
+                <TableCell colSpan={5} align="center">Loading</TableCell>
+              </TableRow>
+            ) : (
+              periodResume
+                .filter(worker => worker.username !== user.username)
+                .map((employee) => (
+                  <TableRow key={employee.username} hover>
+                    <TableCell>{employee.username[0].toUpperCase() + employee.username.slice(1).toLowerCase()}</TableCell>
+                    <TableCell>{employee.matchedHours[0].holidayHoursRate}</TableCell>
+                    <TableCell>{employee.matchedHours[0].lateHoursRate}</TableCell>
+                    <TableCell>{employee.matchedHours[0].normalRate}</TableCell>
+                    <TableCell>{employee.matchedHours[0].totalHours}</TableCell>
+                  </TableRow>
+                ))
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </Box>
   )
 }
 
@@ -303,10 +387,12 @@ const handleGetEmployee = (employee) => {
   // console.log(employee)
   setWorker(employee)
   localStorage.setItem('janUserEmployee', JSON.stringify(employee))
+  navigate(`/Jan/employee/${employee.username}`)
 }
 const handleGetHours = (hours) => {
   setHours(hours)
   localStorage.setItem('janUserHours', JSON.stringify(hours))
+  navigate(`/Jan/employee/${localWorker.username}/hours`)
 }
 const handleSetPeriod = () => {
   filterByPeriod()

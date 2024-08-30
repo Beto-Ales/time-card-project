@@ -22,7 +22,7 @@ function Dropdown({ month, handleChange  }) {
     return (
       <div>
           <label>
-              Month
+              Period
               <select name="month" defaultValue={month} placeholder='Select' onChange={handleChange}>
                 {options.map((option, index) => (
                     <option key={index} value={option.value} style={{display: option.value === '-- Select an option --' && 'none'}}>{option.label}</option>

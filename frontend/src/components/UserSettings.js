@@ -1,31 +1,42 @@
-import React, { useState } from 'react'
-import ChangePasswordForm from './ChangePassword'
-import ChangeEmailForm from './ChangeEmail'
+import React from 'react';
+// components
+import ChangePasswordForm from './ChangePassword';
+import ChangeEmailForm from './ChangeEmail';
+// material
+import { Accordion, AccordionSummary, AccordionDetails, Typography } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const UserSettings = () => {
-  const [activeForm, setActiveForm] = useState('')
-
-  const handleShowChangePassword = () => {
-    setActiveForm('changePassword')
-  }
-
-  const handleShowChangeEmail = () => {
-    setActiveForm('changeEmail')
-  }
-
   return (
-    <div>
-      <h2>Settings</h2>
-      <div>
-        <button onClick={handleShowChangePassword}>Change Password</button>
-        <button onClick={handleShowChangeEmail}>Change Email</button>
-      </div>
-      <div>
-        {activeForm === 'changePassword' && <ChangePasswordForm isRecoverPassword={false} />}
-        {activeForm === 'changeEmail' && <ChangeEmailForm />}
-      </div>
-    </div>
-  )
-}
+    <div style={{width: '15em', marginBottom: '1em'}}>
+      {/* <h2>Settings</h2> */}
+      <Accordion>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="change-password-content"
+          id="change-password-header"
+        >
+          <Typography>Change Password</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <ChangePasswordForm isRecoverPassword={false} />
+        </AccordionDetails>
+      </Accordion>
 
-export default UserSettings
+      <Accordion>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon />}
+          aria-controls="change-email-content"
+          id="change-email-header"
+        >
+          <Typography>Change Email</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <ChangeEmailForm />
+        </AccordionDetails>
+      </Accordion>
+    </div>
+  );
+};
+
+export default UserSettings;
