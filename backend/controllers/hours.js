@@ -2,6 +2,26 @@ const hoursRouter = require('express').Router()
 const Hours = require('../models/hours')
 const User = require('../models/user')
 
+const copenhagenTime = (date) => {
+    // Create a Date object, either from the provided date or the current date
+    let dateObj = date ? new Date(date) : new Date()
+    
+    // Format the date to Copenhagen's time zone
+    const options = {
+        timeZone: 'Europe/Copenhagen',
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+        timeZoneName: 'short'
+    }
+    // Convert the formatted date back into a more human-readable string
+    return new Intl.DateTimeFormat('en-US', options).format(dateObj)
+}
+
 
 // so far we don't nedd this functionality
 hoursRouter.get('/', async (request, response) => {
@@ -10,20 +30,6 @@ hoursRouter.get('/', async (request, response) => {
         .populate('user', { username: 1, id: 1 })       // check id parameter or remove
     response.json(hours)
 })
-
-// doesnt work
-// hoursRouter.get('/', async (request, response) => {
-//     // const user = await User.findById(request.user.id)
-
-//     // if (!user) {
-//     //     return response.status(401).json({ error: 'token missing or invalid' })
-//     // }    
-
-//     const hours = await Hours
-//         .find({ user: request.user.id })
-//         .populate('user', { username: 1, name: 1 })
-//     response.json(hours)
-// })
 
 hoursRouter.get('/:id', async (request, response) => {
 
@@ -57,7 +63,7 @@ hoursRouter.post('/', async (request, response) => {
         endWorkB,
         totalHours,
         monthHours,
-        date: new Date(),
+        date: new Date(copenhagenTime()),
         user: user._id
     })
 

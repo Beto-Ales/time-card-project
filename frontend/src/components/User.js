@@ -38,6 +38,27 @@ const User = ({ user, employees, onUpdateEmployees }) => {
     return date.split("T")[0]
   }
 
+  const copenhagenTime = (date) => {
+    // Create a Date object, either from the provided date or the current date
+    let dateObj = date ? new Date(date) : new Date()
+    
+    // Format the date to Copenhagen's time zone
+    const options = {
+        timeZone: 'Europe/Copenhagen',
+        weekday: 'short',
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+        timeZoneName: 'short'
+    }
+
+    // Convert the formatted date back into a more human-readable string
+    return new Intl.DateTimeFormat('en-US', options).format(dateObj)
+  }
+
   const filterByPeriod = () => {
 
     // const year = 2022
@@ -45,7 +66,7 @@ const User = ({ user, employees, onUpdateEmployees }) => {
 
     const results = activeEmployees.map(user => {
       const matchedHours = user.hours.filter(hour => {
-        const hourYear = new Date(hour.date).getFullYear()
+        const hourYear = new Date(copenhagenTime(hour.date)).getFullYear()
         return hourYear === year && hour.month === period
       }).map(hour => hour.monthHours)
     
@@ -67,7 +88,7 @@ const User = ({ user, employees, onUpdateEmployees }) => {
     setPeriod(event.target.value)
   }
 
-  const currentYear = new Date().getFullYear()
+  const currentYear = new Date(copenhagenTime()).getFullYear()
   const yearOptions = []
   for (let year = currentYear; year >= 2022; year--) {
     yearOptions.push({ value: year, label: year.toString() })
