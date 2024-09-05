@@ -24,6 +24,7 @@ const copenhagenTime = (date) => {
 
 
 // so far we don't nedd this functionality
+// ---------------------------------------
 hoursRouter.get('/', async (request, response) => {
     const hours = await Hours
         .find({})
@@ -40,6 +41,9 @@ hoursRouter.get('/:id', async (request, response) => {
         response.status(404).end()
     }
 })
+
+// ---------------------------------------
+// so far we don't nedd this functionality
 
 hoursRouter.post('/', async (request, response) => {
     

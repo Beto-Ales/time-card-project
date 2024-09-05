@@ -105,6 +105,7 @@ const ChangePasswordForm = ({ isRecoverPassword }) => {
       <form onSubmit={handleSubmit}>
         <TextField
           type={showPassword ? 'text' : 'password'}
+          sx={{ width: '300px' }}
           label="New Password"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
@@ -128,6 +129,7 @@ const ChangePasswordForm = ({ isRecoverPassword }) => {
 
         <TextField
           type={showPassword ? 'text' : 'password'}
+          sx={{ width: '300px' }}
           label="Repeat Password"
           value={newPasswordRepeat}
           onChange={(e) => setNewPasswordRepeat(e.target.value)}

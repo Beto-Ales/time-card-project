@@ -34,7 +34,7 @@ const sanitizeMongoUri = (uri) => {
 const sanitizedUri = sanitizeMongoUri(config.MONGODB_URI)
 logger.info('Connecting to', sanitizedUri)
 
-// logger.info('connecting to', config.MONGODB_URI)
+mongoose.set('strictQuery', true)
 
 mongoose
     .connect(config.MONGODB_URI)
