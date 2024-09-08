@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { Routes, Route, Link, useNavigate } from 'react-router-dom'
 // material
-import { Button, Box, TableContainer, Table, TableHead, TableCell, TableRow, TableBody, Paper , Tooltip, Typography, useMediaQuery  } from '@mui/material'
+import { Button, Box, TableContainer, Table, TableHead, TableCell, TableRow, TableBody, Paper , Tooltip, useMediaQuery  } from '@mui/material'
 // services
 import hoursService from '../services/hours'
 // import usersService from '../services/users'
@@ -520,7 +520,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
             const dayName = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
             
-            hours.days.map((singleDay, index) => {
+            hours.days.forEach((singleDay, index) => {
 
                 // if startWorkA is not defined, leave default value time 00:00
                 singleDay.startWorkA = inputs[`startWorkA${index}`] || '00:00'
@@ -1027,7 +1027,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
             const dayName = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
 
-            hoursToUpdate.days.map((singleDay, index) => {
+            hoursToUpdate.days.forEach((singleDay, index) => {
                 // if startWorkA is not defined, leave default value time 00:00
                 singleDay.startWorkA = inputs[`startWorkA${index}`] || '00:00'
                 

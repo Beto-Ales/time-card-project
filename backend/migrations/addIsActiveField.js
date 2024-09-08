@@ -1,7 +1,7 @@
 const mongoose = require('mongoose')
 const User = require('../models/user') // Update the path to where your User model is located
 
-const MONGO_URI = 'mongodb+srv://beto:hbKKcwE3r469xXJ@cluster0.k43vr.mongodb.net/aic-test?retryWrites=true&w=majority'
+const MONGO_URI = 'mongodb+srv://beto:hbKKcwE3r469xXJ@cluster0.k43vr.mongodb.net/aic?retryWrites=true&w=majority'
 
 const addIsActiveField = async () => {
   try {

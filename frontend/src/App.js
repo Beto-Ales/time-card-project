@@ -8,7 +8,7 @@ import { CircularProgress, Box , Button, Snackbar, IconButton } from '@mui/mater
 import CloseIcon from '@mui/icons-material/Close'
 // services
 import loginService from './services/login'
-import usersService from './services/users'
+import userService from './services/users'
 import signinService from './services/signin'
 import hoursService from './services/hours'
 // components
@@ -64,7 +64,7 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
-      usersService.setToken(user.token)
+      userService.setToken(user.token)
       hoursService.setToken(user.token)
       // user &&
       // console.log(user)
@@ -84,7 +84,7 @@ const App = () => {
       const user = await loginService.login({
         username, password,
       })
-      usersService.setToken(user.token)
+      userService.setToken(user.token)
       hoursService.setToken(user.token)
       setUser(user)
       window.localStorage.setItem(
@@ -124,7 +124,7 @@ const App = () => {
           setErrorMessage(null)
         }, 5000)
     } catch (exception) {
-        setErrorMessage(exception.response.data.error)
+        setErrorMessage(exception.response.data?.error)
         setLoading(false)
         setTimeout(() => {
           setErrorMessage(null)
@@ -136,7 +136,7 @@ const App = () => {
     if (user && user.username === 'jan') {
       setLoading(true)
       try {
-        const users = await usersService.getAll()
+        const users = await userService.getAll()
         setEmployees(users)
         setLoading(false)
       } catch (error) {
