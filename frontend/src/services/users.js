@@ -99,10 +99,13 @@ const forgotPassword = async (userEmail) => {
   }
 }
 
-const resetPassword = async (newPassword) => {
+const resetPassword = async (newPassword, manualToken) => {
+  const userToken = `bearer ${manualToken}`
   const config = {
-    headers: { Authorization: token }
+    headers: { Authorization: userToken }
   }
+  console.log(manualToken);
+  
   try {
     const response = await axios.post(`${baseUrl}/resetpassword`, {
       newPassword: newPassword

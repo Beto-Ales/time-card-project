@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import ChangePasswordForm from './ChangePassword'
 // services
 import userService from '../services/users'
 // material
@@ -90,6 +91,7 @@ const ContactForm = () => {
         />
         <Button type="submit" variant="contained">Send Recover Link</Button>
       </Box>
+      <ChangePasswordForm isRecoverPassword={true}/>
       <Box className="spinner" sx={{ display: 'flex', justifyContent: 'center' }}>
         {loading && <CircularProgress size={24} color="inherit" />}
       </Box>

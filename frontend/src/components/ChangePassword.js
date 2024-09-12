@@ -10,6 +10,7 @@ import userService from '../services/users'
 
 const ChangePasswordForm = ({ isRecoverPassword }) => {
   const [errorMessage, setErrorMessage] = useState(null)
+  const [token, setToken] = useState('')
   const [newPassword, setNewPassword] = useState('')
   const [newPasswordRepeat, setNewPasswordRepeat] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -69,7 +70,7 @@ const ChangePasswordForm = ({ isRecoverPassword }) => {
     if (newPassword === newPasswordRepeat) {
       if (isRecoverPassword) {
         try {
-          await userService.resetPassword(newPassword)
+          await userService.resetPassword(newPassword, token)
           setLoading(false)
           setErrorMessage('Password recovered successfully')
         } catch (error) {
@@ -105,7 +106,7 @@ const ChangePasswordForm = ({ isRecoverPassword }) => {
       <form onSubmit={handleSubmit}>
         <TextField
           type={showPassword ? 'text' : 'password'}
-          sx={{ width: '300px' }}
+          sx={{ width: isRecoverPassword ? '300px' : 'auto' }}
           label="New Password"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
@@ -129,7 +130,7 @@ const ChangePasswordForm = ({ isRecoverPassword }) => {
 
         <TextField
           type={showPassword ? 'text' : 'password'}
-          sx={{ width: '300px' }}
+          sx={{ width: isRecoverPassword ? '300px' : 'auto' }}
           label="Repeat Password"
           value={newPasswordRepeat}
           onChange={(e) => setNewPasswordRepeat(e.target.value)}
@@ -150,6 +151,21 @@ const ChangePasswordForm = ({ isRecoverPassword }) => {
           fullWidth
           margin="normal"
         />
+
+        {isRecoverPassword && (
+          <TextField
+            type='text'
+            sx={{ width: '300px' }}
+            label="Token"
+            value={token}
+            onChange={(e) => setToken(e.target.value)}
+            variant="outlined"
+            required
+            fullWidth
+            margin="normal"
+          />
+        )}
+
         <Button variant="contained" type="submit">Change Password</Button>
       </form>
       <Box className="spinner" sx={{ display: 'flex', justifyContent: 'center' }}>
