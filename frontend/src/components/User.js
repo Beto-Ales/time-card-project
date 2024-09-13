@@ -361,28 +361,48 @@ const ScreenFour = ({ periodResume }) => {
   // Function to handle export
   const handleExport = () => {
     if (!periodResume) return;
-
+    
     // Step 1: Prepare data for Excel export
     const exportData = periodResume.map((employee) => ({
       Name: employee.username,
-      "Normal Hours": employee.matchedHours[0].normalRate,
-      "Late Hours": employee.matchedHours[0].lateHoursRate,
-      "Holiday Hours": employee.matchedHours[0].holidayHoursRate,
-      "Total Hours": employee.matchedHours[0].totalHours,
+      "Normal Hours": Number(employee.matchedHours[0].normalRate),
+      "Late Hours": Number(employee.matchedHours[0].lateHoursRate),
+      "Holiday Hours": Number(employee.matchedHours[0].holidayHoursRate),
+      "Total Hours": Number(employee.matchedHours[0].totalHours),
     }));
-
-    // Step 2: Create a new workbook
+  
+    // Step 2: Calculate the totals
+    const totalNormalHours = periodResume
+      .reduce((acc, employee) => acc + Number(employee.matchedHours[0].normalRate), 0);
+    const totalLateHours = periodResume
+      .reduce((acc, employee) => acc + Number(employee.matchedHours[0].lateHoursRate), 0);
+    const totalHolidayHours = periodResume
+      .reduce((acc, employee) => acc + Number(employee.matchedHours[0].holidayHoursRate), 0);
+    const totalTotalHours = periodResume
+      .reduce((acc, employee) => acc + Number(employee.matchedHours[0].totalHours), 0);
+  
+    // Step 3: Add the totals row to export data
+    exportData.push({
+      Name: 'Total',
+      "Normal Hours": totalNormalHours,
+      "Late Hours": totalLateHours,
+      "Holiday Hours": totalHolidayHours,
+      "Total Hours": totalTotalHours,
+    });
+  
+    // Step 4: Create a new workbook
     const wb = XLSX.utils.book_new();
-
-    // Step 3: Convert the data to a worksheet
+  
+    // Step 5: Convert the data to a worksheet
     const ws = XLSX.utils.json_to_sheet(exportData);
-
-    // Step 4: Append the worksheet to the workbook
+  
+    // Step 6: Append the worksheet to the workbook
     XLSX.utils.book_append_sheet(wb, ws, 'Period Resume');
-
-    // Step 5: Export the Excel file
+  
+    // Step 7: Export the Excel file
     XLSX.writeFile(wb, 'PeriodResume.xlsx');
   };
+
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
@@ -405,21 +425,50 @@ const ScreenFour = ({ periodResume }) => {
                 <TableCell colSpan={5} align="center">Loading</TableCell>
               </TableRow>
             ) : (
-              periodResume
-                .filter(worker => worker.username !== user.username)
-                .map((employee) => (
-                  <TableRow key={employee.username} hover>
-                    <TableCell>{employee.username[0].toUpperCase() + employee.username.slice(1).toLowerCase()}</TableCell>
-                    <TableCell>{employee.matchedHours[0].normalRate}</TableCell>
-                    <TableCell>{employee.matchedHours[0].lateHoursRate}</TableCell>
-                    <TableCell>{employee.matchedHours[0].holidayHoursRate}</TableCell>
-                    <TableCell>{employee.matchedHours[0].totalHours}</TableCell>
-                  </TableRow>
-                ))
+              <>
+                {periodResume
+                  .filter(worker => worker.username !== user.username)
+                  .map((employee) => (
+                    <TableRow key={employee.username} hover>
+                      <TableCell>{employee.username[0].toUpperCase() + employee.username.slice(1).toLowerCase()}</TableCell>
+                      <TableCell>{Number(employee.matchedHours[0].normalRate)}</TableCell>
+                      <TableCell>{Number(employee.matchedHours[0].lateHoursRate)}</TableCell>
+                      <TableCell>{Number(employee.matchedHours[0].holidayHoursRate)}</TableCell>
+                      <TableCell>{Number(employee.matchedHours[0].totalHours)}</TableCell>
+                    </TableRow>
+                  ))}
+
+                {/* Sum Calculation */}
+                <TableRow>
+                  <TableCell><b>Total</b></TableCell>
+                  <TableCell>
+                    {periodResume
+                      .filter(worker => worker.username !== user.username)
+                      .reduce((acc, employee) => acc + Number(employee.matchedHours[0].normalRate), 0)}
+                  </TableCell>
+                  <TableCell>
+                    {periodResume
+                      .filter(worker => worker.username !== user.username)
+                      .reduce((acc, employee) => acc + Number(employee.matchedHours[0].lateHoursRate), 0)}
+                  </TableCell>
+                  <TableCell>
+                    {periodResume
+                      .filter(worker => worker.username !== user.username)
+                      .reduce((acc, employee) => acc + Number(employee.matchedHours[0].holidayHoursRate), 0)}
+                  </TableCell>
+                  <TableCell>
+                    {periodResume
+                      .filter(worker => worker.username !== user.username)
+                      .reduce((acc, employee) => acc + Number(employee.matchedHours[0].totalHours), 0)}
+                  </TableCell>
+                </TableRow>
+              </>
             )}
           </TableBody>
         </Table>
       </TableContainer>
+
+
       <Button variant='contained' onClick={handleExport}>
         Export to Excel
       </Button>
