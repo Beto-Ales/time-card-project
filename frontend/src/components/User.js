@@ -213,7 +213,12 @@ const User = ({ user, employees, onUpdateEmployees }) => {
                   .map(employee => (
                     <TableRow key={employee.username} hover>
                       <TableCell>
-                        {employee.username[0].toUpperCase() + employee.username.slice(1).toLowerCase()}
+                        {employee.username
+                          .split(' ') // Split the username into an array of words by spaces
+                          .map(word => word[0].toUpperCase() + word.slice(1).toLowerCase()) // Capitalize first letter of each word
+                          .join(' ') // Join the array back into a string with spaces
+                        }
+
                       </TableCell>
                       <TableCell>
                         <Tooltip title={"YYYY-MM-DD"}>
@@ -430,7 +435,13 @@ const ScreenFour = ({ periodResume }) => {
                   .filter(worker => worker.username !== user.username)
                   .map((employee) => (
                     <TableRow key={employee.username} hover>
-                      <TableCell>{employee.username[0].toUpperCase() + employee.username.slice(1).toLowerCase()}</TableCell>
+                      <TableCell>
+                        {employee.username
+                          .split(' ') // Split the username into an array of words by spaces
+                          .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize the first letter of each word
+                          .join(' ') // Join the words back into a single string with spaces
+                        }
+                      </TableCell>
                       <TableCell>{Number(employee.matchedHours[0].normalRate)}</TableCell>
                       <TableCell>{Number(employee.matchedHours[0].lateHoursRate)}</TableCell>
                       <TableCell>{Number(employee.matchedHours[0].holidayHoursRate)}</TableCell>

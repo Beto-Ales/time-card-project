@@ -176,7 +176,14 @@ const App = () => {
               action={actionSnackbar}
               anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             />
-            <h1>{ user && user.username[0].toUpperCase() + user.username.slice(1).toLowerCase() }</h1>
+            <h1>
+              {user && user.username
+                .split(' ') // Split the name into an array by spaces
+                .map(word => word[0].toUpperCase() + word.slice(1).toLowerCase()) // Capitalize first letter of each word
+                .join(' ') // Join the array back into a string with spaces
+              }
+            </h1>
+
             {
               user &&
               <p><Button variant="contained" color="error" onClick={() => handleLogout()}>Logout</Button></p>
