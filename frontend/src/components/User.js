@@ -347,7 +347,7 @@ const ScreenThree = ({ hours, worker }) => {
           )
         }
       </ul>
-      <h3>Month total Hours: <span className='totalHoursStyle'>{localHours.monthHours.totalHours}</span>, Normal rate: <span className='totalHoursStyle'>{localHours.monthHours.normalRate}</span>, Late hours rate: <span className='totalHoursStyle'>{localHours.monthHours.lateHoursRate}</span>, Holyday hours rate: <span className='totalHoursStyle'>{localHours.monthHours.holidayHoursRate}</span></h3>
+      <h3>Normal rate: <span className='totalHoursStyle'>{localHours.monthHours.normalRate}</span>, Late hours rate: <span className='totalHoursStyle'>{localHours.monthHours.lateHoursRate}</span>, Holyday hours rate: <span className='totalHoursStyle'>{localHours.monthHours.holidayHoursRate},</span> Month total Hours: <span className='totalHoursStyle'>{localHours.monthHours.totalHours}</span></h3>
     </div>
   )
 }
@@ -361,7 +361,7 @@ const ScreenFour = ({ periodResume }) => {
   // Function to handle export
   const handleExport = () => {
     if (!periodResume) return;
-    
+
     // Step 1: Prepare data for Excel export
     const exportData = periodResume.map((employee) => ({
       Name: employee.username,
@@ -370,7 +370,7 @@ const ScreenFour = ({ periodResume }) => {
       "Holiday Hours": Number(employee.matchedHours[0].holidayHoursRate),
       "Total Hours": Number(employee.matchedHours[0].totalHours),
     }));
-  
+
     // Step 2: Calculate the totals
     const totalNormalHours = periodResume
       .reduce((acc, employee) => acc + Number(employee.matchedHours[0].normalRate), 0);
@@ -380,7 +380,7 @@ const ScreenFour = ({ periodResume }) => {
       .reduce((acc, employee) => acc + Number(employee.matchedHours[0].holidayHoursRate), 0);
     const totalTotalHours = periodResume
       .reduce((acc, employee) => acc + Number(employee.matchedHours[0].totalHours), 0);
-  
+
     // Step 3: Add the totals row to export data
     exportData.push({
       Name: 'Total',
@@ -389,16 +389,16 @@ const ScreenFour = ({ periodResume }) => {
       "Holiday Hours": totalHolidayHours,
       "Total Hours": totalTotalHours,
     });
-  
+
     // Step 4: Create a new workbook
     const wb = XLSX.utils.book_new();
-  
+
     // Step 5: Convert the data to a worksheet
     const ws = XLSX.utils.json_to_sheet(exportData);
-  
+
     // Step 6: Append the worksheet to the workbook
     XLSX.utils.book_append_sheet(wb, ws, 'Period Resume');
-  
+
     // Step 7: Export the Excel file
     XLSX.writeFile(wb, 'PeriodResume.xlsx');
   };

@@ -164,7 +164,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
               }
             </ul>      
           
-            <h3>Month total Hours: <span className='totalHoursStyle'>{localHours.monthHours.totalHours}</span>, Normal rate: <span className='totalHoursStyle'>{localHours.monthHours.normalRate}</span>, Late hours rate: <span className='totalHoursStyle'>{localHours.monthHours.lateHoursRate}</span>, Holyday hours rate: <span className='totalHoursStyle'>{localHours.monthHours.holidayHoursRate}</span></h3>
+            <h3>Normal rate: <span className='totalHoursStyle'>{localHours.monthHours.normalRate}</span>, Late hours rate: <span className='totalHoursStyle'>{localHours.monthHours.lateHoursRate}</span>, Holyday hours rate: <span className='totalHoursStyle'>{localHours.monthHours.holidayHoursRate},</span> Month total Hours: <span className='totalHoursStyle'>{localHours.monthHours.totalHours}</span></h3>
           </div>
         )
 
