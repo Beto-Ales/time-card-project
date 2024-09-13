@@ -7,5 +7,9 @@ const login = async credentials => {
   return response.data
 }
 
+const loginService = {
+  login
+}
+
 // eslint-disable-next-line import/no-anonymous-default-export
-export default { login }
+export default loginService

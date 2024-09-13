@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useNavigate } from 'react-router-dom';
+// library
+import * as XLSX from 'xlsx'
 // services
 import userService from '../services/users'
 // components
@@ -350,18 +352,50 @@ const ScreenThree = ({ hours, worker }) => {
   )
 }
 const ScreenFour = ({ periodResume }) => {
+  // const data = [
+  //   { name: 'John Doe', age: 30, job: 'Developer' },
+  //   { name: 'Jane Smith', age: 25, job: 'Designer' },
+  //   { name: 'Billy Joe', age: 35, job: 'Manager' },
+  // ]
+
+  // Function to handle export
+  const handleExport = () => {
+    if (!periodResume) return;
+
+    // Step 1: Prepare data for Excel export
+    const exportData = periodResume.map((employee) => ({
+      Name: employee.username,
+      "Normal Hours": employee.matchedHours[0].normalRate,
+      "Late Hours": employee.matchedHours[0].lateHoursRate,
+      "Holiday Hours": employee.matchedHours[0].holidayHoursRate,
+      "Total Hours": employee.matchedHours[0].totalHours,
+    }));
+
+    // Step 2: Create a new workbook
+    const wb = XLSX.utils.book_new();
+
+    // Step 3: Convert the data to a worksheet
+    const ws = XLSX.utils.json_to_sheet(exportData);
+
+    // Step 4: Append the worksheet to the workbook
+    XLSX.utils.book_append_sheet(wb, ws, 'Period Resume');
+
+    // Step 5: Export the Excel file
+    XLSX.writeFile(wb, 'PeriodResume.xlsx');
+  };
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
       <h1>Resume of the Period { period } { year }</h1>
-      <Link to="/Jan/"><Button variant='contained' className='screenBtn'>Back</Button></Link>
+      <Link to="/Jan/"><Button variant='contained' sx={{ marginBottom: '10px' }}>Back</Button></Link>
       <TableContainer component={Paper} sx={{ width: 'auto', marginBottom: '1em' }}>
         <Table sx={{ minWidth: 650 }} aria-label="period table">
           <TableHead>
             <TableRow>
               <TableCell><b>Name</b></TableCell>
-              <TableCell><b>Holiday Hours</b></TableCell>
-              <TableCell><b>Late Hours</b></TableCell>
               <TableCell><b>Normal Hours</b></TableCell>
+              <TableCell><b>Late Hours</b></TableCell>
+              <TableCell><b>Holiday Hours</b></TableCell>
               <TableCell><b>Total Hours</b></TableCell>
             </TableRow>
           </TableHead>
@@ -376,9 +410,9 @@ const ScreenFour = ({ periodResume }) => {
                 .map((employee) => (
                   <TableRow key={employee.username} hover>
                     <TableCell>{employee.username[0].toUpperCase() + employee.username.slice(1).toLowerCase()}</TableCell>
-                    <TableCell>{employee.matchedHours[0].holidayHoursRate}</TableCell>
-                    <TableCell>{employee.matchedHours[0].lateHoursRate}</TableCell>
                     <TableCell>{employee.matchedHours[0].normalRate}</TableCell>
+                    <TableCell>{employee.matchedHours[0].lateHoursRate}</TableCell>
+                    <TableCell>{employee.matchedHours[0].holidayHoursRate}</TableCell>
                     <TableCell>{employee.matchedHours[0].totalHours}</TableCell>
                   </TableRow>
                 ))
@@ -386,6 +420,9 @@ const ScreenFour = ({ periodResume }) => {
           </TableBody>
         </Table>
       </TableContainer>
+      <Button variant='contained' onClick={handleExport}>
+        Export to Excel
+      </Button>
     </Box>
   )
 }
