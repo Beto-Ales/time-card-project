@@ -81,7 +81,8 @@ const ContactForm = () => {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       />
       <h3>Recover Password</h3>
-      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box component="form" onSubmit={handleSubmit} sx={{ display: 'flex', flexDirection: 'column', paddingBottom: '1em', gap: 2 }}>
+        <p className='hint-recover-password'>First, enter your email to receive the token.</p>
         <TextField
           label="E-mail"
           variant="outlined"
@@ -90,8 +91,9 @@ const ContactForm = () => {
           required
         />
         <Button type="submit" variant="contained">Send Recover Link</Button>
+        <p className='hint-recover-password'>Then, enter your new password and paste the token to confirm the change.</p>
+        <ChangePasswordForm isRecoverPassword={true}/>
       </Box>
-      <ChangePasswordForm isRecoverPassword={true}/>
       <Box className="spinner" sx={{ display: 'flex', justifyContent: 'center' }}>
         {loading && <CircularProgress size={24} color="inherit" />}
       </Box>
