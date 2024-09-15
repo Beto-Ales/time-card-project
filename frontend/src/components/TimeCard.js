@@ -69,7 +69,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
         return (
             <div style={listScreenOneStyles}>
                 <div style={settingsStyles}>
-                    <UserSettings/>
+                    <UserSettings isEmployee={true}/>
                 </div>
                 <Link to="/Home/createTimeCard"><Button variant="contained" sx={{ marginBottom: '10px' }}>New time card</Button></Link>
                 <TableContainer component={Paper} sx={{ width: 'auto', marginBottom: '1em' }}>

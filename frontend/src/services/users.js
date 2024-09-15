@@ -60,6 +60,20 @@ const deactivateUser = async (id) => {
   return response.data
 }
 
+const changeUsername = async (id, newUsername) => {
+  const config = {
+    headers: { Authorization: token }
+  }
+  try {
+    const response = await axios.put(`${baseUrl}/changeUsername/${id}`, {
+      newUsername
+    }, config)
+    return response.data
+  } catch (error) {
+    throw new Error(error.response?.data?.error || 'Error changing name')
+  }
+}
+
 const changePassword = async (id, userEmail, newPassword) => {
   const config = {
     headers: { Authorization: token }
@@ -123,6 +137,7 @@ const userService = {
   activateUser,
   deactivateUser,
   setToken,
+  changeUsername,
   changeEmail,
   changePassword,
   forgotPassword,

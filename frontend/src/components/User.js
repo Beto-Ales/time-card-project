@@ -138,7 +138,7 @@ const User = ({ user, employees, onUpdateEmployees }) => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
       <div style={settingsStyles}>
-        <UserSettings/>
+        <UserSettings isEmployee={false} />
       </div>
       <ToggleButtonGroup
         style={{ margin: '20px 0', width: '12em' }}

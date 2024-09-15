@@ -104,6 +104,31 @@ function validateEmail(email) {
   return re.test(email);
 }
 
+usersRouter.put('/changeUsername/:id', async (request, response) => {
+    try {
+        const { newUsername } = request.body
+
+        const existingUser = await User.findOne({ username: newUsername })
+
+        if (existingUser) {
+            return response.status(400).json({ error: 'username must be unique' })
+        }
+
+        const user = await User.findById(request.params.id)
+
+        if (user) {
+            user.username = newUsername
+            await user.save()
+            response.status(200).json({ message: 'Name updated successfully' })
+        } else {
+            return response.status(404).json({ error: 'User not found' })
+        }
+    } catch (error) {
+        console.error('Error changing name:', error)
+        response.status(500).json({ error: 'Internal server error' })
+    }
+})
+
 usersRouter.put('/changeEmail/:id', async (request, response) => {
     try {
         const { userEmail, newEmail } = request.body

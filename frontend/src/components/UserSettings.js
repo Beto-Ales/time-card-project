@@ -1,15 +1,30 @@
 import React from 'react';
 // components
+import UpdateUsernameForm from './ChangeUsername'
 import ChangePasswordForm from './ChangePassword';
 import ChangeEmailForm from './ChangeEmail';
 // material
 import { Accordion, AccordionSummary, AccordionDetails, Typography } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-const UserSettings = () => {
+const UserSettings = ({ isEmployee }) => {
   return (
     <div style={{width: '15em', marginBottom: '1em'}}>
-      {/* <h2>Settings</h2> */}
+      {isEmployee && (
+        <Accordion>
+          <AccordionSummary
+            expandIcon={<ExpandMoreIcon />}
+            aria-controls="change-username-content"
+            id="change-username-header"
+          >
+            <Typography>Change Name</Typography>
+          </AccordionSummary>
+          <AccordionDetails>
+            <UpdateUsernameForm />
+          </AccordionDetails>
+        </Accordion>
+      )}
+      
       <Accordion>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
