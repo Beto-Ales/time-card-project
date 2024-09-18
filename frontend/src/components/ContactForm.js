@@ -91,6 +91,8 @@ const ContactForm = () => {
           required
         />
         <Button type="submit" variant="contained">Send Recover Link</Button>
+      </Box>
+      <Box sx={{ display: 'flex', flexDirection: 'column', paddingBottom: '1em', gap: 2 }}>
         <p className='hint-recover-password'>Then, enter your new password and paste the token to confirm the change.</p>
         <ChangePasswordForm isRecoverPassword={true}/>
       </Box>
