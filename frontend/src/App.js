@@ -178,7 +178,8 @@ const App = () => {
             />
             <h1>
               {user && user.username
-                .split(' ') // Split the name into an array by spaces
+                .split(' ') // Split the username into an array of words by spaces
+                .filter(word => word.trim() !== '') // Remove any empty words caused by extra spaces
                 .map(word => word[0].toUpperCase() + word.slice(1).toLowerCase()) // Capitalize first letter of each word
                 .join(' ') // Join the array back into a string with spaces
               }

@@ -262,7 +262,15 @@ const User = ({ user, employees, onUpdateEmployees }) => {
 const ScreenTwo = () => {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
-      <h1>{localWorker.username[0].toUpperCase() + localWorker.username.slice(1).toLowerCase()}</h1>
+      <h1>
+        {
+          localWorker.username
+          .split(' ') // Split the username into an array of words by spaces
+          .filter(word => word.trim() !== '') // Remove any empty words caused by extra spaces
+          .map(word => word[0].toUpperCase() + word.slice(1).toLowerCase()) // Capitalize first letter of each word
+          .join(' ') // Join the array back into a string with spaces
+        }
+      </h1>
       <Link to="/"><Button variant='contained' sx={{ marginBottom: '10px' }}>Back</Button></Link>
       <TableContainer component={Paper} sx={{ width: 'auto', marginBottom: '1em' }}>
         <Table sx={{ minWidth: 650 }} aria-label="hours table">
@@ -309,7 +317,15 @@ const ScreenThree = ({ hours, worker }) => {
   const localWorker = worker ? worker : JSON.parse(localStorage.getItem('janUserEmployee'))
   return (
     <div>
-      <h1>{localWorker.username[0].toUpperCase() + localWorker.username.slice(1).toLowerCase()}</h1>
+      <h1>
+        {
+          localWorker.username
+          .split(' ') // Split the username into an array of words by spaces
+          .filter(word => word.trim() !== '') // Remove any empty words caused by extra spaces
+          .map(word => word[0].toUpperCase() + word.slice(1).toLowerCase()) // Capitalize first letter of each word
+          .join(' ') // Join the array back into a string with spaces
+        }
+      </h1>
       <h3>{localHours.month.toUpperCase()}</h3>
       <Box sx={{ display: 'flex', justifyContent: 'center', gap: '1em' }}>
         <Link to={`/Jan/employee/${localWorker.username}`}><Button variant='contained' className='screenBtn'>Back</Button></Link>
@@ -439,8 +455,9 @@ const ScreenFour = ({ periodResume }) => {
                       <TableCell>
                         {employee.username
                           .split(' ') // Split the username into an array of words by spaces
-                          .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize the first letter of each word
-                          .join(' ') // Join the words back into a single string with spaces
+                          .filter(word => word.trim() !== '') // Remove any empty words caused by extra spaces
+                          .map(word => word[0].toUpperCase() + word.slice(1).toLowerCase()) // Capitalize first letter of each word
+                          .join(' ') // Join the array back into a string with spaces
                         }
                       </TableCell>
                       <TableCell>{Number(employee.matchedHours[0].normalRate)}</TableCell>
