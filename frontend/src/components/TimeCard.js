@@ -25,7 +25,8 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
         }
     }
 
-    const localUser = user ? user : JSON.parse(localStorage.getItem('employeeUser'))
+    // const localUser = user ? user : JSON.parse(localStorage.getItem('employeeUser'))
+    const localUser = JSON.parse(localStorage.getItem('employeeUser')) ? JSON.parse(localStorage.getItem('employeeUser')) : user
 
     const handleDate = (date) => {
       return date.split("T")[0]
@@ -571,6 +572,8 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
               setErrorMessage(null)
             }, 5000)
             localUser.hours.unshift(newHours)
+            // Update local storage
+            localStorage.setItem('employeeUser', JSON.stringify(localUser))
             navigate('/Home')
         }
 
@@ -810,7 +813,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                         break;
                 }
 
-                const year = date[3]
+                let year = date[3]
                 // date.[3] (year)
                 // 2022-07-15
 
@@ -839,6 +842,11 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
 
                 const newYear = inputs.month === 'December/January'
                 
+                // if timecard is created in january for the period of dec/jan
+                if (newYear & date[1] === 'Jan') {
+                    --year
+                    --yearB
+                }
                 
                 for (let index = 0; index < 31; index++) {
                     if (index === 8 && isFebruary === true && isLeapYear === false) continue
@@ -1073,11 +1081,21 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
             
             
             await hoursService
-              .update(localHours.id, hoursToUpdate)
-              setErrorMessage('Time card updated')
-              setTimeout(() => {
+            .update(localHours.id, hoursToUpdate)
+            setErrorMessage('Time card updated')
+            setTimeout(() => {
                 setErrorMessage(null)
-              }, 5000)
+            }, 5000)
+
+            // Update localUser's hours
+            const updatedHoursIndex = localUser.hours.findIndex(hour => hour.id === localHours.id);
+            if (updatedHoursIndex !== -1) {
+                localUser.hours[updatedHoursIndex] = { ...localUser.hours[updatedHoursIndex], ...hoursToUpdate };
+            }
+            
+            // Update local storage
+            localStorage.setItem('employeeUser', JSON.stringify(localUser))
+            navigate('/Home')
         }
 
         return (

@@ -40,7 +40,7 @@ const UpdateEmailForm = () => {
         <p style={{wordBreak: 'break-all'}}>{ user.email }</p>
         <TextField
           sx={{ marginBottom: '1em' }}
-          label="Username"
+          label="Email"
           variant="outlined"
           value={newEmail}
           onChange={({ target }) => handleChange(target.value)}
