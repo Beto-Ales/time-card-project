@@ -323,7 +323,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                 const newYear = inputs.month === 'December/January'
 
                 // if timecard is created in january for the period of dec/jan
-                if (newYear & date[1] === 'Jan') {
+                if (newYear && date[1] === 'Jan') {
                     --year
                     --yearB
                 }
@@ -843,7 +843,7 @@ const TimeCard = ({ user, setUser, setErrorMessage }) => {
                 const newYear = inputs.month === 'December/January'
                 
                 // if timecard is created in january for the period of dec/jan
-                if (newYear & date[1] === 'Jan') {
+                if (newYear && date[1] === 'Jan') {
                     --year
                     --yearB
                 }
